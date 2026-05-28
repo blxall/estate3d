@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND_DIR="$ROOT_DIR/backend"
 FRONTEND_DIR="$ROOT_DIR/frontend"
 STORAGE_DIR="${ESTATE3D_STORAGE_DIR:-$ROOT_DIR/backend/storage}"
+DB_PATH="${ESTATE3D_DB_PATH:-/tmp/estate3d-smoke.sqlite3}"
 BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_PORT="${FRONTEND_PORT:-5173}"
 
@@ -15,9 +16,10 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$STORAGE_DIR"
+rm -f "$DB_PATH"
 
 cd "$BACKEND_DIR"
-ESTATE3D_STORAGE_DIR="$STORAGE_DIR" uv run uvicorn app.main:app --host 127.0.0.1 --port "$BACKEND_PORT" >/tmp/estate3d-backend.log 2>&1 &
+ESTATE3D_STORAGE_DIR="$STORAGE_DIR" ESTATE3D_DB_PATH="$DB_PATH" uv run uvicorn app.main:app --host 127.0.0.1 --port "$BACKEND_PORT" >/tmp/estate3d-backend.log 2>&1 &
 BACKEND_PID=$!
 
 cd "$FRONTEND_DIR"
