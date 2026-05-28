@@ -99,6 +99,11 @@ export function App() {
     setProperties((current) => [created, ...current]);
   }
 
+  function handlePropertyUploadComplete(media: UploadedMedia, tour: TourSummary) {
+    setPropertyMedia((current) => [media, ...current]);
+    setPropertyTours((current) => [tour, ...current]);
+  }
+
   if (tourSlug) {
     if (!publicTour) {
       return <main className="layout">Загружаем тур...</main>;
@@ -110,7 +115,16 @@ export function App() {
     if (!propertyDetail) {
       return <main className="layout">Загружаем объект...</main>;
     }
-    return <PropertyDetailPage property={propertyDetail} media={propertyMedia} tours={propertyTours} />;
+    return (
+      <PropertyDetailPage
+        property={propertyDetail}
+        media={propertyMedia}
+        tours={propertyTours}
+        onUploadMedia={uploadPropertyMedia}
+        onCreateTour={createTour}
+        onUploadComplete={handlePropertyUploadComplete}
+      />
+    );
   }
 
   return (

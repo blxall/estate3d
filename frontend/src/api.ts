@@ -46,8 +46,8 @@ export async function uploadPropertyMedia(propertyId: string, file: File): Promi
   });
 }
 
-export async function createTour(propertyId: string, sceneUrl: string): Promise<unknown> {
-  return requestJson<unknown>(`${API_BASE}/properties/${propertyId}/tours`, {
+export async function createTour(propertyId: string, sceneUrl: string): Promise<TourSummary> {
+  return requestJson<TourSummary>(`${API_BASE}/properties/${propertyId}/tours`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tour_type: 'glb_model', scene_url: sceneUrl, preview_url: '' }),

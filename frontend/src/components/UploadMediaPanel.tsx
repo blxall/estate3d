@@ -1,14 +1,15 @@
 import { useState } from 'react';
 
-import type { UploadedMedia } from '../types';
+import type { TourSummary, UploadedMedia } from '../types';
 
 type Props = {
   propertyId: string;
   onUploadMedia: (propertyId: string, file: File) => Promise<UploadedMedia>;
-  onCreateTour: (propertyId: string, sceneUrl: string) => Promise<unknown>;
+  onCreateTour: (propertyId: string, sceneUrl: string) => Promise<TourSummary>;
+  onComplete?: (media: UploadedMedia, tour: TourSummary) => void;
 };
 
-export function UploadMediaPanel({ propertyId, onUploadMedia, onCreateTour }: Props) {
+export function UploadMediaPanel({ propertyId, onUploadMedia, onCreateTour, onComplete }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState('');
 
@@ -20,7 +21,8 @@ export function UploadMediaPanel({ propertyId, onUploadMedia, onCreateTour }: Pr
     setStatus('Загружаем файл...');
     const media = await onUploadMedia(propertyId, file);
     const sceneUrl = `/storage/${media.storage_path}`;
-    await onCreateTour(propertyId, sceneUrl);
+    const tour = await onCreateTour(propertyId, sceneUrl);
+    onComplete?.(media, tour);
     setStatus('Тур создан');
   }
 

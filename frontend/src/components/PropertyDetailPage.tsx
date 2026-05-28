@@ -1,13 +1,17 @@
 import type { TourSummary, UploadedMedia } from '../types';
 import type { PropertySummary } from '../types';
+import { UploadMediaPanel } from './UploadMediaPanel';
 
 type Props = {
   property: PropertySummary;
   media: UploadedMedia[];
   tours: TourSummary[];
+  onUploadMedia?: (propertyId: string, file: File) => Promise<UploadedMedia>;
+  onCreateTour?: (propertyId: string, sceneUrl: string) => Promise<TourSummary>;
+  onUploadComplete?: (media: UploadedMedia, tour: TourSummary) => void;
 };
 
-export function PropertyDetailPage({ property, media, tours }: Props) {
+export function PropertyDetailPage({ property, media, tours, onUploadMedia, onCreateTour, onUploadComplete }: Props) {
   return (
     <main className="layout">
       <header className="hero">
@@ -22,6 +26,20 @@ export function PropertyDetailPage({ property, media, tours }: Props) {
       </header>
 
       <section className="grid">
+        <div className="card">
+          <h2>Загрузить LiDAR/GLB</h2>
+          {onUploadMedia && onCreateTour ? (
+            <UploadMediaPanel
+              propertyId={property.id}
+              onUploadMedia={onUploadMedia}
+              onCreateTour={onCreateTour}
+              onComplete={onUploadComplete}
+            />
+          ) : (
+            <p>Загрузка недоступна</p>
+          )}
+        </div>
+
         <div className="card">
           <h2>Загруженные файлы</h2>
           {media.length === 0 ? (
