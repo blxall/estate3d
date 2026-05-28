@@ -55,6 +55,7 @@ export function PropertyDashboard({
                   </div>
                   <div className="property-actions">
                     <span className={`status status-${property.status}`}>{property.status}</span>
+                    <a href={`/properties/${property.id}`}>Открыть объект</a>
                     {property.is_public ? (
                       <a href={`/tour/${property.public_slug}`}>Открыть тур</a>
                     ) : (

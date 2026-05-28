@@ -59,6 +59,14 @@ class PublicTourResponse(BaseModel):
     viewer_config: dict
 
 
+class PropertyMediaListResponse(BaseModel):
+    items: list[PropertyMedia]
+
+
+class PropertyTourListResponse(BaseModel):
+    items: list[Tour]
+
+
 @app.get("/health")
 def healthcheck() -> dict[str, str]:
     return {"status": "ok", "service": "estate3d-backend"}
@@ -92,6 +100,14 @@ def get_property(property_id: str) -> Property:
     if property_ is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
     return property_
+
+
+@app.get("/properties/{property_id}/media", response_model=PropertyMediaListResponse)
+def list_property_media(property_id: str) -> PropertyMediaListResponse:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+    return PropertyMediaListResponse(items=media_repository.list_for_property(property_id))
 
 
 @app.post("/properties/{property_id}/media", response_model=PropertyMedia, status_code=status.HTTP_201_CREATED)
@@ -166,6 +182,14 @@ def _property_status_for_job_status(job_status: ProcessingJobStatus) -> Property
     if job_status is ProcessingJobStatus.FALLBACK_READY:
         return PropertyStatus.FALLBACK_READY
     return PropertyStatus.PROCESSING
+
+
+@app.get("/properties/{property_id}/tours", response_model=PropertyTourListResponse)
+def list_property_tours(property_id: str) -> PropertyTourListResponse:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+    return PropertyTourListResponse(items=tour_repository.list_for_property(property_id))
 
 
 @app.post("/properties/{property_id}/tours", response_model=Tour, status_code=status.HTTP_201_CREATED)

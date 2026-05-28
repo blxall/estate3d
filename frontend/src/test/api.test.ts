@@ -1,6 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createProperty, createTour, fetchProperties, fetchPublicTour, uploadPropertyMedia } from '../api';
+import {
+  createProperty,
+  createTour,
+  fetchProperties,
+  fetchProperty,
+  fetchPropertyMedia,
+  fetchPropertyTours,
+  fetchPublicTour,
+  uploadPropertyMedia,
+} from '../api';
 
 const fetchMock = vi.fn();
 
@@ -72,5 +81,35 @@ describe('Estate3D API client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('/api/tour/slug');
     expect(result.viewer_config.scene_url).toBe('/scene.glb');
+  });
+
+  it('fetches property detail by id', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'prop_1', title: 'Детали', property_type: 'apartment', status: 'ready', public_slug: 'slug', is_public: true }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchProperty('prop_1');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1');
+    expect(result.title).toBe('Детали');
+  });
+
+  it('fetches media list for property', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [{ id: 'media_1', original_filename: 'scene.glb', storage_path: 'properties/prop_1/scene.glb' }] }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchPropertyMedia('prop_1');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/media');
+    expect(result[0].original_filename).toBe('scene.glb');
+  });
+
+  it('fetches tours list for property', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [{ id: 'tour_1', public_url: '/tour/slug', scene_url: '/storage/scene.glb' }] }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchPropertyTours('prop_1');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/tours');
+    expect(result[0].public_url).toBe('/tour/slug');
   });
 });

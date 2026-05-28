@@ -1,4 +1,4 @@
-import type { PropertyCreatePayload, PropertySummary, PublicTourPayload, UploadedMedia } from './types';
+import type { PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia } from './types';
 
 const API_BASE = '/api';
 
@@ -12,6 +12,20 @@ async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 export async function fetchProperties(): Promise<PropertySummary[]> {
   const response = await requestJson<{ items: PropertySummary[] }>(`${API_BASE}/properties`);
+  return response.items;
+}
+
+export async function fetchProperty(propertyId: string): Promise<PropertySummary> {
+  return requestJson<PropertySummary>(`${API_BASE}/properties/${propertyId}`);
+}
+
+export async function fetchPropertyMedia(propertyId: string): Promise<UploadedMedia[]> {
+  const response = await requestJson<{ items: UploadedMedia[] }>(`${API_BASE}/properties/${propertyId}/media`);
+  return response.items;
+}
+
+export async function fetchPropertyTours(propertyId: string): Promise<TourSummary[]> {
+  const response = await requestJson<{ items: TourSummary[] }>(`${API_BASE}/properties/${propertyId}/tours`);
   return response.items;
 }
 

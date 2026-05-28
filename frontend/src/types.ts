@@ -27,16 +27,18 @@ export type UploadedMedia = {
   size_bytes: number;
 };
 
+export type TourSummary = {
+  id: string;
+  property_id: string;
+  tour_type: 'glb_model' | 'gaussian_splat' | 'panorama' | 'gallery';
+  scene_url: string;
+  preview_url?: string;
+  public_url: string;
+};
+
 export type PublicTourPayload = {
   property: PropertySummary;
-  tour: {
-    id: string;
-    property_id: string;
-    tour_type: 'glb_model' | 'gaussian_splat' | 'panorama' | 'gallery';
-    scene_url: string;
-    preview_url?: string;
-    public_url: string;
-  };
+  tour: TourSummary;
   viewer_config: {
     tour_type: string;
     scene_url: string;

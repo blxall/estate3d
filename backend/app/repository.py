@@ -77,6 +77,9 @@ class TourRepository:
                 return tour
         return None
 
+    def list_for_property(self, property_id: str) -> list[Tour]:
+        return [tour for tour in self._tours.values() if tour.property_id == property_id]
+
 
 property_repository = PropertyRepository()
 media_repository = MediaRepository()

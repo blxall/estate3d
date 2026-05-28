@@ -25,6 +25,7 @@ describe('PropertyDashboard', () => {
     expect(screen.getByRole('button', { name: /создать объект/i })).toBeInTheDocument();
     expect(screen.getByText('Шоурум ЖК Север')).toBeInTheDocument();
     expect(screen.getByText(/ready/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /открыть объект/i })).toHaveAttribute('href', '/properties/prop_1');
     expect(screen.getByRole('link', { name: /открыть тур/i })).toHaveAttribute('href', '/tour/abc123');
   });
 
