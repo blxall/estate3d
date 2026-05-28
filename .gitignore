@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+storage/
+
+# Node
+node_modules/
+dist/
+.vite/
+coverage/
+
+# OS
+.DS_Store
