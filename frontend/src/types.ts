@@ -53,3 +53,26 @@ export type PropertyAnalytics = {
   lead_click_count: number;
   last_event_at: string | null;
 };
+
+export type UserAccount = {
+  id: string;
+  email: string;
+  full_name?: string;
+  company_name?: string;
+  phone?: string;
+  role?: string;
+};
+
+export type AuthPayload = {
+  email: string;
+  password: string;
+  full_name?: string;
+  company_name?: string;
+  phone?: string;
+};
+
+export type AuthResponse = {
+  user: UserAccount;
+  access_token: string;
+  token_type: 'bearer';
+};

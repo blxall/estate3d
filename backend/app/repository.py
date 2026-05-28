@@ -2,7 +2,42 @@ from __future__ import annotations
 
 from threading import Lock
 
-from app.domain import AnalyticsEvent, ProcessingJob, Property, PropertyMedia, Tour
+from app.domain import AnalyticsEvent, ProcessingJob, Property, PropertyMedia, Tour, User
+
+
+class UserRepository:
+    def __init__(self) -> None:
+        self._users: dict[str, User] = {}
+        self._lock = Lock()
+
+    def create(self, user: User) -> User:
+        with self._lock:
+            self._users[user.id] = user
+        return user
+
+    def get(self, user_id: str) -> User | None:
+        return self._users.get(user_id)
+
+    def get_by_email(self, email: str) -> User | None:
+        normalized = email.lower()
+        for user in self._users.values():
+            if user.email.lower() == normalized:
+                return user
+        return None
+
+
+class SessionRepository:
+    def __init__(self) -> None:
+        self._sessions: dict[str, str] = {}
+        self._lock = Lock()
+
+    def create(self, token: str, user_id: str) -> str:
+        with self._lock:
+            self._sessions[token] = user_id
+        return token
+
+    def get_user_id(self, token: str) -> str | None:
+        return self._sessions.get(token)
 
 
 class PropertyRepository:
@@ -95,6 +130,8 @@ class AnalyticsRepository:
         return [event for event in self._events.values() if event.property_id == property_id]
 
 
+user_repository = UserRepository()
+session_repository = SessionRepository()
 property_repository = PropertyRepository()
 media_repository = MediaRepository()
 job_repository = JobRepository()

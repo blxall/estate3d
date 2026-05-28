@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { createProperty, createTour, fetchProperties, fetchProperty, fetchPropertyAnalytics, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, uploadPropertyMedia } from './api';
+import { createProperty, createTour, fetchMe, fetchProperties, fetchProperty, fetchPropertyAnalytics, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, login, register, uploadPropertyMedia } from './api';
+import { AuthPanel } from './components/AuthPanel';
 import { GlbTourViewer } from './components/GlbTourViewer';
 import { PropertyDashboard } from './components/PropertyDashboard';
 import { PropertyDetailPage } from './components/PropertyDetailPage';
-import type { PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia } from './types';
+import type { AuthPayload, AuthResponse, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
 
 const demoProperties: PropertySummary[] = [
   {
@@ -30,6 +31,25 @@ function currentPropertyId(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function readStoredToken(): string | null {
+  if (typeof window.localStorage?.getItem !== 'function') {
+    return null;
+  }
+  return window.localStorage.getItem('estate3d_token');
+}
+
+function writeStoredToken(token: string) {
+  if (typeof window.localStorage?.setItem === 'function') {
+    window.localStorage.setItem('estate3d_token', token);
+  }
+}
+
+function clearStoredToken() {
+  if (typeof window.localStorage?.removeItem === 'function') {
+    window.localStorage.removeItem('estate3d_token');
+  }
+}
+
 export function App() {
   const tourSlug = currentTourSlug();
   const propertyId = currentPropertyId();
@@ -39,6 +59,25 @@ export function App() {
   const [propertyMedia, setPropertyMedia] = useState<UploadedMedia[]>([]);
   const [propertyTours, setPropertyTours] = useState<TourSummary[]>([]);
   const [propertyAnalytics, setPropertyAnalytics] = useState<PropertyAnalytics | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
+
+  useEffect(() => {
+    const token = readStoredToken();
+    if (!token) {
+      return;
+    }
+    let cancelled = false;
+    fetchMe(token)
+      .then((user) => {
+        if (!cancelled) {
+          setCurrentUser(user);
+        }
+      })
+      .catch(() => clearStoredToken());
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!tourSlug) {
@@ -106,6 +145,20 @@ export function App() {
     setPropertyTours((current) => [tour, ...current]);
   }
 
+  async function handleRegister(payload: AuthPayload): Promise<AuthResponse> {
+    const response = await register(payload);
+    writeStoredToken(response.access_token);
+    setCurrentUser(response.user);
+    return response;
+  }
+
+  async function handleLogin(payload: AuthPayload): Promise<AuthResponse> {
+    const response = await login(payload);
+    writeStoredToken(response.access_token);
+    setCurrentUser(response.user);
+    return response;
+  }
+
   if (tourSlug) {
     if (!publicTour) {
       return <main className="layout">Загружаем тур...</main>;
@@ -132,11 +185,14 @@ export function App() {
   }
 
   return (
-    <PropertyDashboard
-      properties={properties}
-      onCreateProperty={handleCreateProperty}
-      onUploadMedia={uploadPropertyMedia}
-      onCreateTour={createTour}
-    />
+    <>
+      <AuthPanel currentUser={currentUser} onRegister={handleRegister} onLogin={handleLogin} />
+      <PropertyDashboard
+        properties={properties}
+        onCreateProperty={handleCreateProperty}
+        onUploadMedia={uploadPropertyMedia}
+        onCreateTour={createTour}
+      />
+    </>
   );
 }

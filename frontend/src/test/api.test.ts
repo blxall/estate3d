@@ -9,6 +9,9 @@ import {
   fetchPropertyTours,
   fetchPropertyAnalytics,
   fetchPublicTour,
+  login,
+  register,
+  fetchMe,
   generateAiDescription,
   uploadPropertyMedia,
 } from '../api';
@@ -145,5 +148,32 @@ describe('Estate3D API client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/ai-description', { method: 'POST' });
     expect(result.description_ai_short).toBe('Краткое AI-описание');
+  });
+
+  it('registers, logs in, and fetches current user', async () => {
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ access_token: 'token_1', token_type: 'bearer', user: { id: 'user_1', email: 'agent@example.com' } }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ access_token: 'token_2', token_type: 'bearer', user: { id: 'user_1', email: 'agent@example.com' } }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'user_1', email: 'agent@example.com' }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const registered = await register({ email: 'agent@example.com', password: 'strong-password', full_name: 'Agent' });
+    const loggedIn = await login({ email: 'agent@example.com', password: 'strong-password' });
+    const me = await fetchMe('token_2');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'agent@example.com', password: 'strong-password', full_name: 'Agent' }),
+    });
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'agent@example.com', password: 'strong-password' }),
+    });
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/me', { headers: { Authorization: 'Bearer token_2' } });
+    expect(registered.access_token).toBe('token_1');
+    expect(loggedIn.access_token).toBe('token_2');
+    expect(me.email).toBe('agent@example.com');
   });
 });

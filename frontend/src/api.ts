@@ -1,4 +1,4 @@
-import type { PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia } from './types';
+import type { AuthPayload, AuthResponse, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
 
 const API_BASE = '/api';
 
@@ -13,6 +13,26 @@ async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
 export async function fetchProperties(): Promise<PropertySummary[]> {
   const response = await requestJson<{ items: PropertySummary[] }>(`${API_BASE}/properties`);
   return response.items;
+}
+
+export async function register(payload: AuthPayload): Promise<AuthResponse> {
+  return requestJson<AuthResponse>(`${API_BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function login(payload: AuthPayload): Promise<AuthResponse> {
+  return requestJson<AuthResponse>(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchMe(accessToken: string): Promise<UserAccount> {
+  return requestJson<UserAccount>(`${API_BASE}/auth/me`, { headers: { Authorization: `Bearer ${accessToken}` } });
 }
 
 export async function fetchProperty(propertyId: string): Promise<PropertySummary> {

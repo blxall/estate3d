@@ -2,21 +2,51 @@ from __future__ import annotations
 
 from decimal import Decimal
 from datetime import datetime, timezone
+import hashlib
 import os
 from pathlib import Path
+import secrets
 
-from fastapi import FastAPI, HTTPException, Request, UploadFile, status
+from fastapi import FastAPI, Header, HTTPException, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.domain import AnalyticsEvent, ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType
-from app.repository import analytics_repository, job_repository, media_repository, property_repository, tour_repository
+from app.domain import AnalyticsEvent, ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType, User, UserRole
+from app.repository import analytics_repository, job_repository, media_repository, property_repository, session_repository, tour_repository, user_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
 
 
 def storage_root() -> Path:
     return Path(os.getenv("ESTATE3D_STORAGE_DIR", "storage"))
+
+
+class UserPublicResponse(BaseModel):
+    id: str
+    email: str
+    full_name: str = ""
+    company_name: str = ""
+    phone: str = ""
+    role: UserRole = UserRole.INDIVIDUAL
+
+
+class AuthRegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str = ""
+    company_name: str = ""
+    phone: str = ""
+
+
+class AuthLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class AuthTokenResponse(BaseModel):
+    user: UserPublicResponse
+    access_token: str
+    token_type: str = "bearer"
 
 
 class PropertyCreateRequest(BaseModel):
@@ -77,6 +107,84 @@ class PropertyAnalyticsResponse(BaseModel):
 @app.get("/health")
 def healthcheck() -> dict[str, str]:
     return {"status": "ok", "service": "estate3d-backend"}
+
+
+@app.post("/auth/register", response_model=AuthTokenResponse, status_code=status.HTTP_201_CREATED)
+def register(payload: AuthRegisterRequest) -> AuthTokenResponse:
+    if user_repository.get_by_email(payload.email) is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+
+    user = user_repository.create(
+        User(
+            email=payload.email.lower(),
+            password_hash=_hash_password(payload.password),
+            full_name=payload.full_name,
+            company_name=payload.company_name,
+            phone=payload.phone,
+        )
+    )
+    return _auth_response_for_user(user)
+
+
+@app.post("/auth/login", response_model=AuthTokenResponse)
+def login(payload: AuthLoginRequest) -> AuthTokenResponse:
+    user = user_repository.get_by_email(payload.email)
+    if user is None or not _verify_password(payload.password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+    return _auth_response_for_user(user)
+
+
+@app.get("/auth/me", response_model=UserPublicResponse)
+def me(authorization: str | None = Header(default=None)) -> UserPublicResponse:
+    user = _user_from_authorization_header(authorization)
+    return _public_user(user)
+
+
+def _auth_response_for_user(user: User) -> AuthTokenResponse:
+    token = secrets.token_urlsafe(32)
+    session_repository.create(token, user.id)
+    return AuthTokenResponse(user=_public_user(user), access_token=token)
+
+
+def _public_user(user: User) -> UserPublicResponse:
+    return UserPublicResponse(
+        id=user.id,
+        email=user.email,
+        full_name=user.full_name,
+        company_name=user.company_name,
+        phone=user.phone,
+        role=user.role,
+    )
+
+
+def _user_from_authorization_header(authorization: str | None) -> User:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token")
+    token = authorization.removeprefix("Bearer ").strip()
+    user_id = session_repository.get_user_id(token)
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid bearer token")
+    user = user_repository.get(user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid bearer token")
+    return user
+
+
+def _hash_password(password: str) -> str:
+    salt = secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 120_000).hex()
+    return f"pbkdf2_sha256${salt}${digest}"
+
+
+def _verify_password(password: str, password_hash: str) -> bool:
+    try:
+        algorithm, salt, expected = password_hash.split("$", 2)
+    except ValueError:
+        return False
+    if algorithm != "pbkdf2_sha256":
+        return False
+    actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 120_000).hex()
+    return secrets.compare_digest(actual, expected)
 
 
 @app.get("/storage/{file_path:path}")
