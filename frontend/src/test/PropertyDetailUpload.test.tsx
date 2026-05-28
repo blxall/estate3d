@@ -30,6 +30,7 @@ describe('property detail upload workflow', () => {
       })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ property_id: 'prop_1', tour_opened_count: 0, lead_click_count: 0, last_event_at: null }) })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({

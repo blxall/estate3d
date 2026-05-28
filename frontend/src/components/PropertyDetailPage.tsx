@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { TourSummary, UploadedMedia } from '../types';
+import type { PropertyAnalytics, TourSummary, UploadedMedia } from '../types';
 import type { PropertySummary } from '../types';
 import { UploadMediaPanel } from './UploadMediaPanel';
 
@@ -8,13 +8,14 @@ type Props = {
   property: PropertySummary;
   media: UploadedMedia[];
   tours: TourSummary[];
+  analytics?: PropertyAnalytics | null;
   onUploadMedia?: (propertyId: string, file: File) => Promise<UploadedMedia>;
   onCreateTour?: (propertyId: string, sceneUrl: string) => Promise<TourSummary>;
   onUploadComplete?: (media: UploadedMedia, tour: TourSummary) => void;
   onGenerateAiDescription?: (propertyId: string) => Promise<PropertySummary>;
 };
 
-export function PropertyDetailPage({ property, media, tours, onUploadMedia, onCreateTour, onUploadComplete, onGenerateAiDescription }: Props) {
+export function PropertyDetailPage({ property, media, tours, analytics, onUploadMedia, onCreateTour, onUploadComplete, onGenerateAiDescription }: Props) {
   const [currentProperty, setCurrentProperty] = useState(property);
 
   async function handleGenerateAiDescription() {
@@ -44,6 +45,18 @@ export function PropertyDetailPage({ property, media, tours, onUploadMedia, onCr
           {currentProperty.description_ai_short ? <p>{currentProperty.description_ai_short}</p> : <p>AI-описание еще не создано</p>}
           {currentProperty.description_ai_sales ? <p>{currentProperty.description_ai_sales}</p> : null}
           {onGenerateAiDescription ? <button onClick={handleGenerateAiDescription}>Сгенерировать AI-описание</button> : null}
+        </div>
+
+        <div className="card">
+          <h2>Аналитика просмотров</h2>
+          {analytics ? (
+            <>
+              <p>Открытий тура: {analytics.tour_opened_count}</p>
+              <p>Кликов по заявке: {analytics.lead_click_count}</p>
+            </>
+          ) : (
+            <p>Аналитика пока недоступна</p>
+          )}
         </div>
 
         <div className="card">

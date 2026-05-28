@@ -7,6 +7,7 @@ import {
   fetchProperty,
   fetchPropertyMedia,
   fetchPropertyTours,
+  fetchPropertyAnalytics,
   fetchPublicTour,
   generateAiDescription,
   uploadPropertyMedia,
@@ -112,6 +113,16 @@ describe('Estate3D API client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/tours');
     expect(result[0].public_url).toBe('/tour/slug');
+  });
+
+  it('fetches property analytics summary', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ property_id: 'prop_1', tour_opened_count: 3, lead_click_count: 1, last_event_at: '2026-05-28T00:00:00Z' }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchPropertyAnalytics('prop_1');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/analytics');
+    expect(result.tour_opened_count).toBe(3);
   });
 
   it('generates AI description for property', async () => {

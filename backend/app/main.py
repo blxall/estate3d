@@ -5,12 +5,12 @@ from datetime import datetime, timezone
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, UploadFile, status
+from fastapi import FastAPI, HTTPException, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.domain import ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType
-from app.repository import job_repository, media_repository, property_repository, tour_repository
+from app.domain import AnalyticsEvent, ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType
+from app.repository import analytics_repository, job_repository, media_repository, property_repository, tour_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
 
@@ -65,6 +65,13 @@ class PropertyMediaListResponse(BaseModel):
 
 class PropertyTourListResponse(BaseModel):
     items: list[Tour]
+
+
+class PropertyAnalyticsResponse(BaseModel):
+    property_id: str
+    tour_opened_count: int
+    lead_click_count: int
+    last_event_at: datetime | None = None
 
 
 @app.get("/health")
@@ -247,7 +254,7 @@ def create_tour(property_id: str, payload: TourCreateRequest) -> Tour:
 
 
 @app.get("/tour/{public_slug}", response_model=PublicTourResponse)
-def get_public_tour(public_slug: str) -> PublicTourResponse:
+def get_public_tour(public_slug: str, request: Request) -> PublicTourResponse:
     tour = tour_repository.get_by_public_slug(public_slug)
     if tour is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tour not found")
@@ -255,4 +262,31 @@ def get_public_tour(public_slug: str) -> PublicTourResponse:
     property_ = property_repository.get(tour.property_id)
     if property_ is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tour not found")
+
+    analytics_repository.create(
+        AnalyticsEvent(
+            property_id=property_.id,
+            tour_id=tour.id,
+            event_type="tour_opened",
+            user_agent=request.headers.get("user-agent", ""),
+        )
+    )
     return PublicTourResponse(property=property_, tour=tour, viewer_config=tour.viewer_config_json)
+
+
+@app.get("/properties/{property_id}/analytics", response_model=PropertyAnalyticsResponse)
+def get_property_analytics(property_id: str) -> PropertyAnalyticsResponse:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+
+    events = analytics_repository.list_for_property(property_id)
+    tour_opened_count = len([event for event in events if event.event_type == "tour_opened"])
+    lead_click_count = len([event for event in events if event.event_type == "lead_clicked"])
+    last_event_at = max((event.created_at for event in events), default=None)
+    return PropertyAnalyticsResponse(
+        property_id=property_id,
+        tour_opened_count=tour_opened_count,
+        lead_click_count=lead_click_count,
+        last_event_at=last_event_at,
+    )

@@ -39,6 +39,10 @@ describe('property detail route', () => {
         json: async () => ({
           items: [{ id: 'tour_1', property_id: 'prop_1', tour_type: 'glb_model', scene_url: '/storage/properties/prop_1/scene.glb', public_url: '/tour/detail-slug' }],
         }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ property_id: 'prop_1', tour_opened_count: 2, lead_click_count: 0, last_event_at: '2026-05-28T10:00:00Z' }),
       });
     vi.stubGlobal('fetch', fetchMock);
 

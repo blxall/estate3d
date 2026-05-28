@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { createProperty, createTour, fetchProperties, fetchProperty, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, uploadPropertyMedia } from './api';
+import { createProperty, createTour, fetchProperties, fetchProperty, fetchPropertyAnalytics, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, uploadPropertyMedia } from './api';
 import { GlbTourViewer } from './components/GlbTourViewer';
 import { PropertyDashboard } from './components/PropertyDashboard';
 import { PropertyDetailPage } from './components/PropertyDetailPage';
-import type { PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia } from './types';
+import type { PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia } from './types';
 
 const demoProperties: PropertySummary[] = [
   {
@@ -38,6 +38,7 @@ export function App() {
   const [propertyDetail, setPropertyDetail] = useState<PropertySummary | null>(null);
   const [propertyMedia, setPropertyMedia] = useState<UploadedMedia[]>([]);
   const [propertyTours, setPropertyTours] = useState<TourSummary[]>([]);
+  const [propertyAnalytics, setPropertyAnalytics] = useState<PropertyAnalytics | null>(null);
 
   useEffect(() => {
     if (!tourSlug) {
@@ -59,12 +60,13 @@ export function App() {
       return;
     }
     let cancelled = false;
-    Promise.all([fetchProperty(propertyId), fetchPropertyMedia(propertyId), fetchPropertyTours(propertyId)]).then(
-      ([property, media, tours]) => {
+    Promise.all([fetchProperty(propertyId), fetchPropertyMedia(propertyId), fetchPropertyTours(propertyId), fetchPropertyAnalytics(propertyId)]).then(
+      ([property, media, tours, analytics]) => {
         if (!cancelled) {
           setPropertyDetail(property);
           setPropertyMedia(media);
           setPropertyTours(tours);
+          setPropertyAnalytics(analytics);
         }
       },
     );
@@ -120,6 +122,7 @@ export function App() {
         property={propertyDetail}
         media={propertyMedia}
         tours={propertyTours}
+        analytics={propertyAnalytics}
         onUploadMedia={uploadPropertyMedia}
         onCreateTour={createTour}
         onUploadComplete={handlePropertyUploadComplete}

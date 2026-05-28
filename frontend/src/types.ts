@@ -46,3 +46,10 @@ export type PublicTourPayload = {
     scene_url: string;
   };
 };
+
+export type PropertyAnalytics = {
+  property_id: string;
+  tour_opened_count: number;
+  lead_click_count: number;
+  last_event_at: string | null;
+};

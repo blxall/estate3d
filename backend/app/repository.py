@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from threading import Lock
 
-from app.domain import ProcessingJob, Property, PropertyMedia, Tour
+from app.domain import AnalyticsEvent, ProcessingJob, Property, PropertyMedia, Tour
 
 
 class PropertyRepository:
@@ -81,7 +81,22 @@ class TourRepository:
         return [tour for tour in self._tours.values() if tour.property_id == property_id]
 
 
+class AnalyticsRepository:
+    def __init__(self) -> None:
+        self._events: dict[str, AnalyticsEvent] = {}
+        self._lock = Lock()
+
+    def create(self, event: AnalyticsEvent) -> AnalyticsEvent:
+        with self._lock:
+            self._events[event.id] = event
+        return event
+
+    def list_for_property(self, property_id: str) -> list[AnalyticsEvent]:
+        return [event for event in self._events.values() if event.property_id == property_id]
+
+
 property_repository = PropertyRepository()
 media_repository = MediaRepository()
 job_repository = JobRepository()
 tour_repository = TourRepository()
+analytics_repository = AnalyticsRepository()
