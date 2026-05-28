@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from threading import Lock
 
-from app.domain import ProcessingJob, Property, PropertyMedia
+from app.domain import ProcessingJob, Property, PropertyMedia, Tour
 
 
 class PropertyRepository:
@@ -60,6 +60,25 @@ class JobRepository:
         return job
 
 
+class TourRepository:
+    def __init__(self) -> None:
+        self._tours: dict[str, Tour] = {}
+        self._lock = Lock()
+
+    def create(self, tour: Tour) -> Tour:
+        with self._lock:
+            self._tours[tour.id] = tour
+        return tour
+
+    def get_by_public_slug(self, slug: str) -> Tour | None:
+        public_url = f"/tour/{slug}"
+        for tour in self._tours.values():
+            if tour.public_url == public_url:
+                return tour
+        return None
+
+
 property_repository = PropertyRepository()
 media_repository = MediaRepository()
 job_repository = JobRepository()
+tour_repository = TourRepository()

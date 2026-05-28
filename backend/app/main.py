@@ -8,8 +8,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
-from app.domain import ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType
-from app.repository import job_repository, media_repository, property_repository
+from app.domain import ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType
+from app.repository import job_repository, media_repository, property_repository, tour_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
 
@@ -40,6 +40,18 @@ class ProcessingJobUpdateRequest(BaseModel):
     status: ProcessingJobStatus
     output_json: dict = {}
     error_message: str = ""
+
+
+class TourCreateRequest(BaseModel):
+    tour_type: TourType
+    scene_url: str
+    preview_url: str = ""
+
+
+class PublicTourResponse(BaseModel):
+    property: Property
+    tour: Tour
+    viewer_config: dict
 
 
 @app.get("/health")
@@ -138,3 +150,35 @@ def _property_status_for_job_status(job_status: ProcessingJobStatus) -> Property
     if job_status is ProcessingJobStatus.FALLBACK_READY:
         return PropertyStatus.FALLBACK_READY
     return PropertyStatus.PROCESSING
+
+
+@app.post("/properties/{property_id}/tours", response_model=Tour, status_code=status.HTTP_201_CREATED)
+def create_tour(property_id: str, payload: TourCreateRequest) -> Tour:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+
+    property_.is_public = True
+    property_.status = PropertyStatus.READY
+    property_repository.update(property_)
+
+    tour = Tour(
+        property_id=property_id,
+        tour_type=payload.tour_type,
+        scene_url=payload.scene_url,
+        preview_url=payload.preview_url,
+        public_url=f"/tour/{property_.public_slug}",
+    )
+    return tour_repository.create(tour)
+
+
+@app.get("/tour/{public_slug}", response_model=PublicTourResponse)
+def get_public_tour(public_slug: str) -> PublicTourResponse:
+    tour = tour_repository.get_by_public_slug(public_slug)
+    if tour is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tour not found")
+
+    property_ = property_repository.get(tour.property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tour not found")
+    return PublicTourResponse(property=property_, tour=tour, viewer_config=tour.viewer_config_json)
