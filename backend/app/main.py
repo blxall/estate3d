@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
-from app.domain import Property, PropertyMedia, PropertyStatus, PropertyType
-from app.repository import media_repository, property_repository
+from app.domain import ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType
+from app.repository import job_repository, media_repository, property_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
 
@@ -28,6 +29,17 @@ class PropertyCreateRequest(BaseModel):
 
 class PropertyListResponse(BaseModel):
     items: list[Property]
+
+
+class ProcessingJobCreateRequest(BaseModel):
+    job_type: str
+    input_media_ids: list[str] = []
+
+
+class ProcessingJobUpdateRequest(BaseModel):
+    status: ProcessingJobStatus
+    output_json: dict = {}
+    error_message: str = ""
 
 
 @app.get("/health")
@@ -80,3 +92,49 @@ async def upload_property_media(property_id: str, file: UploadFile) -> PropertyM
     property_.status = PropertyStatus.UPLOADED
     property_repository.update(property_)
     return media
+
+
+@app.post("/properties/{property_id}/jobs", response_model=ProcessingJob, status_code=status.HTTP_201_CREATED)
+def create_processing_job(property_id: str, payload: ProcessingJobCreateRequest) -> ProcessingJob:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+
+    job = ProcessingJob(
+        property_id=property_id,
+        job_type=payload.job_type,
+        input_media_ids=payload.input_media_ids,
+    )
+    job_repository.create(job)
+    property_.status = PropertyStatus.PROCESSING
+    property_repository.update(property_)
+    return job
+
+
+@app.patch("/jobs/{job_id}", response_model=ProcessingJob)
+def update_processing_job(job_id: str, payload: ProcessingJobUpdateRequest) -> ProcessingJob:
+    job = job_repository.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Processing job not found")
+
+    job.status = payload.status
+    job.output_json = payload.output_json
+    job.error_message = payload.error_message
+    job.finished_at = datetime.now(timezone.utc)
+    job_repository.update(job)
+
+    property_ = property_repository.get(job.property_id)
+    if property_ is not None:
+        property_.status = _property_status_for_job_status(payload.status)
+        property_repository.update(property_)
+    return job
+
+
+def _property_status_for_job_status(job_status: ProcessingJobStatus) -> PropertyStatus:
+    if job_status is ProcessingJobStatus.READY:
+        return PropertyStatus.READY
+    if job_status is ProcessingJobStatus.FAILED:
+        return PropertyStatus.FAILED
+    if job_status is ProcessingJobStatus.FALLBACK_READY:
+        return PropertyStatus.FALLBACK_READY
+    return PropertyStatus.PROCESSING

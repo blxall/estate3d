@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from threading import Lock
 
-from app.domain import Property, PropertyMedia
+from app.domain import ProcessingJob, Property, PropertyMedia
 
 
 class PropertyRepository:
@@ -41,5 +41,25 @@ class MediaRepository:
         return [media for media in self._media.values() if media.property_id == property_id]
 
 
+class JobRepository:
+    def __init__(self) -> None:
+        self._jobs: dict[str, ProcessingJob] = {}
+        self._lock = Lock()
+
+    def create(self, job: ProcessingJob) -> ProcessingJob:
+        with self._lock:
+            self._jobs[job.id] = job
+        return job
+
+    def get(self, job_id: str) -> ProcessingJob | None:
+        return self._jobs.get(job_id)
+
+    def update(self, job: ProcessingJob) -> ProcessingJob:
+        with self._lock:
+            self._jobs[job.id] = job
+        return job
+
+
 property_repository = PropertyRepository()
 media_repository = MediaRepository()
+job_repository = JobRepository()
