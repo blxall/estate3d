@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from decimal import Decimal
+import os
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
-from app.domain import Property, PropertyType
-from app.repository import property_repository
+from app.domain import Property, PropertyMedia, PropertyStatus, PropertyType
+from app.repository import media_repository, property_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
 
@@ -50,3 +52,31 @@ def get_property(property_id: str) -> Property:
     if property_ is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
     return property_
+
+
+@app.post("/properties/{property_id}/media", response_model=PropertyMedia, status_code=status.HTTP_201_CREATED)
+async def upload_property_media(property_id: str, file: UploadFile) -> PropertyMedia:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+
+    filename = file.filename or "upload.bin"
+    content = await file.read()
+    storage_path = Path("properties") / property_id / filename
+    storage_root = Path(os.getenv("ESTATE3D_STORAGE_DIR", "storage"))
+    absolute_path = storage_root / storage_path
+    absolute_path.parent.mkdir(parents=True, exist_ok=True)
+    absolute_path.write_bytes(content)
+
+    media = PropertyMedia.from_upload(
+        property_id=property_id,
+        original_filename=filename,
+        storage_path=str(storage_path),
+        mime_type=file.content_type or "application/octet-stream",
+        size_bytes=len(content),
+    )
+    media_repository.create(media)
+
+    property_.status = PropertyStatus.UPLOADED
+    property_repository.update(property_)
+    return media
