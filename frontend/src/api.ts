@@ -1,0 +1,45 @@
+import type { PropertyCreatePayload, PropertySummary, PublicTourPayload, UploadedMedia } from './types';
+
+const API_BASE = '/api';
+
+async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = init === undefined ? await fetch(url) : await fetch(url, init);
+  if (!response.ok) {
+    throw new Error(`Estate3D API request failed: ${response.status}`);
+  }
+  return response.json() as Promise<T>;
+}
+
+export async function fetchProperties(): Promise<PropertySummary[]> {
+  const response = await requestJson<{ items: PropertySummary[] }>(`${API_BASE}/properties`);
+  return response.items;
+}
+
+export async function createProperty(payload: PropertyCreatePayload): Promise<PropertySummary> {
+  return requestJson<PropertySummary>(`${API_BASE}/properties`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function uploadPropertyMedia(propertyId: string, file: File): Promise<UploadedMedia> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return requestJson<UploadedMedia>(`${API_BASE}/properties/${propertyId}/media`, {
+    method: 'POST',
+    body: formData,
+  });
+}
+
+export async function createTour(propertyId: string, sceneUrl: string): Promise<unknown> {
+  return requestJson<unknown>(`${API_BASE}/properties/${propertyId}/tours`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tour_type: 'glb_model', scene_url: sceneUrl, preview_url: '' }),
+  });
+}
+
+export async function fetchPublicTour(slug: string): Promise<PublicTourPayload> {
+  return requestJson<PublicTourPayload>(`${API_BASE}/tour/${slug}`);
+}

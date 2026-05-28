@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { PropertyDashboard } from '../components/PropertyDashboard';
 
@@ -26,5 +26,18 @@ describe('PropertyDashboard', () => {
     expect(screen.getByText('Шоурум ЖК Север')).toBeInTheDocument();
     expect(screen.getByText(/ready/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть тур/i })).toHaveAttribute('href', '/tour/abc123');
+  });
+
+  it('shows upload controls for selected first property when handlers are provided', () => {
+    render(
+      <PropertyDashboard
+        properties={properties}
+        onUploadMedia={vi.fn()}
+        onCreateTour={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText(/glb\/lidar файл/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /загрузить и создать тур/i })).toBeInTheDocument();
   });
 });

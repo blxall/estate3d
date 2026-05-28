@@ -8,7 +8,7 @@ describe('App', () => {
     render(<App />);
 
     expect(screen.getByRole('heading', { name: /Estate3D/i })).toBeInTheDocument();
-    expect(screen.getByText(/Демо LiDAR/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Демо LiDAR/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть тур/i })).toHaveAttribute('href', '/tour/demo-lidar');
   });
 });

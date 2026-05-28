@@ -17,6 +17,16 @@ export type PropertyCreatePayload = {
   area_m2: string;
 };
 
+export type UploadedMedia = {
+  id: string;
+  property_id: string;
+  file_type: string;
+  original_filename: string;
+  storage_path: string;
+  mime_type: string;
+  size_bytes: number;
+};
+
 export type PublicTourPayload = {
   property: PropertySummary;
   tour: {

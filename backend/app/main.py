@@ -6,12 +6,17 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from app.domain import ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType
 from app.repository import job_repository, media_repository, property_repository, tour_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
+
+
+def storage_root() -> Path:
+    return Path(os.getenv("ESTATE3D_STORAGE_DIR", "storage"))
 
 
 class PropertyCreateRequest(BaseModel):
@@ -59,6 +64,17 @@ def healthcheck() -> dict[str, str]:
     return {"status": "ok", "service": "estate3d-backend"}
 
 
+@app.get("/storage/{file_path:path}")
+def get_storage_file(file_path: str) -> FileResponse:
+    root = storage_root().resolve()
+    target = (root / file_path).resolve()
+    if root not in target.parents and target != root:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Storage file not found")
+    if not target.is_file():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Storage file not found")
+    return FileResponse(target)
+
+
 @app.post("/properties", response_model=Property, status_code=status.HTTP_201_CREATED)
 def create_property(payload: PropertyCreateRequest) -> Property:
     property_ = Property(**payload.model_dump())
@@ -87,8 +103,8 @@ async def upload_property_media(property_id: str, file: UploadFile) -> PropertyM
     filename = file.filename or "upload.bin"
     content = await file.read()
     storage_path = Path("properties") / property_id / filename
-    storage_root = Path(os.getenv("ESTATE3D_STORAGE_DIR", "storage"))
-    absolute_path = storage_root / storage_path
+    storage_root_path = storage_root()
+    absolute_path = storage_root_path / storage_path
     absolute_path.parent.mkdir(parents=True, exist_ok=True)
     absolute_path.write_bytes(content)
 
