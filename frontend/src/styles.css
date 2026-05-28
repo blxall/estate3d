@@ -147,7 +147,37 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   margin-bottom: 16px;
+}
+
+.viewer-header h2 {
+  margin: 0 0 4px;
+}
+
+.viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.viewer-actions a {
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+}
+
+.viewer-status {
+  margin: 0;
+  padding: 18px;
+  color: #cbd5e1;
+}
+
+.viewer-canvas-inner {
+  width: 100%;
+  min-height: 70vh;
 }
 
 .viewer-canvas {
