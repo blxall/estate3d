@@ -54,6 +54,10 @@ export async function createTour(propertyId: string, sceneUrl: string): Promise<
   });
 }
 
+export async function generateAiDescription(propertyId: string): Promise<PropertySummary> {
+  return requestJson<PropertySummary>(`${API_BASE}/properties/${propertyId}/ai-description`, { method: 'POST' });
+}
+
 export async function fetchPublicTour(slug: string): Promise<PublicTourPayload> {
   return requestJson<PublicTourPayload>(`${API_BASE}/tour/${slug}`);
 }

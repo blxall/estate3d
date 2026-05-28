@@ -8,6 +8,7 @@ import {
   fetchPropertyMedia,
   fetchPropertyTours,
   fetchPublicTour,
+  generateAiDescription,
   uploadPropertyMedia,
 } from '../api';
 
@@ -111,5 +112,27 @@ describe('Estate3D API client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/tours');
     expect(result[0].public_url).toBe('/tour/slug');
+  });
+
+  it('generates AI description for property', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        id: 'prop_1',
+        title: 'Объект',
+        property_type: 'apartment',
+        status: 'draft',
+        public_slug: 'slug',
+        is_public: false,
+        description_ai_short: 'Краткое AI-описание',
+        description_ai_sales: 'Продающее AI-описание',
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await generateAiDescription('prop_1');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/properties/prop_1/ai-description', { method: 'POST' });
+    expect(result.description_ai_short).toBe('Краткое AI-описание');
   });
 });

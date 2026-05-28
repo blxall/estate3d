@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import type { TourSummary, UploadedMedia } from '../types';
 import type { PropertySummary } from '../types';
 import { UploadMediaPanel } from './UploadMediaPanel';
@@ -9,23 +11,41 @@ type Props = {
   onUploadMedia?: (propertyId: string, file: File) => Promise<UploadedMedia>;
   onCreateTour?: (propertyId: string, sceneUrl: string) => Promise<TourSummary>;
   onUploadComplete?: (media: UploadedMedia, tour: TourSummary) => void;
+  onGenerateAiDescription?: (propertyId: string) => Promise<PropertySummary>;
 };
 
-export function PropertyDetailPage({ property, media, tours, onUploadMedia, onCreateTour, onUploadComplete }: Props) {
+export function PropertyDetailPage({ property, media, tours, onUploadMedia, onCreateTour, onUploadComplete, onGenerateAiDescription }: Props) {
+  const [currentProperty, setCurrentProperty] = useState(property);
+
+  async function handleGenerateAiDescription() {
+    if (!onGenerateAiDescription) {
+      return;
+    }
+    const updated = await onGenerateAiDescription(currentProperty.id);
+    setCurrentProperty(updated);
+  }
+
   return (
     <main className="layout">
       <header className="hero">
         <div>
           <p className="eyebrow">Объект недвижимости</p>
-          <h1>{property.title}</h1>
+          <h1>{currentProperty.title}</h1>
           <p>
-            {property.city || 'Город не указан'} · {property.area_m2 || '—'} м² · {property.property_type}
+            {currentProperty.city || 'Город не указан'} · {currentProperty.area_m2 || '—'} м² · {currentProperty.property_type}
           </p>
         </div>
         <a href="/">Назад в кабинет</a>
       </header>
 
       <section className="grid">
+        <div className="card">
+          <h2>AI-описание</h2>
+          {currentProperty.description_ai_short ? <p>{currentProperty.description_ai_short}</p> : <p>AI-описание еще не создано</p>}
+          {currentProperty.description_ai_sales ? <p>{currentProperty.description_ai_sales}</p> : null}
+          {onGenerateAiDescription ? <button onClick={handleGenerateAiDescription}>Сгенерировать AI-описание</button> : null}
+        </div>
+
         <div className="card">
           <h2>Загрузить LiDAR/GLB</h2>
           {onUploadMedia && onCreateTour ? (

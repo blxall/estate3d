@@ -8,6 +8,8 @@ export type PropertySummary = {
   status: string;
   public_slug: string;
   is_public: boolean;
+  description_ai_short?: string;
+  description_ai_sales?: string;
 };
 
 export type PropertyCreatePayload = {

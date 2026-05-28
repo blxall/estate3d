@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { createProperty, createTour, fetchProperties, fetchProperty, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, uploadPropertyMedia } from './api';
+import { createProperty, createTour, fetchProperties, fetchProperty, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, uploadPropertyMedia } from './api';
 import { GlbTourViewer } from './components/GlbTourViewer';
 import { PropertyDashboard } from './components/PropertyDashboard';
 import { PropertyDetailPage } from './components/PropertyDetailPage';
@@ -123,6 +123,7 @@ export function App() {
         onUploadMedia={uploadPropertyMedia}
         onCreateTour={createTour}
         onUploadComplete={handlePropertyUploadComplete}
+        onGenerateAiDescription={generateAiDescription}
       />
     );
   }

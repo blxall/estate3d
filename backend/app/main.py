@@ -102,6 +102,40 @@ def get_property(property_id: str) -> Property:
     return property_
 
 
+@app.post("/properties/{property_id}/ai-description", response_model=Property)
+def generate_ai_description(property_id: str) -> Property:
+    property_ = property_repository.get(property_id)
+    if property_ is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+
+    property_.description_ai_short = _build_ai_short_description(property_)
+    property_.description_ai_sales = _build_ai_sales_description(property_)
+    return property_repository.update(property_)
+
+
+def _build_ai_short_description(property_: Property) -> str:
+    rooms = f"{property_.rooms_count}-комн. " if property_.rooms_count is not None else ""
+    area = f", {property_.area_m2} м²" if property_.area_m2 is not None else ""
+    location_parts = [part for part in [property_.city, property_.district] if part]
+    location = f", {', '.join(location_parts)}" if location_parts else ""
+    raw = f" {property_.description_raw}" if property_.description_raw else ""
+    return f"{rooms}{property_.property_type.value}{area}{location}.{raw}".strip()
+
+
+def _build_ai_sales_description(property_: Property) -> str:
+    price = _format_price(property_.price, property_.currency) if property_.price is not None else "цену уточняйте"
+    return (
+        f"{property_.title} — объект для дистанционного просмотра через 3D-тур. "
+        f"Стоимость: {price}. "
+        f"Планировка и параметры: {property_.description_ai_short} "
+        "Отправьте публичную ссылку клиенту, чтобы он мог заранее оценить объект онлайн."
+    )
+
+
+def _format_price(price: Decimal, currency: str) -> str:
+    return f"{int(price):,}".replace(",", " ") + f" {currency}"
+
+
 @app.get("/properties/{property_id}/media", response_model=PropertyMediaListResponse)
 def list_property_media(property_id: str) -> PropertyMediaListResponse:
     property_ = property_repository.get(property_id)
