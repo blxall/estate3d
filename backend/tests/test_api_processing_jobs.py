@@ -3,17 +3,21 @@ from fastapi.testclient import TestClient
 from app.domain import ProcessingJobStatus, PropertyStatus
 from app.main import app
 from app.repository import job_repository, property_repository
+from tests.helpers import auth_headers
 
 
 def test_create_processing_job_marks_property_processing():
     client = TestClient(app)
+    headers = auth_headers(client, "jobs-1@example.com")
     created = client.post(
         "/properties",
+        headers=headers,
         json={"title": "Объект для обработки", "property_type": "apartment"},
     ).json()
 
     response = client.post(
         f"/properties/{created['id']}/jobs",
+        headers=headers,
         json={"job_type": "glb_import", "input_media_ids": ["media_1"]},
     )
 
@@ -30,17 +34,21 @@ def test_create_processing_job_marks_property_processing():
 
 def test_complete_processing_job_ready_marks_property_ready():
     client = TestClient(app)
+    headers = auth_headers(client, "jobs-2@example.com")
     created = client.post(
         "/properties",
+        headers=headers,
         json={"title": "Готовый объект", "property_type": "apartment"},
     ).json()
     job = client.post(
         f"/properties/{created['id']}/jobs",
+        headers=headers,
         json={"job_type": "glb_import", "input_media_ids": []},
     ).json()
 
     response = client.patch(
         f"/jobs/{job['id']}",
+        headers=headers,
         json={"status": "ready", "output_json": {"scene_url": "/storage/scene.glb"}},
     )
 
@@ -52,17 +60,21 @@ def test_complete_processing_job_ready_marks_property_ready():
 
 def test_complete_processing_job_failed_marks_property_failed():
     client = TestClient(app)
+    headers = auth_headers(client, "jobs-3@example.com")
     created = client.post(
         "/properties",
+        headers=headers,
         json={"title": "Ошибка обработки", "property_type": "apartment"},
     ).json()
     job = client.post(
         f"/properties/{created['id']}/jobs",
+        headers=headers,
         json={"job_type": "video_reconstruction", "input_media_ids": []},
     ).json()
 
     response = client.patch(
         f"/jobs/{job['id']}",
+        headers=headers,
         json={"status": "failed", "error_message": "not enough coverage"},
     )
 
@@ -73,8 +85,9 @@ def test_complete_processing_job_failed_marks_property_failed():
 
 def test_update_unknown_job_returns_404():
     client = TestClient(app)
+    headers = auth_headers(client, "jobs-4@example.com")
 
-    response = client.patch("/jobs/job_missing", json={"status": "ready"})
+    response = client.patch("/jobs/job_missing", headers=headers, json={"status": "ready"})
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Processing job not found"

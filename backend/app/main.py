@@ -199,29 +199,28 @@ def get_storage_file(file_path: str) -> FileResponse:
 
 
 @app.post("/properties", response_model=Property, status_code=status.HTTP_201_CREATED)
-def create_property(payload: PropertyCreateRequest) -> Property:
-    property_ = Property(**payload.model_dump())
+def create_property(payload: PropertyCreateRequest, authorization: str | None = Header(default=None)) -> Property:
+    current_user = _user_from_authorization_header(authorization)
+    property_ = Property(**payload.model_dump(), owner_id=current_user.id)
     return property_repository.create(property_)
 
 
 @app.get("/properties", response_model=PropertyListResponse)
-def list_properties() -> PropertyListResponse:
-    return PropertyListResponse(items=property_repository.list())
+def list_properties(authorization: str | None = Header(default=None)) -> PropertyListResponse:
+    current_user = _user_from_authorization_header(authorization)
+    return PropertyListResponse(items=[property_ for property_ in property_repository.list() if property_.owner_id == current_user.id])
 
 
 @app.get("/properties/{property_id}", response_model=Property)
-def get_property(property_id: str) -> Property:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
-    return property_
+def get_property(property_id: str, authorization: str | None = Header(default=None)) -> Property:
+    current_user = _user_from_authorization_header(authorization)
+    return _owned_property_or_404(property_id, current_user)
 
 
 @app.post("/properties/{property_id}/ai-description", response_model=Property)
-def generate_ai_description(property_id: str) -> Property:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+def generate_ai_description(property_id: str, authorization: str | None = Header(default=None)) -> Property:
+    current_user = _user_from_authorization_header(authorization)
+    property_ = _owned_property_or_404(property_id, current_user)
 
     property_.description_ai_short = _build_ai_short_description(property_)
     property_.description_ai_sales = _build_ai_sales_description(property_)
@@ -252,18 +251,16 @@ def _format_price(price: Decimal, currency: str) -> str:
 
 
 @app.get("/properties/{property_id}/media", response_model=PropertyMediaListResponse)
-def list_property_media(property_id: str) -> PropertyMediaListResponse:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+def list_property_media(property_id: str, authorization: str | None = Header(default=None)) -> PropertyMediaListResponse:
+    current_user = _user_from_authorization_header(authorization)
+    _owned_property_or_404(property_id, current_user)
     return PropertyMediaListResponse(items=media_repository.list_for_property(property_id))
 
 
 @app.post("/properties/{property_id}/media", response_model=PropertyMedia, status_code=status.HTTP_201_CREATED)
-async def upload_property_media(property_id: str, file: UploadFile) -> PropertyMedia:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+async def upload_property_media(property_id: str, file: UploadFile, authorization: str | None = Header(default=None)) -> PropertyMedia:
+    current_user = _user_from_authorization_header(authorization)
+    property_ = _owned_property_or_404(property_id, current_user)
 
     filename = file.filename or "upload.bin"
     content = await file.read()
@@ -288,10 +285,9 @@ async def upload_property_media(property_id: str, file: UploadFile) -> PropertyM
 
 
 @app.post("/properties/{property_id}/jobs", response_model=ProcessingJob, status_code=status.HTTP_201_CREATED)
-def create_processing_job(property_id: str, payload: ProcessingJobCreateRequest) -> ProcessingJob:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+def create_processing_job(property_id: str, payload: ProcessingJobCreateRequest, authorization: str | None = Header(default=None)) -> ProcessingJob:
+    current_user = _user_from_authorization_header(authorization)
+    property_ = _owned_property_or_404(property_id, current_user)
 
     job = ProcessingJob(
         property_id=property_id,
@@ -305,10 +301,12 @@ def create_processing_job(property_id: str, payload: ProcessingJobCreateRequest)
 
 
 @app.patch("/jobs/{job_id}", response_model=ProcessingJob)
-def update_processing_job(job_id: str, payload: ProcessingJobUpdateRequest) -> ProcessingJob:
+def update_processing_job(job_id: str, payload: ProcessingJobUpdateRequest, authorization: str | None = Header(default=None)) -> ProcessingJob:
+    current_user = _user_from_authorization_header(authorization)
     job = job_repository.get(job_id)
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Processing job not found")
+    _owned_property_or_404(job.property_id, current_user)
 
     job.status = payload.status
     job.output_json = payload.output_json
@@ -334,18 +332,16 @@ def _property_status_for_job_status(job_status: ProcessingJobStatus) -> Property
 
 
 @app.get("/properties/{property_id}/tours", response_model=PropertyTourListResponse)
-def list_property_tours(property_id: str) -> PropertyTourListResponse:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+def list_property_tours(property_id: str, authorization: str | None = Header(default=None)) -> PropertyTourListResponse:
+    current_user = _user_from_authorization_header(authorization)
+    _owned_property_or_404(property_id, current_user)
     return PropertyTourListResponse(items=tour_repository.list_for_property(property_id))
 
 
 @app.post("/properties/{property_id}/tours", response_model=Tour, status_code=status.HTTP_201_CREATED)
-def create_tour(property_id: str, payload: TourCreateRequest) -> Tour:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+def create_tour(property_id: str, payload: TourCreateRequest, authorization: str | None = Header(default=None)) -> Tour:
+    current_user = _user_from_authorization_header(authorization)
+    property_ = _owned_property_or_404(property_id, current_user)
 
     property_.is_public = True
     property_.status = PropertyStatus.READY
@@ -383,10 +379,9 @@ def get_public_tour(public_slug: str, request: Request) -> PublicTourResponse:
 
 
 @app.get("/properties/{property_id}/analytics", response_model=PropertyAnalyticsResponse)
-def get_property_analytics(property_id: str) -> PropertyAnalyticsResponse:
-    property_ = property_repository.get(property_id)
-    if property_ is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+def get_property_analytics(property_id: str, authorization: str | None = Header(default=None)) -> PropertyAnalyticsResponse:
+    current_user = _user_from_authorization_header(authorization)
+    _owned_property_or_404(property_id, current_user)
 
     events = analytics_repository.list_for_property(property_id)
     tour_opened_count = len([event for event in events if event.event_type == "tour_opened"])
@@ -398,3 +393,10 @@ def get_property_analytics(property_id: str) -> PropertyAnalyticsResponse:
         lead_click_count=lead_click_count,
         last_event_at=last_event_at,
     )
+
+
+def _owned_property_or_404(property_id: str, current_user: User) -> Property:
+    property_ = property_repository.get(property_id)
+    if property_ is None or property_.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
+    return property_

@@ -1,17 +1,21 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.helpers import auth_headers
 
 
 def test_create_tour_for_property_exposes_public_slug_endpoint():
     client = TestClient(app)
+    headers = auth_headers(client, "tour@example.com")
     created = client.post(
         "/properties",
+        headers=headers,
         json={"title": "Публичный тур", "property_type": "apartment", "price": "12000000"},
     ).json()
 
     response = client.post(
         f"/properties/{created['id']}/tours",
+        headers=headers,
         json={
             "tour_type": "glb_model",
             "scene_url": "/storage/properties/prop_1/scene.glb",

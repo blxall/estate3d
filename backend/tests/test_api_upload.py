@@ -3,18 +3,22 @@ from fastapi.testclient import TestClient
 from app.domain import PropertyStatus
 from app.main import app
 from app.repository import property_repository
+from tests.helpers import auth_headers
 
 
 def test_upload_glb_file_creates_model_media_and_marks_property_uploaded(tmp_path, monkeypatch):
     monkeypatch.setenv("ESTATE3D_STORAGE_DIR", str(tmp_path))
     client = TestClient(app)
+    headers = auth_headers(client, "upload@example.com")
     created = client.post(
         "/properties",
+        headers=headers,
         json={"title": "LiDAR объект", "property_type": "apartment"},
     ).json()
 
     response = client.post(
         f"/properties/{created['id']}/media",
+        headers=headers,
         files={"file": ("scan.glb", b"glb-content", "model/gltf-binary")},
     )
 
@@ -36,9 +40,11 @@ def test_upload_glb_file_creates_model_media_and_marks_property_uploaded(tmp_pat
 def test_upload_media_to_unknown_property_returns_404(tmp_path, monkeypatch):
     monkeypatch.setenv("ESTATE3D_STORAGE_DIR", str(tmp_path))
     client = TestClient(app)
+    headers = auth_headers(client, "upload-missing@example.com")
 
     response = client.post(
         "/properties/prop_missing/media",
+        headers=headers,
         files={"file": ("scan.glb", b"glb-content", "model/gltf-binary")},
     )
 

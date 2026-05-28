@@ -36,20 +36,29 @@ done
 curl -fsS "http://127.0.0.1:$BACKEND_PORT/health" | grep -q 'estate3d-backend'
 curl -fsS "http://127.0.0.1:$FRONTEND_PORT/" | grep -q 'Estate3D'
 
+AUTH_JSON=$(curl -fsS -X POST "http://127.0.0.1:$BACKEND_PORT/auth/register" \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"smoke@example.com","password":"strong-password","full_name":"Smoke Agent"}')
+ACCESS_TOKEN=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])' <<<"$AUTH_JSON")
+AUTH_HEADER="Authorization: Bearer $ACCESS_TOKEN"
+
 PROPERTY_JSON=$(curl -fsS -X POST "http://127.0.0.1:$BACKEND_PORT/properties" \
   -H 'Content-Type: application/json' \
+  -H "$AUTH_HEADER" \
   -d '{"title":"Smoke GLB объект","property_type":"apartment","city":"Москва","area_m2":"55"}')
 PROPERTY_ID=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])' <<<"$PROPERTY_JSON")
 
 SMOKE_GLB="/tmp/estate3d-smoke-scene.glb"
 printf 'glb-smoke' > "$SMOKE_GLB"
 MEDIA_JSON=$(curl -fsS -X POST "http://127.0.0.1:$BACKEND_PORT/properties/$PROPERTY_ID/media" \
+  -H "$AUTH_HEADER" \
   -F "file=@$SMOKE_GLB;type=model/gltf-binary")
 STORAGE_PATH=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["storage_path"])' <<<"$MEDIA_JSON")
 SCENE_URL="/storage/$STORAGE_PATH"
 
 TOUR_JSON=$(curl -fsS -X POST "http://127.0.0.1:$BACKEND_PORT/properties/$PROPERTY_ID/tours" \
   -H 'Content-Type: application/json' \
+  -H "$AUTH_HEADER" \
   -d "{\"tour_type\":\"glb_model\",\"scene_url\":\"$SCENE_URL\",\"preview_url\":\"\"}")
 PUBLIC_URL=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["public_url"])' <<<"$TOUR_JSON")
 
