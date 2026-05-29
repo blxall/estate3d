@@ -83,7 +83,15 @@ export function DevelopmentViewer({ development }: Props) {
       </section>
 
       <section className="viewer-stage" aria-label="Интерактивная 3D сцена ЖК">
-        <ViewerScene scene={scene} viewerState={viewerState} selectedFloor={selectedFloor} selectedUnit={selectedUnit} selectedViewpoint={selectedViewpoint} onChooseFloor={chooseFloor} />
+        <ViewerScene
+          scene={scene}
+          viewerState={viewerState}
+          selectedFloor={selectedFloor}
+          selectedUnit={selectedUnit}
+          selectedViewpoint={selectedViewpoint}
+          onChooseFloor={chooseFloor}
+          onChooseUnit={chooseUnit}
+        />
         <ViewerHud
           building={building}
           selectedFloor={selectedFloor}

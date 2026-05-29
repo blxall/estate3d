@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildCameraPlan, buildViewerScene, cameraMessageForState, polygonPoints, roomPlanStyle } from '../viewer/sceneAdapter';
+import { buildCameraPlan, buildUnitFootprints, buildViewerScene, cameraMessageForState, polygonPoints, roomPlanStyle } from '../viewer/sceneAdapter';
 import type { DevelopmentViewerPayload } from '../types';
 
 const payload: DevelopmentViewerPayload = {
@@ -123,5 +123,20 @@ describe('viewer scene adapter', () => {
       zoom: 1.45,
       label: 'Unit camera: квартира 21',
     });
+  });
+
+  it('builds unit footprint primitives for the selected floor', () => {
+    const floor = payload.buildings[0].floors[1];
+
+    expect(buildUnitFootprints(floor)).toEqual([
+      {
+        id: 'unit_2_1',
+        number: '21',
+        label: 'квартира 21',
+        status: 'available',
+        center: [0.33, 0.73, 1.33],
+        size: [2, 0.06, 2],
+      },
+    ]);
   });
 });

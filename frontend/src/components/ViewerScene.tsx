@@ -14,9 +14,10 @@ type Props = {
   selectedUnit: DevelopmentUnit | null;
   selectedViewpoint: DevelopmentViewpoint | null;
   onChooseFloor: (floorId: string) => void;
+  onChooseUnit: (unit: DevelopmentUnit) => void;
 };
 
-export function ViewerScene({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, onChooseFloor }: Props) {
+export function ViewerScene({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, onChooseFloor, onChooseUnit }: Props) {
   const activeWindow = selectedUnit?.window_views[0] ?? null;
   const cameraMessage = cameraMessageForState({ viewerState, selectedFloor, selectedUnit, selectedViewpoint, activeWindow });
 
@@ -32,6 +33,7 @@ export function ViewerScene({ scene, viewerState, selectedFloor, selectedUnit, s
           selectedUnit={selectedUnit}
           selectedFloorId={selectedFloor?.id}
           onChooseFloor={onChooseFloor}
+          onChooseUnit={onChooseUnit}
         />
       </Suspense>
       <div className="procedural-tower dom-fallback backup-controls" aria-label={`${scene.building.name} backup floor controls`}>

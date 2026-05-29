@@ -86,7 +86,7 @@ describe('Premium development viewer route', () => {
     fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
     expect(await screen.findByText(/Камера поднимается на 8 этаж/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /квартира 81/i }));
+    fireEvent.click(screen.getByRole('button', { name: /3D unit mesh: квартира 81/i }));
     await waitFor(() => expect(screen.getAllByText(/Top-down план квартиры 81/i).length).toBeGreaterThan(0));
     expect(screen.getAllByText('Гостиная-кухня').length).toBeGreaterThan(0);
 
@@ -124,7 +124,7 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('State: development_overview')).toBeInTheDocument();
     fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
     expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /квартира 81/i }));
+    fireEvent.click(screen.getByRole('button', { name: /3D unit mesh: квартира 81/i }));
     expect(await screen.findByText('State: unit_top_down')).toBeInTheDocument();
     expect(screen.getByLabelText('Планировка квартиры 81')).toBeInTheDocument();
     expect(screen.getByText('Room polygon: 0,0 5.2,0 5.2,4.6 0,4.6')).toBeInTheDocument();
@@ -181,6 +181,29 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Floor camera: 8 этаж')).toBeInTheDocument();
     expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
     expect(await screen.findByText(/Камера поднимается на 8 этаж/i)).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: /Квартира 81/i })).toBeInTheDocument();
+    await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i });
+    expect(screen.getAllByText(/Квартира\s+81/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /3D unit mesh: квартира 81/i })).toBeInTheDocument();
+  });
+
+  it('uses the R3F unit mesh bridge to enter unit top-down mode', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    const unitMesh = await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i });
+    expect(unitMesh).toBeInTheDocument();
+    expect(screen.getByText('Unit footprints: 1')).toBeInTheDocument();
+    expect(screen.getByText('Unit footprint: квартира 81 · available')).toBeInTheDocument();
+
+    fireEvent.click(unitMesh);
+
+    expect(await screen.findByText('State: unit_top_down')).toBeInTheDocument();
+    expect(await screen.findByText('Camera frame: unit_8_1')).toBeInTheDocument();
+    expect(await screen.findByText('Unit camera: квартира 81')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Планировка квартиры 81')).toBeInTheDocument();
   });
 });

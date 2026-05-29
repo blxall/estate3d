@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { useState } from 'react';
 
 import type { DevelopmentFloor, DevelopmentUnit } from '../types';
-import { buildCameraPlan, type ViewerScene as ViewerSceneModel, type ViewerState } from '../viewer/sceneAdapter';
+import { buildCameraPlan, buildUnitFootprints, type UnitFootprintPrimitive, type ViewerScene as ViewerSceneModel, type ViewerState } from '../viewer/sceneAdapter';
 
 type Props = {
   scene: ViewerSceneModel;
@@ -11,11 +11,18 @@ type Props = {
   selectedUnit?: DevelopmentUnit | null;
   selectedFloorId?: string | null;
   onChooseFloor: (floorId: string) => void;
+  onChooseUnit: (unit: DevelopmentUnit) => void;
 };
 
 type TowerMeshesProps = Pick<Props, 'scene' | 'selectedFloorId' | 'onChooseFloor'> & {
   hoveredFloorId: string | null;
   onHoverFloor: (floorId: string | null) => void;
+};
+
+type UnitMeshesProps = {
+  footprints: UnitFootprintPrimitive[];
+  selectedUnitId?: string | null;
+  onChooseUnitById: (unitId: string) => void;
 };
 
 function canUseWebGl(): boolean {
@@ -70,12 +77,36 @@ function TowerMeshes({ scene, selectedFloorId, hoveredFloorId, onChooseFloor, on
   );
 }
 
-export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedFloorId, onChooseFloor }: Props) {
+function UnitMeshes({ footprints, selectedUnitId, onChooseUnitById }: UnitMeshesProps) {
+  return (
+    <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
+      {footprints.map((unit) => {
+        const isSelected = selectedUnitId === unit.id;
+        return (
+          <mesh key={unit.id} position={unit.center} onClick={() => onChooseUnitById(unit.id)}>
+            <boxGeometry args={unit.size} />
+            <meshStandardMaterial color={isSelected ? '#f6d77b' : '#22d3ee'} transparent opacity={isSelected ? 0.92 : 0.7} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedFloorId, onChooseFloor, onChooseUnit }: Props) {
   const webGlAvailable = canUseWebGl();
   const [hoveredFloorId, setHoveredFloorId] = useState<string | null>(null);
   const selectedLabel = floorLabel(scene, selectedFloorId);
   const hoveredLabel = floorLabel(scene, hoveredFloorId);
   const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit });
+  const unitFootprints = buildUnitFootprints(selectedFloor);
+
+  function chooseUnitById(unitId: string) {
+    const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
+    if (unit) {
+      onChooseUnit(unit);
+    }
+  }
 
   return (
     <div className="r3f-scene-shell" aria-label={`R3F scene slice for ${scene.building.name}`}>
@@ -90,6 +121,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>{cameraPlan.label}</span>
         <span>Selected mesh: {selectedLabel}</span>
         <span>Hover floor: {hoveredLabel}</span>
+        <span>Unit footprints: {unitFootprints.length}</span>
       </div>
       <div className="r3f-building-shell" aria-label={`R3F building shell: ${scene.building.name}`} />
       <div className="r3f-canvas-frame" aria-hidden="true">
@@ -104,6 +136,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
               onChooseFloor={onChooseFloor}
               onHoverFloor={setHoveredFloorId}
             />
+            <UnitMeshes footprints={unitFootprints} selectedUnitId={selectedUnit?.id} onChooseUnitById={chooseUnitById} />
           </Canvas>
         ) : (
           <div className="r3f-canvas-fallback">WebGL preview fallback</div>
@@ -123,6 +156,23 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
           >
             3D floor mesh: {floor.label}
           </button>
+        ))}
+      </div>
+      <div className="r3f-unit-hitboxes" aria-label="3D unit selection bridge">
+        {unitFootprints.map((unit) => (
+          <button
+            key={unit.id}
+            type="button"
+            className={`r3f-unit-hitbox ${selectedUnit?.id === unit.id ? 'active' : ''}`}
+            onClick={() => chooseUnitById(unit.id)}
+          >
+            3D unit mesh: {unit.label}
+          </button>
+        ))}
+      </div>
+      <div className="r3f-unit-footprints" aria-label="R3F unit footprint readout">
+        {unitFootprints.map((unit) => (
+          <span key={unit.id}>Unit footprint: {unit.label} · {unit.status}</span>
         ))}
       </div>
     </div>

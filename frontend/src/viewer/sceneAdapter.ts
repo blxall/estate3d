@@ -45,6 +45,15 @@ export type CameraPlan = {
   label: string;
 };
 
+export type UnitFootprintPrimitive = {
+  id: string;
+  number: string;
+  label: string;
+  status: string;
+  center: [number, number, number];
+  size: [number, number, number];
+};
+
 export function buildViewerScene(development: DevelopmentViewerPayload): ViewerScene {
   const building = development.buildings[0];
   const floors = [...building.floors];
@@ -98,6 +107,57 @@ function bounds(points: DevelopmentRoom['polygon']): { minX: number; maxX: numbe
   };
 }
 
+function rounded(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function floorTargetY(floor?: DevelopmentFloor | null): number {
+  if (!floor) {
+    return 1.6;
+  }
+  return rounded(floor.elevation / 10);
+}
+
+function scaledPlanBounds(unit: DevelopmentUnit) {
+  const unitBounds = bounds(unit.plan_polygon);
+  if (!unitBounds) {
+    return null;
+  }
+  const centerX = (unitBounds.minX + unitBounds.maxX) / 2;
+  const centerY = (unitBounds.minY + unitBounds.maxY) / 2;
+  const width = unitBounds.maxX - unitBounds.minX || 1;
+  const depth = unitBounds.maxY - unitBounds.minY || 1;
+  return {
+    centerX: rounded(centerX / 3),
+    centerZ: rounded(centerY / 3),
+    width: rounded(width / 3),
+    depth: rounded(depth / 3),
+  };
+}
+
+export function buildUnitFootprints(floor?: DevelopmentFloor | null): UnitFootprintPrimitive[] {
+  if (!floor) {
+    return [];
+  }
+  const y = rounded(floorTargetY(floor) + 0.08);
+  return floor.units.flatMap((unit) => {
+    const footprint = scaledPlanBounds(unit);
+    if (!footprint) {
+      return [];
+    }
+    return [
+      {
+        id: unit.id,
+        number: unit.number,
+        label: `квартира ${unit.number}`,
+        status: unit.status,
+        center: [footprint.centerX, y, footprint.centerZ],
+        size: [footprint.width, 0.06, footprint.depth],
+      },
+    ];
+  });
+}
+
 function pct(value: number): string {
   const rounded = Math.round(value * 100) / 100;
   return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded}%`;
@@ -146,17 +206,6 @@ export function cameraMessageForState({
     return `Камера поднимается на ${selectedFloor.label}`;
   }
   return 'Общий вид ЖК и плавный подлет к корпусу';
-}
-
-function rounded(value: number): number {
-  return Math.round(value * 100) / 100;
-}
-
-function floorTargetY(floor?: DevelopmentFloor | null): number {
-  if (!floor) {
-    return 1.6;
-  }
-  return rounded(floor.elevation / 10);
 }
 
 export function buildCameraPlan({
