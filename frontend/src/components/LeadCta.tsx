@@ -1,13 +1,14 @@
-import type { LeadContextSummary, ShareHandoffSummary } from '../viewer/sceneAdapter';
+import type { LeadContextSummary, LeadSuccessSummary, ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
   leadContext: LeadContextSummary | null;
+  leadSuccess: LeadSuccessSummary | null;
   shareHandoff: ShareHandoffSummary | null;
   onSubmit: () => void;
 };
 
-export function LeadCta({ leadMessage, leadContext, shareHandoff, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadContext, leadSuccess, shareHandoff, onSubmit }: Props) {
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -27,6 +28,12 @@ export function LeadCta({ leadMessage, leadContext, shareHandoff, onSubmit }: Pr
         </div>
       )}
       <button type="button" onClick={onSubmit}>Оставить заявку</button>
+      {leadSuccess && (
+        <div className={leadSuccess.cardClass}>
+          <p>{leadSuccess.label}</p>
+          <small>{leadSuccess.nextAction}</small>
+        </div>
+      )}
       {leadMessage && <p className="lead-message">{leadMessage}</p>}
     </div>
   );

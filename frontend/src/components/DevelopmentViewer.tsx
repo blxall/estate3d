@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildLeadContextSummary, buildResponsiveHudState, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type ViewerState } from '../viewer/sceneAdapter';
+import { buildLeadContextSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -27,6 +27,7 @@ export function DevelopmentViewer({ development }: Props) {
   const [selectedViewpoint, setSelectedViewpoint] = useState<DevelopmentViewpoint | null>(initialViewpoint);
   const [activeWindow, setActiveWindow] = useState<DevelopmentWindowView | null>(initialWindow);
   const [leadMessage, setLeadMessage] = useState('');
+  const [leadSuccess, setLeadSuccess] = useState<LeadSuccessSummary | null>(null);
 
   const firstViewpoint = selectedUnit?.viewpoints[0] ?? null;
   const firstWindow = selectedUnit?.window_views[0] ?? null;
@@ -58,6 +59,7 @@ export function DevelopmentViewer({ development }: Props) {
     setSelectedViewpoint(null);
     setActiveWindow(null);
     setLeadMessage('');
+    setLeadSuccess(null);
     setViewerState('floor_focus');
   }
 
@@ -66,6 +68,7 @@ export function DevelopmentViewer({ development }: Props) {
     setSelectedViewpoint(null);
     setActiveWindow(null);
     setLeadMessage('');
+    setLeadSuccess(null);
     setViewerState('unit_top_down');
   }
 
@@ -73,12 +76,14 @@ export function DevelopmentViewer({ development }: Props) {
     setSelectedViewpoint(viewpoint);
     setActiveWindow(null);
     setLeadMessage('');
+    setLeadSuccess(null);
     setViewerState('walk_mode');
   }
 
   function showWindowView(windowView?: DevelopmentWindowView) {
     setActiveWindow(windowView ?? firstWindow ?? null);
     setLeadMessage('');
+    setLeadSuccess(null);
     setViewerState('window_view');
   }
 
@@ -89,6 +94,7 @@ export function DevelopmentViewer({ development }: Props) {
     }
 
     setLeadMessage('Отправляем заявку менеджеру…');
+    setLeadSuccess(null);
     const leadContext = buildLeadContextSummary({
       development,
       building,
@@ -109,7 +115,8 @@ export function DevelopmentViewer({ development }: Props) {
         contact_email: '',
         message: leadContext.message,
       });
-      setLeadMessage(`Заявка отправлена: #${lead.id} · ${lead.development_name}, ${building.name}, ${selectedFloor.label}, квартира ${lead.unit_number}`);
+      setLeadSuccess(buildLeadSuccessSummary({ leadId: lead.id, selectedFloor, selectedUnit, viewerState, shareLink }));
+      setLeadMessage('');
     } catch {
       setLeadMessage('Не удалось отправить заявку. Попробуйте еще раз.');
     }
@@ -149,6 +156,7 @@ export function DevelopmentViewer({ development }: Props) {
           firstViewpoint={firstViewpoint}
           viewerState={viewerState}
           leadMessage={leadMessage}
+          leadSuccess={leadSuccess}
           shareLink={shareLink}
           onChooseUnit={chooseUnit}
           onEnterWalkMode={enterWalkMode}

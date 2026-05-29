@@ -146,7 +146,10 @@ describe('Premium development viewer route', () => {
     expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · window_view' })).toHaveClass('share-copy-button', 'premium-outline');
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
-    expect(await screen.findByText(/Заявка отправлена: #lead_123/i)).toBeInTheDocument();
+    expect(await screen.findByText('Заявка отправлена: #lead_123 · 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    const successCard = screen.getByText('Заявка отправлена: #lead_123 · 8 этаж · квартира 81 · window_view').closest('.lead-success-card');
+    expect(successCard).toHaveClass('glass-card', 'follow-up-ready');
+    expect(screen.getByText(/Менеджер получает контекст просмотра и ссылку для продолжения:/i)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

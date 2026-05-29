@@ -5,6 +5,7 @@ import {
   buildCameraPlan,
   buildAvailabilityState,
   buildLeadContextSummary,
+  buildLeadSuccessSummary,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -308,6 +309,17 @@ describe('viewer scene adapter', () => {
       cardClass: 'share-handoff-card glass-card desktop-inline',
       copyClass: 'share-handoff-copy copy-ready',
       buttonClass: 'share-copy-button premium-outline',
+    });
+  });
+
+  it('builds premium lead success summaries with viewer context and follow-up copy', () => {
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+
+    expect(buildLeadSuccessSummary({ leadId: 'lead_123', selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view' })).toEqual({
+      label: 'Заявка отправлена: #lead_123 · 2 этаж · квартира 21 · window_view',
+      nextAction: 'Менеджер получает контекст просмотра и ссылку для продолжения: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view',
+      cardClass: 'lead-success-card glass-card follow-up-ready',
     });
   });
 

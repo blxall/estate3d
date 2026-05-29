@@ -104,6 +104,12 @@ export type ShareHandoffSummary = {
   buttonClass: string;
 };
 
+export type LeadSuccessSummary = {
+  label: string;
+  nextAction: string;
+  cardClass: string;
+};
+
 export type ResponsiveHudState = {
   mode: 'mobile' | 'desktop';
   stageClass: string;
@@ -358,6 +364,27 @@ export function buildShareHandoffSummary({
     cardClass: 'share-handoff-card glass-card desktop-inline',
     copyClass: 'share-handoff-copy copy-ready',
     buttonClass: 'share-copy-button premium-outline',
+  };
+}
+
+export function buildLeadSuccessSummary({
+  leadId,
+  selectedFloor,
+  selectedUnit,
+  viewerState,
+  shareLink,
+}: {
+  leadId: string;
+  selectedFloor: DevelopmentFloor;
+  selectedUnit: DevelopmentUnit;
+  viewerState: ViewerState;
+  shareLink: string;
+}): LeadSuccessSummary {
+  const context = `${selectedFloor.label} · квартира ${selectedUnit.number} · ${viewerState}`;
+  return {
+    label: `Заявка отправлена: #${leadId} · ${context}`,
+    nextAction: `Менеджер получает контекст просмотра и ссылку для продолжения: ${shareLink}`,
+    cardClass: 'lead-success-card glass-card follow-up-ready',
   };
 }
 
