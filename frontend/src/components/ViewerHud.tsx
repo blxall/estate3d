@@ -1,5 +1,5 @@
 import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { polygonPoints, type ViewerState } from '../viewer/sceneAdapter';
+import { buildAvailabilityState, polygonPoints, type ViewerState } from '../viewer/sceneAdapter';
 import { LeadCta } from './LeadCta';
 
 type Props = {
@@ -29,13 +29,21 @@ export function ViewerHud({
   onShowWindowView,
   onSubmitLead,
 }: Props) {
+  const availability = buildAvailabilityState({ selectedFloor, selectedUnit });
+
   return (
     <aside className="viewer-hud">
       <p className="eyebrow">{building.name}</p>
       <h2>{selectedFloor ? selectedFloor.label : 'Выберите этаж'}</h2>
       {!selectedFloor && <p>Нажмите на 8 этаж, чтобы увидеть доступные квартиры и перейти в режим плана.</p>}
 
-      {selectedFloor && selectedFloor.units.length === 0 && <p>Для демо наполнен 8 этаж. Остальные этажи показывают механику выбора.</p>}
+      {(availability.state === 'empty-floor' || availability.state === 'no-walkthrough-media' || availability.state === 'unavailable-unit') && (
+        <div className={`viewer-empty-state ${availability.state}`}>
+          <p>{availability.hudMessage}</p>
+        </div>
+      )}
+
+      {selectedFloor && selectedFloor.units.length === 0 && availability.state !== 'empty-floor' && <p>Для демо наполнен 8 этаж. Остальные этажи показывают механику выбора.</p>}
 
       {selectedFloor && selectedFloor.units.length > 0 && (
         <div className="unit-list">

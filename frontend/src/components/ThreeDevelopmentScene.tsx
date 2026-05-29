@@ -4,6 +4,7 @@ import { Vector3 } from 'three';
 
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
 import {
+  buildAvailabilityState,
   buildCameraControlState,
   buildCameraPlan,
   buildMaterialTheme,
@@ -180,6 +181,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   const roomFootprints = buildRoomFootprints(selectedUnit, selectedFloor);
   const viewpointAnchors = buildViewpointAnchors(selectedUnit, selectedFloor);
   const windowHotspots = buildWindowHotspots(selectedUnit, selectedFloor);
+  const availability = buildAvailabilityState({ selectedFloor, selectedUnit });
   const selectedMaterial = buildMaterialTheme({
     kind: selectedUnit ? 'unit' : 'floor',
     status: selectedUnit?.status,
@@ -228,6 +230,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>Window hotspots: {windowHotspots.length}</span>
         <span>Material theme: {selectedMaterial.label.replace('Material ', '').replace(':', '')} · {selectedMaterial.color} · opacity {selectedMaterial.opacity}</span>
         <span>Scene availability: units {unitFootprints.length} · viewpoints {viewpointAnchors.length} · windows {windowHotspots.length}</span>
+        <span>{availability.label}</span>
       </div>
       <div className="r3f-building-shell" aria-label={`R3F building shell: ${scene.building.name}`} />
       <div className="r3f-canvas-frame" aria-hidden="true">

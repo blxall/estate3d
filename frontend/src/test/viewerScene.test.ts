@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCameraControlState,
   buildCameraPlan,
+  buildAvailabilityState,
   buildMaterialTheme,
   buildRoomFootprints,
   buildUnitFootprints,
@@ -194,6 +195,40 @@ describe('viewer scene adapter', () => {
     });
     expect(buildMaterialTheme({ kind: 'room' })).toMatchObject({ color: '#a78bfa', opacity: 0.82, label: 'Material room: walkthrough violet' });
     expect(buildMaterialTheme({ kind: 'window-hotspot' })).toMatchObject({ color: '#f97316', opacity: 0.92, label: 'Material window-hotspot: sunset view-hotspot' });
+  });
+
+  it('describes premium empty and unavailable states for sparse floor/unit data', () => {
+    const emptyFloor = payload.buildings[0].floors[0];
+    const floor = payload.buildings[0].floors[1];
+    const unitWithoutMedia = {
+      ...floor.units[0],
+      status: 'sold',
+      viewpoints: [],
+      window_views: [],
+    };
+
+    expect(buildAvailabilityState({ selectedFloor: emptyFloor })).toEqual({
+      state: 'empty-floor',
+      unitCount: 0,
+      viewpointCount: 0,
+      windowCount: 0,
+      canChooseUnit: false,
+      canWalk: false,
+      canOpenWindow: false,
+      label: 'Availability: empty floor · units 0 · viewpoints 0 · windows 0',
+      hudMessage: 'На этом этаже пока нет доступных квартир — покажите другой этаж или оставьте заявку менеджеру.',
+    });
+    expect(buildAvailabilityState({ selectedFloor: floor, selectedUnit: unitWithoutMedia })).toEqual({
+      state: 'unavailable-unit',
+      unitCount: 1,
+      viewpointCount: 0,
+      windowCount: 0,
+      canChooseUnit: false,
+      canWalk: false,
+      canOpenWindow: false,
+      label: 'Availability: unavailable unit · units 1 · viewpoints 0 · windows 0',
+      hudMessage: 'Квартира 21 сейчас недоступна для выбора, но её можно оставить в заявке менеджеру.',
+    });
   });
 
   it('builds unit footprint primitives for the selected floor', () => {

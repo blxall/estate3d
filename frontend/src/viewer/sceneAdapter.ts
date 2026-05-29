@@ -67,6 +67,18 @@ export type MaterialTheme = {
   label: string;
 };
 
+export type AvailabilityState = {
+  state: 'overview' | 'empty-floor' | 'floor-ready' | 'unit-ready' | 'no-walkthrough-media' | 'unavailable-unit';
+  unitCount: number;
+  viewpointCount: number;
+  windowCount: number;
+  canChooseUnit: boolean;
+  canWalk: boolean;
+  canOpenWindow: boolean;
+  label: string;
+  hudMessage: string;
+};
+
 export type UnitFootprintPrimitive = {
   id: string;
   number: string;
@@ -101,6 +113,85 @@ export type ViewpointAnchorPrimitive = {
   position: [number, number, number];
   target: [number, number, number];
 };
+
+export function buildAvailabilityState({
+  selectedFloor,
+  selectedUnit,
+}: {
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+}): AvailabilityState {
+  const unitCount = selectedFloor?.units.length ?? 0;
+  const viewpointCount = selectedUnit?.viewpoints.length ?? 0;
+  const windowCount = selectedUnit?.window_views.length ?? 0;
+  const unavailableUnit = selectedUnit?.status === 'sold' || selectedUnit?.status === 'hidden';
+  const state: AvailabilityState['state'] = !selectedFloor
+    ? 'overview'
+    : unitCount === 0
+      ? 'empty-floor'
+      : selectedUnit && unavailableUnit
+        ? 'unavailable-unit'
+        : selectedUnit && viewpointCount === 0 && windowCount === 0
+          ? 'no-walkthrough-media'
+          : selectedUnit
+            ? 'unit-ready'
+            : 'floor-ready';
+  const canChooseUnit = Boolean(selectedFloor && unitCount > 0 && !unavailableUnit);
+  const canWalk = Boolean(selectedUnit && viewpointCount > 0 && !unavailableUnit);
+  const canOpenWindow = Boolean(selectedUnit && windowCount > 0 && !unavailableUnit);
+  const label = `Availability: ${state.replaceAll('-', ' ')} · units ${unitCount} · viewpoints ${viewpointCount} · windows ${windowCount}`;
+
+  if (state === 'empty-floor') {
+    return {
+      state,
+      unitCount,
+      viewpointCount,
+      windowCount,
+      canChooseUnit,
+      canWalk,
+      canOpenWindow,
+      label,
+      hudMessage: 'На этом этаже пока нет доступных квартир — покажите другой этаж или оставьте заявку менеджеру.',
+    };
+  }
+  if (state === 'unavailable-unit') {
+    return {
+      state,
+      unitCount,
+      viewpointCount,
+      windowCount,
+      canChooseUnit,
+      canWalk,
+      canOpenWindow,
+      label,
+      hudMessage: `Квартира ${selectedUnit?.number} сейчас недоступна для выбора, но её можно оставить в заявке менеджеру.`,
+    };
+  }
+  if (state === 'no-walkthrough-media') {
+    return {
+      state,
+      unitCount,
+      viewpointCount,
+      windowCount,
+      canChooseUnit,
+      canWalk,
+      canOpenWindow,
+      label,
+      hudMessage: `Для квартиры ${selectedUnit?.number} пока нет точек прогулки или видов из окна — покажите планировку и соберите заявку.`,
+    };
+  }
+  return {
+    state,
+    unitCount,
+    viewpointCount,
+    windowCount,
+    canChooseUnit,
+    canWalk,
+    canOpenWindow,
+    label,
+    hudMessage: state === 'floor-ready' ? 'Выберите доступную квартиру на этаже, чтобы открыть планировку.' : 'Интерактивный просмотр готов: планировка, прогулка и виды из окна доступны.',
+  };
+}
 
 export function buildMaterialTheme({
   kind,

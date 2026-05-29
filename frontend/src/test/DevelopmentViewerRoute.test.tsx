@@ -264,4 +264,25 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Camera controls: animated 650ms · target 1.2,4.5,-0.91 · frame window_city')).toBeInTheDocument();
     expect(screen.getAllByText(/Панорама из окна: Вид из окна на город/i).length).toBeGreaterThan(0);
   });
+
+  it('shows premium empty states for floors and units without walkthrough media', async () => {
+    const sparsePayload = structuredClone(demoPayload);
+    sparsePayload.buildings[0].floors[7].units[0].viewpoints = [];
+    sparsePayload.buildings[0].floors[7].units[0].window_views = [];
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => sparsePayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 7 этаж/i }));
+    expect(await screen.findByText('Availability: empty floor · units 0 · viewpoints 0 · windows 0')).toBeInTheDocument();
+    expect(await screen.findByText('На этом этаже пока нет доступных квартир — покажите другой этаж или оставьте заявку менеджеру.')).toBeInTheDocument();
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    expect(await screen.findByText('Availability: no walkthrough media · units 1 · viewpoints 0 · windows 0')).toBeInTheDocument();
+    expect(await screen.findByText('Для квартиры 81 пока нет точек прогулки или видов из окна — покажите планировку и соберите заявку.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /войти в гостиную/i })).not.toBeInTheDocument();
+  });
 });
