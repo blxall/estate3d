@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCameraControlState,
   buildCameraPlan,
+  buildMaterialTheme,
   buildRoomFootprints,
   buildUnitFootprints,
   buildViewpointAnchors,
@@ -160,6 +161,39 @@ describe('viewer scene adapter', () => {
       controlsEnabled: true,
       label: 'Camera controls: animated 650ms · target 0.67,2.05,1.33 · frame vp_living',
     });
+  });
+
+  it('maps premium R3F material themes for floor, unit, room, and window states', () => {
+    expect(buildMaterialTheme({ kind: 'floor', active: true, hasUnits: true })).toEqual({
+      color: '#f6d77b',
+      opacity: 0.98,
+      emissive: '#7c5f1b',
+      metalness: 0.42,
+      roughness: 0.38,
+      label: 'Material floor: active premium-gold',
+    });
+    expect(buildMaterialTheme({ kind: 'floor', hovered: true, hasUnits: true })).toMatchObject({
+      color: '#7dd3fc',
+      opacity: 0.9,
+      label: 'Material floor: hover sky-highlight',
+    });
+    expect(buildMaterialTheme({ kind: 'floor', hasUnits: false })).toMatchObject({
+      color: '#24344d',
+      opacity: 0.42,
+      label: 'Material floor: empty muted-shell',
+    });
+    expect(buildMaterialTheme({ kind: 'unit', status: 'reserved' })).toMatchObject({
+      color: '#fb923c',
+      opacity: 0.74,
+      label: 'Material unit: reserved warm-reserve',
+    });
+    expect(buildMaterialTheme({ kind: 'unit', status: 'sold' })).toMatchObject({
+      color: '#64748b',
+      opacity: 0.34,
+      label: 'Material unit: sold muted-unavailable',
+    });
+    expect(buildMaterialTheme({ kind: 'room' })).toMatchObject({ color: '#a78bfa', opacity: 0.82, label: 'Material room: walkthrough violet' });
+    expect(buildMaterialTheme({ kind: 'window-hotspot' })).toMatchObject({ color: '#f97316', opacity: 0.92, label: 'Material window-hotspot: sunset view-hotspot' });
   });
 
   it('builds unit footprint primitives for the selected floor', () => {

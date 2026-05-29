@@ -6,6 +6,7 @@ import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, Developme
 import {
   buildCameraControlState,
   buildCameraPlan,
+  buildMaterialTheme,
   buildRoomFootprints,
   buildUnitFootprints,
   buildViewpointAnchors,
@@ -72,13 +73,13 @@ function TowerMeshes({ scene, selectedFloorId, hoveredFloorId, onChooseFloor, on
     <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
       <mesh position={[0, 1.62, 0]}>
         <boxGeometry args={[3.0, 3.2, 1.34]} />
-        <meshStandardMaterial color="#0f172a" transparent opacity={0.18} />
+        <meshStandardMaterial {...buildMaterialTheme({ kind: 'tower-shell' })} transparent />
       </mesh>
       {scene.towerFloors.map((floor, index) => {
         const y = scene.towerFloors.length - index;
         const isSelected = selectedFloorId === floor.id;
         const isHovered = hoveredFloorId === floor.id;
-        const color = isSelected ? '#f6d77b' : isHovered ? '#7dd3fc' : floor.hasUnits ? '#4aa3ff' : '#24344d';
+        const material = buildMaterialTheme({ kind: 'floor', active: isSelected, hovered: isHovered, hasUnits: floor.hasUnits });
         const width = isSelected || isHovered ? 2.9 : 2.6;
         return (
           <mesh
@@ -92,7 +93,7 @@ function TowerMeshes({ scene, selectedFloorId, hoveredFloorId, onChooseFloor, on
             onPointerOut={() => onHoverFloor(null)}
           >
             <boxGeometry args={[width, 0.12, 1.1]} />
-            <meshStandardMaterial color={color} transparent opacity={isSelected ? 0.97 : isHovered ? 0.86 : 0.68} />
+            <meshStandardMaterial {...material} transparent />
           </mesh>
         );
       })}
@@ -109,10 +110,11 @@ function UnitMeshes({ footprints, selectedUnitId, onChooseUnitById }: UnitMeshes
     <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
       {footprints.map((unit) => {
         const isSelected = selectedUnitId === unit.id;
+        const material = buildMaterialTheme({ kind: 'unit', status: unit.status, active: isSelected });
         return (
           <mesh key={unit.id} position={unit.center} onClick={() => onChooseUnitById(unit.id)}>
             <boxGeometry args={unit.size} />
-            <meshStandardMaterial color={isSelected ? '#f6d77b' : '#22d3ee'} transparent opacity={isSelected ? 0.92 : 0.7} />
+            <meshStandardMaterial {...material} transparent />
           </mesh>
         );
       })}
@@ -123,12 +125,15 @@ function UnitMeshes({ footprints, selectedUnitId, onChooseUnitById }: UnitMeshes
 function RoomMeshes({ footprints, onChooseRoomById }: RoomMeshesProps) {
   return (
     <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
-      {footprints.map((room) => (
-        <mesh key={room.id} position={room.center} onClick={() => onChooseRoomById(room.id)}>
-          <boxGeometry args={room.size} />
-          <meshStandardMaterial color="#a78bfa" transparent opacity={0.82} />
-        </mesh>
-      ))}
+      {footprints.map((room) => {
+        const material = buildMaterialTheme({ kind: 'room' });
+        return (
+          <mesh key={room.id} position={room.center} onClick={() => onChooseRoomById(room.id)}>
+            <boxGeometry args={room.size} />
+            <meshStandardMaterial {...material} transparent />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
@@ -136,12 +141,15 @@ function RoomMeshes({ footprints, onChooseRoomById }: RoomMeshesProps) {
 function WindowHotspotMeshes({ hotspots, onChooseWindowById }: WindowHotspotMeshesProps) {
   return (
     <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
-      {hotspots.map((hotspot) => (
-        <mesh key={hotspot.id} position={hotspot.center} onClick={() => onChooseWindowById(hotspot.id)}>
-          <boxGeometry args={hotspot.size} />
-          <meshStandardMaterial color="#f97316" transparent opacity={0.9} />
-        </mesh>
-      ))}
+      {hotspots.map((hotspot) => {
+        const material = buildMaterialTheme({ kind: 'window-hotspot' });
+        return (
+          <mesh key={hotspot.id} position={hotspot.center} onClick={() => onChooseWindowById(hotspot.id)}>
+            <boxGeometry args={hotspot.size} />
+            <meshStandardMaterial {...material} transparent />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
@@ -172,6 +180,12 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   const roomFootprints = buildRoomFootprints(selectedUnit, selectedFloor);
   const viewpointAnchors = buildViewpointAnchors(selectedUnit, selectedFloor);
   const windowHotspots = buildWindowHotspots(selectedUnit, selectedFloor);
+  const selectedMaterial = buildMaterialTheme({
+    kind: selectedUnit ? 'unit' : 'floor',
+    status: selectedUnit?.status,
+    active: Boolean(selectedUnit || selectedFloor),
+    hasUnits: Boolean(selectedFloor?.units.length),
+  });
 
   function chooseUnitById(unitId: string) {
     const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
@@ -212,6 +226,8 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>Room footprints: {roomFootprints.length}</span>
         <span>Active viewpoint: {selectedViewpoint?.label ?? 'none'}</span>
         <span>Window hotspots: {windowHotspots.length}</span>
+        <span>Material theme: {selectedMaterial.label.replace('Material ', '').replace(':', '')} · {selectedMaterial.color} · opacity {selectedMaterial.opacity}</span>
+        <span>Scene availability: units {unitFootprints.length} · viewpoints {viewpointAnchors.length} · windows {windowHotspots.length}</span>
       </div>
       <div className="r3f-building-shell" aria-label={`R3F building shell: ${scene.building.name}`} />
       <div className="r3f-canvas-frame" aria-hidden="true">

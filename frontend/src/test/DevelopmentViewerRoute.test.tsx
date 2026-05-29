@@ -175,6 +175,8 @@ describe('Premium development viewer route', () => {
     fireEvent.click(meshFloor);
 
     expect(await screen.findByText('Selected mesh: 8 этаж')).toBeInTheDocument();
+    expect(await screen.findByText('Material theme: floor active premium-gold · #f6d77b · opacity 0.98')).toBeInTheDocument();
+    expect(await screen.findByText('Scene availability: units 1 · viewpoints 0 · windows 0')).toBeInTheDocument();
     expect(await screen.findByText('Camera frame: floor_8')).toBeInTheDocument();
     expect(await screen.findByText('Camera target: 0,2.6,0')).toBeInTheDocument();
     expect(await screen.findByText('Camera position: 3.8,5.35,5.6')).toBeInTheDocument();
@@ -201,6 +203,7 @@ describe('Premium development viewer route', () => {
 
     fireEvent.click(unitMesh);
 
+    expect(await screen.findByText('Scene availability: units 1 · viewpoints 1 · windows 1')).toBeInTheDocument();
     expect(await screen.findByText('State: unit_top_down')).toBeInTheDocument();
     expect(await screen.findByText('Camera frame: unit_8_1')).toBeInTheDocument();
     expect(await screen.findByText('Unit camera: квартира 81')).toBeInTheDocument();

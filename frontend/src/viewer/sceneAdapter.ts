@@ -56,6 +56,17 @@ export type CameraControlState = {
   label: string;
 };
 
+export type MaterialKind = 'tower-shell' | 'floor' | 'unit' | 'room' | 'window-hotspot';
+
+export type MaterialTheme = {
+  color: string;
+  opacity: number;
+  emissive: string;
+  metalness: number;
+  roughness: number;
+  label: string;
+};
+
 export type UnitFootprintPrimitive = {
   id: string;
   number: string;
@@ -90,6 +101,52 @@ export type ViewpointAnchorPrimitive = {
   position: [number, number, number];
   target: [number, number, number];
 };
+
+export function buildMaterialTheme({
+  kind,
+  status = 'available',
+  active = false,
+  hovered = false,
+  hasUnits = true,
+}: {
+  kind: MaterialKind;
+  status?: string;
+  active?: boolean;
+  hovered?: boolean;
+  hasUnits?: boolean;
+}): MaterialTheme {
+  if (kind === 'floor') {
+    if (active) {
+      return { color: '#f6d77b', opacity: 0.98, emissive: '#7c5f1b', metalness: 0.42, roughness: 0.38, label: 'Material floor: active premium-gold' };
+    }
+    if (hovered) {
+      return { color: '#7dd3fc', opacity: 0.9, emissive: '#075985', metalness: 0.28, roughness: 0.42, label: 'Material floor: hover sky-highlight' };
+    }
+    if (!hasUnits) {
+      return { color: '#24344d', opacity: 0.42, emissive: '#020617', metalness: 0.12, roughness: 0.7, label: 'Material floor: empty muted-shell' };
+    }
+    return { color: '#4aa3ff', opacity: 0.72, emissive: '#0f3c68', metalness: 0.2, roughness: 0.48, label: 'Material floor: available blue-glass' };
+  }
+  if (kind === 'unit') {
+    if (active) {
+      return { color: '#f6d77b', opacity: 0.94, emissive: '#7c5f1b', metalness: 0.36, roughness: 0.4, label: 'Material unit: active premium-gold' };
+    }
+    if (status === 'sold') {
+      return { color: '#64748b', opacity: 0.34, emissive: '#0f172a', metalness: 0.12, roughness: 0.76, label: 'Material unit: sold muted-unavailable' };
+    }
+    if (status === 'reserved') {
+      return { color: '#fb923c', opacity: 0.74, emissive: '#7c2d12', metalness: 0.24, roughness: 0.48, label: 'Material unit: reserved warm-reserve' };
+    }
+    return { color: '#22d3ee', opacity: 0.72, emissive: '#164e63', metalness: 0.22, roughness: 0.46, label: 'Material unit: available cyan-glass' };
+  }
+  if (kind === 'room') {
+    return { color: '#a78bfa', opacity: 0.82, emissive: '#4c1d95', metalness: 0.18, roughness: 0.5, label: 'Material room: walkthrough violet' };
+  }
+  if (kind === 'window-hotspot') {
+    return { color: '#f97316', opacity: 0.92, emissive: '#7c2d12', metalness: 0.3, roughness: 0.36, label: 'Material window-hotspot: sunset view-hotspot' };
+  }
+  return { color: '#0f172a', opacity: 0.18, emissive: '#020617', metalness: 0.2, roughness: 0.62, label: 'Material tower-shell: midnight glass' };
+}
 
 export function buildViewerScene(development: DevelopmentViewerPayload): ViewerScene {
   const building = development.buildings[0];
