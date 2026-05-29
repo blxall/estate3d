@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from '../App';
@@ -36,8 +36,25 @@ const demoPayload = {
                   rooms_count: 2,
                   price: 'от 24.8 млн ₽',
                   status: 'available',
-                  plan_polygon: [],
-                  rooms: [{ id: 'room_living', name: 'Гостиная-кухня', area_m2: 24.8, polygon: [] }],
+                  plan_polygon: [
+                    { x: 0, y: 0, z: 0 },
+                    { x: 5.8, y: 0, z: 0 },
+                    { x: 5.8, y: 8.8, z: 0 },
+                    { x: 0, y: 8.8, z: 0 },
+                  ],
+                  rooms: [
+                    {
+                      id: 'room_living',
+                      name: 'Гостиная-кухня',
+                      area_m2: 24.8,
+                      polygon: [
+                        { x: 0, y: 0, z: 0 },
+                        { x: 5.2, y: 0, z: 0 },
+                        { x: 5.2, y: 4.6, z: 0 },
+                        { x: 0, y: 4.6, z: 0 },
+                      ],
+                    },
+                  ],
                   viewpoints: [{ id: 'vp_living', room_id: 'room_living', label: 'Войти в гостиную', mode: 'walk', position: { x: 0, y: 0, z: 1.6 }, target: { x: 1, y: 1, z: 1.4 } }],
                   window_views: [{ id: 'window_city', room_id: 'room_living', label: 'Вид из окна на город', image_url: '/demo/window-views/unit_8_1-city.jpg', direction_degrees: 118 }],
                 },
@@ -49,6 +66,7 @@ const demoPayload = {
 };
 
 afterEach(() => {
+  cleanup();
   vi.restoreAllMocks();
   fetchMock.mockReset();
 });
@@ -70,9 +88,35 @@ describe('Premium development viewer route', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /квартира 81/i }));
     await waitFor(() => expect(screen.getAllByText(/Top-down план квартиры 81/i).length).toBeGreaterThan(0));
-    expect(screen.getByText('Гостиная-кухня')).toBeInTheDocument();
+    expect(screen.getAllByText('Гостиная-кухня').length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole('button', { name: /вид из окна/i }));
-    expect(await screen.findByText(/Панорама из окна/i)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getAllByText(/Панорама из окна/i).length).toBeGreaterThan(0));
+  });
+
+  it('drives explicit camera states, walk mode, room plan geometry, and lead CTA', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    expect(await screen.findByText('State: development_overview')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /8 этаж/i }));
+    expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /квартира 81/i }));
+    expect(await screen.findByText('State: unit_top_down')).toBeInTheDocument();
+    expect(screen.getByLabelText('Планировка квартиры 81')).toBeInTheDocument();
+    expect(screen.getByText('Room polygon: 0,0 5.2,0 5.2,4.6 0,4.6')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /войти в гостиную/i }));
+    expect(await screen.findByText('State: walk_mode')).toBeInTheDocument();
+    expect(screen.getAllByText(/Walk mode: Войти в гостиную/i).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('button', { name: /вид из окна/i }));
+    expect(await screen.findByText('State: window_view')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
+    expect(await screen.findByText(/Заявка подготовлена/i)).toBeInTheDocument();
   });
 });

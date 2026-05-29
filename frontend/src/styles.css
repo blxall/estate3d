@@ -274,6 +274,19 @@ button {
   color: #f8e7b7;
 }
 
+.state-pill {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 2;
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: rgba(2, 6, 23, 0.72);
+  color: #bae6fd;
+  font-weight: 800;
+}
+
 .procedural-tower {
   position: relative;
   z-index: 1;
@@ -282,6 +295,14 @@ button {
   flex-direction: column;
   gap: 4px;
   transform: perspective(900px) rotateX(55deg) rotateZ(-28deg);
+  transition: transform 420ms ease, opacity 420ms ease;
+}
+
+.state-unit_top_down .procedural-tower,
+.state-walk_mode .procedural-tower,
+.state-window_view .procedural-tower {
+  opacity: 0.28;
+  transform: perspective(900px) rotateX(55deg) rotateZ(-28deg) scale(0.82) translateY(-36px);
 }
 
 .tower-floor {
@@ -311,8 +332,10 @@ button {
 }
 
 .unit-list button,
-.window-button {
+.window-button,
+.walk-button {
   width: 100%;
+  margin-top: 10px;
 }
 
 .unit-list button.active {
@@ -330,9 +353,73 @@ button {
 }
 
 .room-card {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
   margin-top: 0;
+}
+
+.room-card small {
+  grid-column: 1 / -1;
+  color: #94a3b8;
+}
+
+.floating-plan {
+  position: absolute;
+  z-index: 3;
+  width: min(420px, 76%);
+  height: 340px;
+  border: 1px solid rgba(215, 181, 109, 0.36);
+  border-radius: 28px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    rgba(2, 6, 23, 0.72);
+  background-size: 28px 28px;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.4);
+}
+
+.plan-room {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(248, 231, 183, 0.54);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(215, 181, 109, 0.26), rgba(56, 189, 248, 0.14));
+  color: #fff7ed;
+  font-weight: 800;
+  text-align: center;
+}
+
+.walk-mode-card {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 34px;
+  width: min(520px, 84%);
+  transform: translateX(-50%);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  border-radius: 24px;
+  padding: 18px;
+  background: rgba(2, 6, 23, 0.78);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+.lead-card {
+  margin-top: 16px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 20px;
+  padding: 16px;
+  background: rgba(8, 47, 73, 0.24);
+}
+
+.lead-card button {
+  width: 100%;
+}
+
+.lead-message {
+  color: #86efac;
+  font-weight: 800;
 }
 
 @media (max-width: 860px) {
