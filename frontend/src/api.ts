@@ -1,4 +1,4 @@
-import type { AuthPayload, AuthResponse, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
+import type { AuthPayload, AuthResponse, DevelopmentViewerPayload, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
 
 const API_BASE = '/api';
 
@@ -84,4 +84,8 @@ export async function generateAiDescription(propertyId: string): Promise<Propert
 
 export async function fetchPublicTour(slug: string): Promise<PublicTourPayload> {
   return requestJson<PublicTourPayload>(`${API_BASE}/tour/${slug}`);
+}
+
+export async function fetchDevelopmentViewer(developmentSlug: string): Promise<DevelopmentViewerPayload> {
+  return requestJson<DevelopmentViewerPayload>(`${API_BASE}/developments/${developmentSlug}/viewer`);
 }

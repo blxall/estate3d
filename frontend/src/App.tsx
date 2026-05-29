@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { createProperty, createTour, fetchMe, fetchProperties, fetchProperty, fetchPropertyAnalytics, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, login, register, uploadPropertyMedia } from './api';
+import { createProperty, createTour, fetchDevelopmentViewer, fetchMe, fetchProperties, fetchProperty, fetchPropertyAnalytics, fetchPropertyMedia, fetchPropertyTours, fetchPublicTour, generateAiDescription, login, register, uploadPropertyMedia } from './api';
 import { AuthPanel } from './components/AuthPanel';
+import { DevelopmentViewer } from './components/DevelopmentViewer';
 import { GlbTourViewer } from './components/GlbTourViewer';
 import { PropertyDashboard } from './components/PropertyDashboard';
 import { PropertyDetailPage } from './components/PropertyDetailPage';
-import type { AuthPayload, AuthResponse, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
+import type { AuthPayload, AuthResponse, DevelopmentViewerPayload, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
 
 const demoProperties: PropertySummary[] = [
   {
@@ -31,6 +32,11 @@ function currentPropertyId(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function currentDevelopmentViewerSlug(): string | null {
+  const match = window.location.pathname.match(/^\/developments\/([^/]+)\/viewer$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 function readStoredToken(): string | null {
   if (typeof window.localStorage?.getItem !== 'function') {
     return null;
@@ -53,8 +59,10 @@ function clearStoredToken() {
 export function App() {
   const tourSlug = currentTourSlug();
   const propertyId = currentPropertyId();
+  const developmentViewerSlug = currentDevelopmentViewerSlug();
   const [properties, setProperties] = useState<PropertySummary[]>(demoProperties);
   const [publicTour, setPublicTour] = useState<PublicTourPayload | null>(null);
+  const [developmentViewer, setDevelopmentViewer] = useState<DevelopmentViewerPayload | null>(null);
   const [propertyDetail, setPropertyDetail] = useState<PropertySummary | null>(null);
   const [propertyMedia, setPropertyMedia] = useState<UploadedMedia[]>([]);
   const [propertyTours, setPropertyTours] = useState<TourSummary[]>([]);
@@ -78,6 +86,21 @@ export function App() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!developmentViewerSlug) {
+      return;
+    }
+    let cancelled = false;
+    fetchDevelopmentViewer(developmentViewerSlug).then((payload) => {
+      if (!cancelled) {
+        setDevelopmentViewer(payload);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [developmentViewerSlug]);
 
   useEffect(() => {
     if (!tourSlug) {
@@ -115,7 +138,7 @@ export function App() {
   }, [propertyId]);
 
   useEffect(() => {
-    if (tourSlug || propertyId) {
+    if (tourSlug || propertyId || developmentViewerSlug) {
       return;
     }
     let cancelled = false;
@@ -133,7 +156,7 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [tourSlug]);
+  }, [tourSlug, developmentViewerSlug]);
 
   async function handleCreateProperty(payload: PropertyCreatePayload) {
     const created = await createProperty(payload);
@@ -157,6 +180,13 @@ export function App() {
     writeStoredToken(response.access_token);
     setCurrentUser(response.user);
     return response;
+  }
+
+  if (developmentViewerSlug) {
+    if (!developmentViewer) {
+      return <main className="layout">Загружаем интерактивный ЖК...</main>;
+    }
+    return <DevelopmentViewer development={developmentViewer} />;
   }
 
   if (tourSlug) {

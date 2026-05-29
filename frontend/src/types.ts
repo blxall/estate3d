@@ -76,3 +76,67 @@ export type AuthResponse = {
   access_token: string;
   token_type: 'bearer';
 };
+
+export type ViewerPoint = { x: number; y: number; z: number };
+
+export type DevelopmentWindowView = {
+  id: string;
+  room_id: string;
+  label: string;
+  image_url: string;
+  direction_degrees: number;
+};
+
+export type DevelopmentViewpoint = {
+  id: string;
+  room_id: string;
+  label: string;
+  mode: string;
+  position: ViewerPoint;
+  target: ViewerPoint;
+};
+
+export type DevelopmentRoom = {
+  id: string;
+  name: string;
+  area_m2: number;
+  polygon: ViewerPoint[];
+};
+
+export type DevelopmentUnit = {
+  id: string;
+  number: string;
+  area_m2: number;
+  rooms_count: number;
+  price: string;
+  status: string;
+  plan_polygon: ViewerPoint[];
+  rooms: DevelopmentRoom[];
+  viewpoints: DevelopmentViewpoint[];
+  window_views: DevelopmentWindowView[];
+};
+
+export type DevelopmentFloor = {
+  id: string;
+  level: number;
+  label: string;
+  elevation: number;
+  units: DevelopmentUnit[];
+};
+
+export type DevelopmentBuilding = {
+  id: string;
+  name: string;
+  floors_count: number;
+  model: Record<string, unknown>;
+  floors: DevelopmentFloor[];
+};
+
+export type DevelopmentViewerPayload = {
+  id: string;
+  name: string;
+  city: string;
+  hero: { tagline: string; headline: string; lead: string };
+  viewer_config: Record<string, unknown>;
+  buildings: DevelopmentBuilding[];
+};

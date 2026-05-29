@@ -104,9 +104,82 @@ class PropertyAnalyticsResponse(BaseModel):
     last_event_at: datetime | None = None
 
 
+class ViewerPoint(BaseModel):
+    x: float
+    y: float
+    z: float
+
+
+class WindowView(BaseModel):
+    id: str
+    room_id: str
+    label: str
+    image_url: str
+    direction_degrees: int
+
+
+class Viewpoint(BaseModel):
+    id: str
+    room_id: str
+    label: str
+    mode: str
+    position: ViewerPoint
+    target: ViewerPoint
+
+
+class Room(BaseModel):
+    id: str
+    name: str
+    area_m2: float
+    polygon: list[ViewerPoint]
+
+
+class Unit(BaseModel):
+    id: str
+    number: str
+    area_m2: float
+    rooms_count: int
+    price: str
+    status: str
+    plan_polygon: list[ViewerPoint]
+    rooms: list[Room]
+    viewpoints: list[Viewpoint]
+    window_views: list[WindowView]
+
+
+class Floor(BaseModel):
+    id: str
+    level: int
+    label: str
+    elevation: float
+    units: list[Unit]
+
+
+class Building(BaseModel):
+    id: str
+    name: str
+    floors_count: int
+    model: dict
+    floors: list[Floor]
+
+
+class DevelopmentViewerResponse(BaseModel):
+    id: str
+    name: str
+    city: str
+    hero: dict
+    viewer_config: dict
+    buildings: list[Building]
+
+
 @app.get("/health")
 def healthcheck() -> dict[str, str]:
     return {"status": "ok", "service": "estate3d-backend"}
+
+
+@app.get("/developments/demo-premium/viewer", response_model=DevelopmentViewerResponse)
+def get_demo_development_viewer() -> DevelopmentViewerResponse:
+    return _demo_development_viewer()
 
 
 @app.post("/auth/register", response_model=AuthTokenResponse, status_code=status.HTTP_201_CREATED)
@@ -400,3 +473,86 @@ def _owned_property_or_404(property_id: str, current_user: User) -> Property:
     if property_ is None or property_.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
     return property_
+
+
+def _p(x: float, y: float, z: float = 0) -> ViewerPoint:
+    return ViewerPoint(x=x, y=y, z=z)
+
+
+def _demo_unit(unit_id: str, number: str, x_offset: float) -> Unit:
+    living_room = Room(
+        id=f"room_{unit_id}_living",
+        name="Гостиная-кухня",
+        area_m2=24.8,
+        polygon=[_p(x_offset, 0), _p(x_offset + 5.2, 0), _p(x_offset + 5.2, 4.6), _p(x_offset, 4.6)],
+    )
+    bedroom = Room(
+        id=f"room_{unit_id}_bedroom",
+        name="Спальня",
+        area_m2=14.2,
+        polygon=[_p(x_offset, 4.8), _p(x_offset + 4.2, 4.8), _p(x_offset + 4.2, 8.4), _p(x_offset, 8.4)],
+    )
+    return Unit(
+        id=unit_id,
+        number=number,
+        area_m2=58.7 if number.endswith("1") else 64.3,
+        rooms_count=2,
+        price="от 24.8 млн ₽",
+        status="available",
+        plan_polygon=[_p(x_offset, 0), _p(x_offset + 5.8, 0), _p(x_offset + 5.8, 8.8), _p(x_offset, 8.8)],
+        rooms=[living_room, bedroom],
+        viewpoints=[
+            Viewpoint(
+                id=f"vp_{unit_id}_living",
+                room_id=living_room.id,
+                label="Войти в гостиную",
+                mode="walk",
+                position=_p(x_offset + 2.4, 1.8, 1.6),
+                target=_p(x_offset + 4.8, 4.2, 1.4),
+            )
+        ],
+        window_views=[
+            WindowView(
+                id=f"window_{unit_id}_city",
+                room_id=living_room.id,
+                label="Вид из окна на город",
+                image_url=f"/demo/window-views/{unit_id}-city.jpg",
+                direction_degrees=118,
+            )
+        ],
+    )
+
+
+def _demo_floor(level: int) -> Floor:
+    units = []
+    if level == 8:
+        units = [_demo_unit("unit_8_1", "81", -6.2), _demo_unit("unit_8_2", "82", 0.8), _demo_unit("unit_8_3", "83", 7.8)]
+    return Floor(id=f"floor_{level}", level=level, label=f"{level} этаж", elevation=level * 3.25, units=units)
+
+
+def _demo_development_viewer() -> DevelopmentViewerResponse:
+    floors = [_demo_floor(level) for level in range(1, 17)]
+    return DevelopmentViewerResponse(
+        id="dev_demo_premium",
+        name="Estate3D Skyline",
+        city="Москва",
+        hero={
+            "tagline": "ЖК → корпус → этаж → квартира → окно",
+            "headline": "Интерактивный выбор квартиры в 3D",
+            "lead": "Демо-сцена для premium viewer: плавный подлет к корпусу, выбор этажа, top-down квартира и виды из окон.",
+        },
+        viewer_config={
+            "default_state": "development_overview",
+            "camera_states": ["development_overview", "building_focus", "floor_focus", "unit_top_down", "walk_mode", "window_view"],
+            "accent_color": "#d7b56d",
+        },
+        buildings=[
+            Building(
+                id="building_a",
+                name="Корпус A",
+                floors_count=len(floors),
+                model={"kind": "procedural_tower", "width": 18, "depth": 12, "floor_height": 3.25},
+                floors=floors,
+            )
+        ],
+    )
