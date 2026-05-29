@@ -99,6 +99,9 @@ export type ShareHandoffSummary = {
   label: string;
   copy: string;
   ariaLabel: string;
+  cardClass: string;
+  copyClass: string;
+  buttonClass: string;
 };
 
 export type ResponsiveHudState = {
@@ -352,6 +355,9 @@ export function buildShareHandoffSummary({
     label: `Share handoff: ${context}`,
     copy: `Ссылка для клиента: ${shareLink}`,
     ariaLabel: `Copy share link: ${context}`,
+    cardClass: 'share-handoff-card glass-card desktop-inline',
+    copyClass: 'share-handoff-copy copy-ready',
+    buttonClass: 'share-copy-button premium-outline',
   };
 }
 

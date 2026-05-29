@@ -20,10 +20,10 @@ export function LeadCta({ leadMessage, leadContext, shareHandoff, onSubmit }: Pr
         </div>
       )}
       {shareHandoff && (
-        <div className="share-handoff-card">
+        <div className={shareHandoff.cardClass}>
           <p>{shareHandoff.label}</p>
-          <small>{shareHandoff.copy}</small>
-          <button type="button" aria-label={shareHandoff.ariaLabel}>Ссылка готова к отправке</button>
+          <small className={shareHandoff.copyClass}>{shareHandoff.copy}</small>
+          <button type="button" className={shareHandoff.buttonClass} aria-label={shareHandoff.ariaLabel}>Ссылка готова к отправке</button>
         </div>
       )}
       <button type="button" onClick={onSubmit}>Оставить заявку</button>

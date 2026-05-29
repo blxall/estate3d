@@ -305,6 +305,9 @@ describe('viewer scene adapter', () => {
       label: 'Share handoff: 2 этаж · квартира 21 · window_view',
       copy: 'Ссылка для клиента: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city',
       ariaLabel: 'Copy share link: 2 этаж · квартира 21 · window_view',
+      cardClass: 'share-handoff-card glass-card desktop-inline',
+      copyClass: 'share-handoff-copy copy-ready',
+      buttonClass: 'share-copy-button premium-outline',
     });
   });
 

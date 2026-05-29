@@ -548,6 +548,48 @@ button {
   background: rgba(2, 6, 23, 0.34);
 }
 
+.share-handoff-card.glass-card {
+  margin: 12px 0;
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(248, 231, 183, 0.28);
+  border-radius: 18px;
+  padding: 13px;
+  background:
+    linear-gradient(135deg, rgba(248, 231, 183, 0.12), rgba(56, 189, 248, 0.08)),
+    rgba(2, 6, 23, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 46px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.share-handoff-card.desktop-inline {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.share-handoff-card p {
+  margin: 0;
+  color: #f8e7b7;
+  font-weight: 900;
+}
+
+.share-handoff-copy.copy-ready {
+  display: block;
+  color: #dbeafe;
+  overflow-wrap: anywhere;
+}
+
+.lead-card .share-copy-button.premium-outline {
+  width: 100%;
+  border: 1px solid rgba(248, 231, 183, 0.42);
+  background: rgba(2, 6, 23, 0.34);
+  color: #f8e7b7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.lead-card .share-copy-button.premium-outline:hover {
+  background: linear-gradient(135deg, rgba(248, 231, 183, 0.22), rgba(56, 189, 248, 0.14));
+}
+
 .unit-status {
   margin-top: 6px;
   font-weight: 900;
@@ -614,6 +656,27 @@ button {
   .viewer-hud.mobile-stack .lead-context small {
     max-height: 6.5rem;
     overflow: auto;
+  }
+
+  .viewer-hud.mobile-stack .share-handoff-card.glass-card {
+    margin: 10px -2px 12px;
+    padding: 12px;
+    gap: 8px;
+    border-radius: 16px;
+  }
+
+  .viewer-hud.mobile-stack .share-handoff-card p {
+    font-size: 0.92rem;
+  }
+
+  .viewer-hud.mobile-stack .share-handoff-copy.copy-ready {
+    max-height: 4.8rem;
+    overflow: auto;
+    font-size: 0.78rem;
+  }
+
+  .viewer-hud.mobile-stack .share-copy-button.premium-outline {
+    padding: 0.68rem 0.85rem;
   }
 
   .r3f-camera-readout {
