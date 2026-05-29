@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 
-import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint } from '../types';
+import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
 import { cameraMessageForState, type ViewerScene as ViewerSceneModel, type ViewerState } from '../viewer/sceneAdapter';
 import { ApartmentPlan } from './ApartmentPlan';
 import { WalkModePanel } from './WalkModePanel';
@@ -13,13 +13,25 @@ type Props = {
   selectedFloor: DevelopmentFloor | null;
   selectedUnit: DevelopmentUnit | null;
   selectedViewpoint: DevelopmentViewpoint | null;
+  activeWindow: DevelopmentWindowView | null;
   onChooseFloor: (floorId: string) => void;
   onChooseUnit: (unit: DevelopmentUnit) => void;
   onEnterWalkMode: (viewpoint: DevelopmentViewpoint) => void;
+  onShowWindowView: (windowView?: DevelopmentWindowView) => void;
 };
 
-export function ViewerScene({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, onChooseFloor, onChooseUnit, onEnterWalkMode }: Props) {
-  const activeWindow = selectedUnit?.window_views[0] ?? null;
+export function ViewerScene({
+  scene,
+  viewerState,
+  selectedFloor,
+  selectedUnit,
+  selectedViewpoint,
+  activeWindow,
+  onChooseFloor,
+  onChooseUnit,
+  onEnterWalkMode,
+  onShowWindowView,
+}: Props) {
   const cameraMessage = cameraMessageForState({ viewerState, selectedFloor, selectedUnit, selectedViewpoint, activeWindow });
 
   return (
@@ -36,6 +48,7 @@ export function ViewerScene({ scene, viewerState, selectedFloor, selectedUnit, s
           onChooseFloor={onChooseFloor}
           onChooseUnit={onChooseUnit}
           onEnterWalkMode={onEnterWalkMode}
+          onShowWindowView={onShowWindowView}
         />
       </Suspense>
       <div className="procedural-tower dom-fallback backup-controls" aria-label={`${scene.building.name} backup floor controls`}>

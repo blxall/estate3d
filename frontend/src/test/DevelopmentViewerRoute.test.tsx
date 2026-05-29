@@ -90,7 +90,7 @@ describe('Premium development viewer route', () => {
     await waitFor(() => expect(screen.getAllByText(/Top-down план квартиры 81/i).length).toBeGreaterThan(0));
     expect(screen.getAllByText('Гостиная-кухня').length).toBeGreaterThan(0);
 
-    fireEvent.click(screen.getByRole('button', { name: /вид из окна/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /вид из окна/i })[1]);
     await waitFor(() => expect(screen.getAllByText(/Панорама из окна/i).length).toBeGreaterThan(0));
   });
 
@@ -133,7 +133,7 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('State: walk_mode')).toBeInTheDocument();
     expect(screen.getAllByText(/Walk mode: Войти в гостиную/i).length).toBeGreaterThan(0);
 
-    fireEvent.click(screen.getByRole('button', { name: /вид из окна/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /вид из окна/i })[1]);
     expect(await screen.findByText('State: window_view')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
@@ -225,5 +225,28 @@ describe('Premium development viewer route', () => {
 
     expect(await screen.findByText('State: walk_mode')).toBeInTheDocument();
     expect(screen.getAllByText(/Walk mode: Войти в гостиную/i).length).toBeGreaterThan(0);
+  });
+
+  it('uses the R3F window hotspot bridge to open the selected window view', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    const roomMesh = await screen.findByRole('button', { name: /3D room mesh: Гостиная-кухня/i });
+    fireEvent.click(roomMesh);
+
+    const windowHotspot = await screen.findByRole('button', { name: /3D window hotspot: Вид из окна на город/i });
+    expect(windowHotspot).toBeInTheDocument();
+    expect(screen.getByText('Window hotspots: 1')).toBeInTheDocument();
+    expect(screen.getByText('Window hotspot: Вид из окна на город · 118°')).toBeInTheDocument();
+
+    fireEvent.click(windowHotspot);
+
+    expect(await screen.findByText('State: window_view')).toBeInTheDocument();
+    expect(screen.getAllByText(/Панорама из окна: Вид из окна на город/i).length).toBeGreaterThan(0);
   });
 });

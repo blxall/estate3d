@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
-import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint } from '../types';
+import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
 import { buildViewerScene, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
@@ -17,16 +17,18 @@ export function DevelopmentViewer({ development }: Props) {
   const [selectedFloor, setSelectedFloor] = useState<DevelopmentFloor | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<DevelopmentUnit | null>(null);
   const [selectedViewpoint, setSelectedViewpoint] = useState<DevelopmentViewpoint | null>(null);
+  const [activeWindow, setActiveWindow] = useState<DevelopmentWindowView | null>(null);
   const [leadMessage, setLeadMessage] = useState('');
 
-  const activeWindow = selectedUnit?.window_views[0] ?? null;
   const firstViewpoint = selectedUnit?.viewpoints[0] ?? null;
+  const firstWindow = selectedUnit?.window_views[0] ?? null;
 
   function chooseFloor(floorId: string) {
     const floor = building.floors.find((candidate) => candidate.id === floorId) ?? null;
     setSelectedFloor(floor);
     setSelectedUnit(null);
     setSelectedViewpoint(null);
+    setActiveWindow(null);
     setLeadMessage('');
     setViewerState('floor_focus');
   }
@@ -34,19 +36,22 @@ export function DevelopmentViewer({ development }: Props) {
   function chooseUnit(unit: DevelopmentUnit) {
     setSelectedUnit(unit);
     setSelectedViewpoint(null);
+    setActiveWindow(null);
     setLeadMessage('');
     setViewerState('unit_top_down');
   }
 
   function enterWalkMode(viewpoint: DevelopmentViewpoint) {
     setSelectedViewpoint(viewpoint);
+    setActiveWindow(null);
     setLeadMessage('');
     setViewerState('walk_mode');
   }
 
-  function showWindowView() {
-    setViewerState('window_view');
+  function showWindowView(windowView?: DevelopmentWindowView) {
+    setActiveWindow(windowView ?? firstWindow ?? null);
     setLeadMessage('');
+    setViewerState('window_view');
   }
 
   async function submitLead() {
@@ -89,15 +94,17 @@ export function DevelopmentViewer({ development }: Props) {
           selectedFloor={selectedFloor}
           selectedUnit={selectedUnit}
           selectedViewpoint={selectedViewpoint}
+          activeWindow={activeWindow}
           onChooseFloor={chooseFloor}
           onChooseUnit={chooseUnit}
           onEnterWalkMode={enterWalkMode}
+          onShowWindowView={showWindowView}
         />
         <ViewerHud
           building={building}
           selectedFloor={selectedFloor}
           selectedUnit={selectedUnit}
-          activeWindow={activeWindow}
+          activeWindow={activeWindow ?? firstWindow}
           firstViewpoint={firstViewpoint}
           viewerState={viewerState}
           leadMessage={leadMessage}

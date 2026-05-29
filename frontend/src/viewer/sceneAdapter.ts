@@ -63,6 +63,15 @@ export type RoomFootprintPrimitive = {
   size: [number, number, number];
 };
 
+export type WindowHotspotPrimitive = {
+  id: string;
+  roomId: string;
+  label: string;
+  directionDegrees: number;
+  center: [number, number, number];
+  size: [number, number, number];
+};
+
 export function buildViewerScene(development: DevelopmentViewerPayload): ViewerScene {
   const building = development.buildings[0];
   const floors = [...building.floors];
@@ -202,6 +211,30 @@ export function buildRoomFootprints(unit?: DevelopmentUnit | null, floor?: Devel
         areaM2: room.area_m2,
         center: [footprint.centerX, y, footprint.centerZ],
         size: [footprint.width, 0.04, footprint.depth],
+      },
+    ];
+  });
+}
+
+export function buildWindowHotspots(unit?: DevelopmentUnit | null, floor?: DevelopmentFloor | null): WindowHotspotPrimitive[] {
+  if (!unit) {
+    return [];
+  }
+  const y = rounded(floorTargetY(floor) + 0.22);
+  return unit.window_views.flatMap((windowView) => {
+    const room = unit.rooms.find((candidate) => candidate.id === windowView.room_id);
+    const footprint = room ? scaledPolygonBounds(room.polygon) : scaledPlanBounds(unit);
+    if (!footprint) {
+      return [];
+    }
+    return [
+      {
+        id: windowView.id,
+        roomId: windowView.room_id,
+        label: windowView.label,
+        directionDegrees: windowView.direction_degrees,
+        center: [footprint.centerX, y, footprint.centerZ],
+        size: [Math.max(0.24, rounded(footprint.width * 0.27)), 0.1, 0.1],
       },
     ];
   });
