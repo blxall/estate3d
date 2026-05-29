@@ -45,6 +45,17 @@ export type CameraPlan = {
   label: string;
 };
 
+export type CameraControlState = {
+  key: string;
+  position: [number, number, number];
+  target: [number, number, number];
+  zoom: number;
+  easing: number;
+  animationMs: number;
+  controlsEnabled: boolean;
+  label: string;
+};
+
 export type UnitFootprintPrimitive = {
   id: string;
   number: string;
@@ -253,6 +264,32 @@ function viewpointVector(point: DevelopmentViewpoint['position'], floor?: Develo
   return [rounded(point.x / 3), rounded(y + point.z), rounded(point.y / 3)];
 }
 
+function directionVector(degrees: number): { x: number; z: number } {
+  const radians = (degrees * Math.PI) / 180;
+  return { x: Math.sin(radians), z: Math.cos(radians) };
+}
+
+function windowCameraVector({
+  windowView,
+  floor,
+  unit,
+  selectedViewpoint,
+}: {
+  windowView: DevelopmentWindowView;
+  floor?: DevelopmentFloor | null;
+  unit?: DevelopmentUnit | null;
+  selectedViewpoint?: DevelopmentViewpoint | null;
+}): Pick<CameraPlan, 'position' | 'target'> {
+  const baseViewpoint = selectedViewpoint ?? unit?.viewpoints.find((viewpoint) => viewpoint.room_id === windowView.room_id) ?? unit?.viewpoints[0];
+  const basePosition = baseViewpoint ? viewpointVector(baseViewpoint.position, floor) : ([0, rounded(floorTargetY(floor) + 1.6), 0] as [number, number, number]);
+  const direction = directionVector(windowView.direction_degrees);
+  const eyeY = rounded(basePosition[1] + 0.3);
+  return {
+    position: [rounded(basePosition[0] - direction.x), eyeY, rounded(basePosition[2] - direction.z * 1.94)],
+    target: [rounded(basePosition[0] + direction.x * 1.36), eyeY, rounded(basePosition[2] + direction.z * 1.94)],
+  };
+}
+
 export function buildViewpointAnchors(unit?: DevelopmentUnit | null, floor?: DevelopmentFloor | null): ViewpointAnchorPrimitive[] {
   if (!unit) {
     return [];
@@ -322,13 +359,25 @@ export function buildCameraPlan({
   selectedFloor,
   selectedUnit,
   selectedViewpoint,
+  activeWindow,
 }: {
   scene: ViewerScene;
   viewerState: ViewerState;
   selectedFloor?: DevelopmentFloor | null;
   selectedUnit?: DevelopmentUnit | null;
   selectedViewpoint?: DevelopmentViewpoint | null;
+  activeWindow?: DevelopmentWindowView | null;
 }): CameraPlan {
+  if (viewerState === 'window_view' && activeWindow) {
+    const camera = windowCameraVector({ windowView: activeWindow, floor: selectedFloor, unit: selectedUnit, selectedViewpoint });
+    return {
+      frame: activeWindow.id,
+      position: camera.position,
+      target: camera.target,
+      zoom: 1.64,
+      label: `Window camera: ${activeWindow.label}`,
+    };
+  }
   if (viewerState === 'walk_mode' && selectedFloor && selectedViewpoint) {
     return {
       frame: selectedViewpoint.id,
@@ -364,5 +413,20 @@ export function buildCameraPlan({
     target: [0, 1.6, 0],
     zoom: 1,
     label: `Overview camera: ${scene.building.name}`,
+  };
+}
+
+export function buildCameraControlState(plan: CameraPlan, viewerState: ViewerState): CameraControlState {
+  const animationMs = viewerState === 'development_overview' ? 900 : 650;
+  const easing = viewerState === 'development_overview' ? 0.06 : 0.08;
+  return {
+    key: `${viewerState}:${plan.frame}`,
+    position: plan.position,
+    target: plan.target,
+    zoom: plan.zoom,
+    easing,
+    animationMs,
+    controlsEnabled: viewerState !== 'development_overview',
+    label: `Camera controls: animated ${animationMs}ms · target ${plan.target.join(',')} · frame ${plan.frame}`,
   };
 }

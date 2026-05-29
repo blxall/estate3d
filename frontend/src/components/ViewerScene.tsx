@@ -45,6 +45,7 @@ export function ViewerScene({
           selectedFloor={selectedFloor}
           selectedUnit={selectedUnit}
           selectedViewpoint={selectedViewpoint}
+          activeWindow={activeWindow}
           selectedFloorId={selectedFloor?.id}
           onChooseFloor={onChooseFloor}
           onChooseUnit={onChooseUnit}

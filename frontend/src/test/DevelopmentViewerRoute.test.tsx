@@ -231,6 +231,7 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Camera target: 0.33,4,0.33')).toBeInTheDocument();
     expect(await screen.findByText('Camera position: 0,4.2,0')).toBeInTheDocument();
     expect(await screen.findByText('Viewpoint camera: Войти в гостиную')).toBeInTheDocument();
+    expect(await screen.findByText('Camera controls: animated 650ms · target 0.33,4,0.33 · frame vp_living')).toBeInTheDocument();
   });
 
   it('uses the R3F window hotspot bridge to open the selected window view', async () => {
@@ -253,6 +254,11 @@ describe('Premium development viewer route', () => {
     fireEvent.click(windowHotspot);
 
     expect(await screen.findByText('State: window_view')).toBeInTheDocument();
+    expect(await screen.findByText('Camera frame: window_city')).toBeInTheDocument();
+    expect(await screen.findByText('Camera target: 1.2,4.5,-0.91')).toBeInTheDocument();
+    expect(await screen.findByText('Camera position: -0.88,4.5,0.91')).toBeInTheDocument();
+    expect(await screen.findByText('Window camera: Вид из окна на город')).toBeInTheDocument();
+    expect(await screen.findByText('Camera controls: animated 650ms · target 1.2,4.5,-0.91 · frame window_city')).toBeInTheDocument();
     expect(screen.getAllByText(/Панорама из окна: Вид из окна на город/i).length).toBeGreaterThan(0);
   });
 });

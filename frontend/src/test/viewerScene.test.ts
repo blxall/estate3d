@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildCameraControlState,
   buildCameraPlan,
   buildRoomFootprints,
   buildUnitFootprints,
@@ -132,6 +133,32 @@ describe('viewer scene adapter', () => {
       target: [0, 0.65, 0],
       zoom: 1.45,
       label: 'Unit camera: квартира 21',
+    });
+    expect(buildCameraPlan({ scene, viewerState: 'window_view', selectedFloor: floor, selectedUnit: unit, activeWindow: unit.window_views[0] })).toEqual({
+      frame: 'window_city',
+      position: [-0.87, 2.55, 1.3],
+      target: [1.18, 2.55, -0.64],
+      zoom: 1.64,
+      label: 'Window camera: Вид из окна',
+    });
+  });
+
+  it('describes animated camera controls for R3F transitions while preserving deterministic fallback data', () => {
+    const scene = buildViewerScene(payload);
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+    const viewpoint = unit.viewpoints[0];
+    const plan = buildCameraPlan({ scene, viewerState: 'walk_mode', selectedFloor: floor, selectedUnit: unit, selectedViewpoint: viewpoint });
+
+    expect(buildCameraControlState(plan, 'walk_mode')).toEqual({
+      key: 'walk_mode:vp_living',
+      position: [0, 2.25, 0.33],
+      target: [0.67, 2.05, 1.33],
+      zoom: 1.72,
+      easing: 0.08,
+      animationMs: 650,
+      controlsEnabled: true,
+      label: 'Camera controls: animated 650ms · target 0.67,2.05,1.33 · frame vp_living',
     });
   });
 

@@ -1,8 +1,10 @@
-import { Canvas } from '@react-three/fiber';
-import { useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useMemo, useState } from 'react';
+import { Vector3 } from 'three';
 
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
 import {
+  buildCameraControlState,
   buildCameraPlan,
   buildRoomFootprints,
   buildUnitFootprints,
@@ -21,6 +23,7 @@ type Props = {
   selectedFloor?: DevelopmentFloor | null;
   selectedUnit?: DevelopmentUnit | null;
   selectedViewpoint?: DevelopmentViewpoint | null;
+  activeWindow?: DevelopmentWindowView | null;
   selectedFloorId?: string | null;
   onChooseFloor: (floorId: string) => void;
   onChooseUnit: (unit: DevelopmentUnit) => void;
@@ -143,12 +146,28 @@ function WindowHotspotMeshes({ hotspots, onChooseWindowById }: WindowHotspotMesh
   );
 }
 
-export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, selectedFloorId, onChooseFloor, onChooseUnit, onEnterWalkMode, onShowWindowView }: Props) {
+function CameraController({ control }: { control: ReturnType<typeof buildCameraControlState> }) {
+  const { camera } = useThree();
+  const targetPosition = useMemo(() => new Vector3(...control.position), [control.key, control.position]);
+  const targetLookAt = useMemo(() => new Vector3(...control.target), [control.key, control.target]);
+
+  useFrame(() => {
+    camera.position.lerp(targetPosition, control.easing);
+    camera.zoom += (control.zoom - camera.zoom) * control.easing;
+    camera.lookAt(targetLookAt);
+    camera.updateProjectionMatrix();
+  });
+
+  return null;
+}
+
+export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, activeWindow, selectedFloorId, onChooseFloor, onChooseUnit, onEnterWalkMode, onShowWindowView }: Props) {
   const webGlAvailable = canUseWebGl();
   const [hoveredFloorId, setHoveredFloorId] = useState<string | null>(null);
   const selectedLabel = floorLabel(scene, selectedFloorId);
   const hoveredLabel = floorLabel(scene, hoveredFloorId);
-  const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint });
+  const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, activeWindow });
+  const cameraControl = buildCameraControlState(cameraPlan, viewerState);
   const unitFootprints = buildUnitFootprints(selectedFloor);
   const roomFootprints = buildRoomFootprints(selectedUnit, selectedFloor);
   const viewpointAnchors = buildViewpointAnchors(selectedUnit, selectedFloor);
@@ -186,6 +205,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>Camera target: {cameraPlan.target.join(',')}</span>
         <span>Camera position: {cameraPlan.position.join(',')}</span>
         <span>{cameraPlan.label}</span>
+        <span>{cameraControl.label}</span>
         <span>Selected mesh: {selectedLabel}</span>
         <span>Hover floor: {hoveredLabel}</span>
         <span>Unit footprints: {unitFootprints.length}</span>
@@ -197,6 +217,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
       <div className="r3f-canvas-frame" aria-hidden="true">
         {webGlAvailable ? (
           <Canvas camera={{ position: cameraPlan.position, fov: 38, zoom: cameraPlan.zoom }}>
+            <CameraController control={cameraControl} />
             <ambientLight intensity={0.8} />
             <directionalLight position={[4, 5, 4]} intensity={1.5} />
             <TowerMeshes
