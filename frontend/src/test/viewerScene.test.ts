@@ -6,6 +6,7 @@ import {
   buildAvailabilityState,
   buildLeadContextSummary,
   buildMaterialTheme,
+  buildResponsiveHudState,
   buildRoomFootprints,
   buildUnitCard,
   buildUnitFootprints,
@@ -275,6 +276,21 @@ describe('viewer scene adapter', () => {
     ).toEqual({
       label: 'Lead context: Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Войти в гостиную · Вид из окна',
       message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 2 этаж, квартира 21 (2 комнаты, 61 м², от 20 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна.',
+    });
+  });
+
+  it('plans responsive premium HUD states for mobile and desktop fallback layouts', () => {
+    expect(buildResponsiveHudState({ viewportWidth: 390, viewerState: 'window_view', hasSelectedUnit: true, hasLeadContext: true })).toEqual({
+      mode: 'mobile',
+      stageClass: 'viewer-stage responsive-mobile state-window_view has-unit has-lead-context',
+      hudClass: 'viewer-hud mobile-stack compact-lead',
+      label: 'Responsive HUD: mobile stack · sticky CTA · lead context visible',
+    });
+    expect(buildResponsiveHudState({ viewportWidth: 1180, viewerState: 'floor_focus', hasSelectedUnit: false, hasLeadContext: false })).toEqual({
+      mode: 'desktop',
+      stageClass: 'viewer-stage responsive-desktop state-floor_focus no-unit no-lead-context',
+      hudClass: 'viewer-hud desktop-panel',
+      label: 'Responsive HUD: desktop panel · exploratory browsing',
     });
   });
 

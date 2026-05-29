@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildLeadContextSummary, buildViewerScene, type ViewerState } from '../viewer/sceneAdapter';
+import { buildLeadContextSummary, buildResponsiveHudState, buildViewerScene, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -22,6 +22,12 @@ export function DevelopmentViewer({ development }: Props) {
 
   const firstViewpoint = selectedUnit?.viewpoints[0] ?? null;
   const firstWindow = selectedUnit?.window_views[0] ?? null;
+  const responsiveStage = buildResponsiveHudState({
+    viewportWidth: typeof window === 'undefined' ? 1180 : window.innerWidth,
+    viewerState,
+    hasSelectedUnit: Boolean(selectedUnit),
+    hasLeadContext: Boolean(selectedUnit),
+  });
 
   function chooseFloor(floorId: string) {
     const floor = building.floors.find((candidate) => candidate.id === floorId) ?? null;
@@ -96,7 +102,7 @@ export function DevelopmentViewer({ development }: Props) {
         <p>{development.hero.lead}</p>
       </section>
 
-      <section className="viewer-stage" aria-label="Интерактивная 3D сцена ЖК">
+      <section className={responsiveStage.stageClass} aria-label="Интерактивная 3D сцена ЖК">
         <ViewerScene
           scene={scene}
           viewerState={viewerState}

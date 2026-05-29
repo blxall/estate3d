@@ -526,6 +526,49 @@ button {
   background: rgba(8, 47, 73, 0.24);
 }
 
+.responsive-hud-readout,
+.lead-context small,
+.unit-list small {
+  display: block;
+  color: #bfdbfe;
+  line-height: 1.45;
+}
+
+.responsive-hud-readout {
+  margin: 0 0 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.lead-context {
+  margin: 12px 0;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(2, 6, 23, 0.34);
+}
+
+.unit-status {
+  margin-top: 6px;
+  font-weight: 900;
+}
+
+.viewer-hud.mobile-stack.compact-lead .lead-card {
+  position: sticky;
+  bottom: 12px;
+  z-index: 6;
+  backdrop-filter: blur(16px);
+}
+
+.viewer-hud.mobile-stack .unit-list button {
+  text-align: left;
+  border-radius: 18px;
+}
+
+.viewer-hud.desktop-panel {
+  min-width: 0;
+}
+
 .lead-card button {
   width: 100%;
 }
@@ -548,6 +591,34 @@ button {
 
   .viewer-stage {
     grid-template-columns: 1fr;
+  }
+
+  .development-viewer {
+    padding: 18px;
+  }
+
+  .viewer-hero,
+  .viewer-hud,
+  .viewer-scene {
+    border-radius: 22px;
+  }
+
+  .viewer-stage.responsive-mobile {
+    gap: 14px;
+  }
+
+  .viewer-hud.mobile-stack {
+    padding: 18px;
+  }
+
+  .viewer-hud.mobile-stack .lead-context small {
+    max-height: 6.5rem;
+    overflow: auto;
+  }
+
+  .r3f-camera-readout {
+    max-width: calc(100% - 36px);
+    font-size: 0.72rem;
   }
 
   .property-actions {

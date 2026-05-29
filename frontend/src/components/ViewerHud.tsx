@@ -1,5 +1,5 @@
 import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildAvailabilityState, buildLeadContextSummary, buildUnitCard, polygonPoints, type LeadContextSummary, type ViewerState } from '../viewer/sceneAdapter';
+import { buildAvailabilityState, buildLeadContextSummary, buildResponsiveHudState, buildUnitCard, polygonPoints, type LeadContextSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { LeadCta } from './LeadCta';
 
 type Props = {
@@ -46,9 +46,16 @@ export function ViewerHud({
         viewerState,
       })
     : null;
+  const responsiveHud = buildResponsiveHudState({
+    viewportWidth: typeof window === 'undefined' ? 1180 : window.innerWidth,
+    viewerState,
+    hasSelectedUnit: Boolean(selectedUnit),
+    hasLeadContext: Boolean(leadContext),
+  });
 
   return (
-    <aside className="viewer-hud">
+    <aside className={responsiveHud.hudClass}>
+      <p className="responsive-hud-readout">{responsiveHud.label}</p>
       <p className="eyebrow">{building.name}</p>
       <h2>{selectedFloor ? selectedFloor.label : 'Выберите этаж'}</h2>
       {!selectedFloor && <p>Нажмите на 8 этаж, чтобы увидеть доступные квартиры и перейти в режим плана.</p>}

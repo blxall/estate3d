@@ -95,6 +95,13 @@ export type LeadContextSummary = {
   message: string;
 };
 
+export type ResponsiveHudState = {
+  mode: 'mobile' | 'desktop';
+  stageClass: string;
+  hudClass: string;
+  label: string;
+};
+
 export type UnitFootprintPrimitive = {
   id: string;
   number: string;
@@ -287,6 +294,28 @@ export function buildLeadContextSummary({
     label,
     message: details.join(' '),
   };
+}
+
+export function buildResponsiveHudState({
+  viewportWidth,
+  viewerState,
+  hasSelectedUnit,
+  hasLeadContext,
+}: {
+  viewportWidth: number;
+  viewerState: ViewerState;
+  hasSelectedUnit: boolean;
+  hasLeadContext: boolean;
+}): ResponsiveHudState {
+  const mode: ResponsiveHudState['mode'] = viewportWidth <= 640 ? 'mobile' : 'desktop';
+  const unitClass = hasSelectedUnit ? 'has-unit' : 'no-unit';
+  const leadClass = hasLeadContext ? 'has-lead-context' : 'no-lead-context';
+  const stageClass = `viewer-stage responsive-${mode} state-${viewerState} ${unitClass} ${leadClass}`;
+  const hudClass = mode === 'mobile' ? `viewer-hud mobile-stack${hasLeadContext ? ' compact-lead' : ''}` : 'viewer-hud desktop-panel';
+  const label = hasLeadContext
+    ? `Responsive HUD: ${mode === 'mobile' ? 'mobile stack' : 'desktop panel'} · sticky CTA · lead context visible`
+    : `Responsive HUD: ${mode === 'mobile' ? 'mobile stack' : 'desktop panel'} · exploratory browsing`;
+  return { mode, stageClass, hudClass, label };
 }
 
 export function buildMaterialTheme({
