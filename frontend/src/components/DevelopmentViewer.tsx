@@ -91,6 +91,7 @@ export function DevelopmentViewer({ development }: Props) {
           selectedViewpoint={selectedViewpoint}
           onChooseFloor={chooseFloor}
           onChooseUnit={chooseUnit}
+          onEnterWalkMode={enterWalkMode}
         />
         <ViewerHud
           building={building}

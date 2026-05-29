@@ -54,6 +54,15 @@ export type UnitFootprintPrimitive = {
   size: [number, number, number];
 };
 
+export type RoomFootprintPrimitive = {
+  id: string;
+  name: string;
+  label: string;
+  areaM2: number;
+  center: [number, number, number];
+  size: [number, number, number];
+};
+
 export function buildViewerScene(development: DevelopmentViewerPayload): ViewerScene {
   const building = development.buildings[0];
   const floors = [...building.floors];
@@ -135,6 +144,23 @@ function scaledPlanBounds(unit: DevelopmentUnit) {
   };
 }
 
+function scaledPolygonBounds(points: DevelopmentRoom['polygon']) {
+  const primitiveBounds = bounds(points);
+  if (!primitiveBounds) {
+    return null;
+  }
+  const centerX = (primitiveBounds.minX + primitiveBounds.maxX) / 2;
+  const centerY = (primitiveBounds.minY + primitiveBounds.maxY) / 2;
+  const width = primitiveBounds.maxX - primitiveBounds.minX || 1;
+  const depth = primitiveBounds.maxY - primitiveBounds.minY || 1;
+  return {
+    centerX: rounded(centerX / 3),
+    centerZ: rounded(centerY / 3),
+    width: rounded(width / 3),
+    depth: rounded(depth / 3),
+  };
+}
+
 export function buildUnitFootprints(floor?: DevelopmentFloor | null): UnitFootprintPrimitive[] {
   if (!floor) {
     return [];
@@ -153,6 +179,29 @@ export function buildUnitFootprints(floor?: DevelopmentFloor | null): UnitFootpr
         status: unit.status,
         center: [footprint.centerX, y, footprint.centerZ],
         size: [footprint.width, 0.06, footprint.depth],
+      },
+    ];
+  });
+}
+
+export function buildRoomFootprints(unit?: DevelopmentUnit | null, floor?: DevelopmentFloor | null): RoomFootprintPrimitive[] {
+  if (!unit) {
+    return [];
+  }
+  const y = rounded(floorTargetY(floor) + 0.16);
+  return unit.rooms.flatMap((room) => {
+    const footprint = scaledPolygonBounds(room.polygon);
+    if (!footprint) {
+      return [];
+    }
+    return [
+      {
+        id: room.id,
+        name: room.name,
+        label: room.name,
+        areaM2: room.area_m2,
+        center: [footprint.centerX, y, footprint.centerZ],
+        size: [footprint.width, 0.04, footprint.depth],
       },
     ];
   });

@@ -1,8 +1,16 @@
 import { Canvas } from '@react-three/fiber';
 import { useState } from 'react';
 
-import type { DevelopmentFloor, DevelopmentUnit } from '../types';
-import { buildCameraPlan, buildUnitFootprints, type UnitFootprintPrimitive, type ViewerScene as ViewerSceneModel, type ViewerState } from '../viewer/sceneAdapter';
+import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint } from '../types';
+import {
+  buildCameraPlan,
+  buildRoomFootprints,
+  buildUnitFootprints,
+  type RoomFootprintPrimitive,
+  type UnitFootprintPrimitive,
+  type ViewerScene as ViewerSceneModel,
+  type ViewerState,
+} from '../viewer/sceneAdapter';
 
 type Props = {
   scene: ViewerSceneModel;
@@ -12,6 +20,7 @@ type Props = {
   selectedFloorId?: string | null;
   onChooseFloor: (floorId: string) => void;
   onChooseUnit: (unit: DevelopmentUnit) => void;
+  onEnterWalkMode: (viewpoint: DevelopmentViewpoint) => void;
 };
 
 type TowerMeshesProps = Pick<Props, 'scene' | 'selectedFloorId' | 'onChooseFloor'> & {
@@ -23,6 +32,11 @@ type UnitMeshesProps = {
   footprints: UnitFootprintPrimitive[];
   selectedUnitId?: string | null;
   onChooseUnitById: (unitId: string) => void;
+};
+
+type RoomMeshesProps = {
+  footprints: RoomFootprintPrimitive[];
+  onChooseRoomById: (roomId: string) => void;
 };
 
 function canUseWebGl(): boolean {
@@ -93,18 +107,39 @@ function UnitMeshes({ footprints, selectedUnitId, onChooseUnitById }: UnitMeshes
   );
 }
 
-export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedFloorId, onChooseFloor, onChooseUnit }: Props) {
+function RoomMeshes({ footprints, onChooseRoomById }: RoomMeshesProps) {
+  return (
+    <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
+      {footprints.map((room) => (
+        <mesh key={room.id} position={room.center} onClick={() => onChooseRoomById(room.id)}>
+          <boxGeometry args={room.size} />
+          <meshStandardMaterial color="#a78bfa" transparent opacity={0.82} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedFloorId, onChooseFloor, onChooseUnit, onEnterWalkMode }: Props) {
   const webGlAvailable = canUseWebGl();
   const [hoveredFloorId, setHoveredFloorId] = useState<string | null>(null);
   const selectedLabel = floorLabel(scene, selectedFloorId);
   const hoveredLabel = floorLabel(scene, hoveredFloorId);
   const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit });
   const unitFootprints = buildUnitFootprints(selectedFloor);
+  const roomFootprints = buildRoomFootprints(selectedUnit, selectedFloor);
 
   function chooseUnitById(unitId: string) {
     const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
     if (unit) {
       onChooseUnit(unit);
+    }
+  }
+
+  function chooseRoomById(roomId: string) {
+    const viewpoint = selectedUnit?.viewpoints.find((candidate) => candidate.room_id === roomId) ?? selectedUnit?.viewpoints[0];
+    if (viewpoint) {
+      onEnterWalkMode(viewpoint);
     }
   }
 
@@ -122,6 +157,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>Selected mesh: {selectedLabel}</span>
         <span>Hover floor: {hoveredLabel}</span>
         <span>Unit footprints: {unitFootprints.length}</span>
+        <span>Room footprints: {roomFootprints.length}</span>
       </div>
       <div className="r3f-building-shell" aria-label={`R3F building shell: ${scene.building.name}`} />
       <div className="r3f-canvas-frame" aria-hidden="true">
@@ -137,6 +173,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
               onHoverFloor={setHoveredFloorId}
             />
             <UnitMeshes footprints={unitFootprints} selectedUnitId={selectedUnit?.id} onChooseUnitById={chooseUnitById} />
+            <RoomMeshes footprints={roomFootprints} onChooseRoomById={chooseRoomById} />
           </Canvas>
         ) : (
           <div className="r3f-canvas-fallback">WebGL preview fallback</div>
@@ -173,6 +210,18 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
       <div className="r3f-unit-footprints" aria-label="R3F unit footprint readout">
         {unitFootprints.map((unit) => (
           <span key={unit.id}>Unit footprint: {unit.label} · {unit.status}</span>
+        ))}
+      </div>
+      <div className="r3f-room-hitboxes" aria-label="3D room selection bridge">
+        {roomFootprints.map((room) => (
+          <button key={room.id} type="button" className="r3f-room-hitbox" onClick={() => chooseRoomById(room.id)}>
+            3D room mesh: {room.label}
+          </button>
+        ))}
+      </div>
+      <div className="r3f-room-footprints" aria-label="R3F room footprint readout">
+        {roomFootprints.map((room) => (
+          <span key={room.id}>Room footprint: {room.label} · {room.areaM2} м²</span>
         ))}
       </div>
     </div>

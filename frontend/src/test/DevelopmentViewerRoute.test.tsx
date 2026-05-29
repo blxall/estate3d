@@ -206,4 +206,24 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Unit camera: квартира 81')).toBeInTheDocument();
     expect(await screen.findByLabelText('Планировка квартиры 81')).toBeInTheDocument();
   });
+
+  it('uses the R3F room mesh bridge to enter walk mode from selected apartment', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    const roomMesh = await screen.findByRole('button', { name: /3D room mesh: Гостиная-кухня/i });
+    expect(roomMesh).toBeInTheDocument();
+    expect(screen.getByText('Room footprints: 1')).toBeInTheDocument();
+    expect(screen.getByText('Room footprint: Гостиная-кухня · 24.8 м²')).toBeInTheDocument();
+
+    fireEvent.click(roomMesh);
+
+    expect(await screen.findByText('State: walk_mode')).toBeInTheDocument();
+    expect(screen.getAllByText(/Walk mode: Войти в гостиную/i).length).toBeGreaterThan(0);
+  });
 });
