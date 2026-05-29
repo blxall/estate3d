@@ -40,7 +40,7 @@ AUTH_JSON=$(curl -fsS -X POST "http://127.0.0.1:$BACKEND_PORT/auth/register" \
   -H 'Content-Type: application/json' \
   -d '{"email":"smoke@example.com","password":"strong-password","full_name":"Smoke Agent"}')
 ACCESS_TOKEN=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])' <<<"$AUTH_JSON")
-AUTH_HEADER="Authorization: Bearer $ACCESS_TOKEN"
+AUTH_HEADER="Authorization: Bearer ${ACCESS_TOKEN}"
 
 PROPERTY_JSON=$(curl -fsS -X POST "http://127.0.0.1:$BACKEND_PORT/properties" \
   -H 'Content-Type: application/json' \

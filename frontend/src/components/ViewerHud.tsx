@@ -1,0 +1,87 @@
+import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
+import { polygonPoints, type ViewerState } from '../viewer/sceneAdapter';
+import { LeadCta } from './LeadCta';
+
+type Props = {
+  building: DevelopmentBuilding;
+  selectedFloor: DevelopmentFloor | null;
+  selectedUnit: DevelopmentUnit | null;
+  activeWindow: DevelopmentWindowView | null;
+  firstViewpoint: DevelopmentViewpoint | null;
+  viewerState: ViewerState;
+  leadMessage: string;
+  onChooseUnit: (unit: DevelopmentUnit) => void;
+  onEnterWalkMode: (viewpoint: DevelopmentViewpoint) => void;
+  onShowWindowView: () => void;
+  onSubmitLead: () => void;
+};
+
+export function ViewerHud({
+  building,
+  selectedFloor,
+  selectedUnit,
+  activeWindow,
+  firstViewpoint,
+  viewerState,
+  leadMessage,
+  onChooseUnit,
+  onEnterWalkMode,
+  onShowWindowView,
+  onSubmitLead,
+}: Props) {
+  return (
+    <aside className="viewer-hud">
+      <p className="eyebrow">{building.name}</p>
+      <h2>{selectedFloor ? selectedFloor.label : 'Выберите этаж'}</h2>
+      {!selectedFloor && <p>Нажмите на 8 этаж, чтобы увидеть доступные квартиры и перейти в режим плана.</p>}
+
+      {selectedFloor && selectedFloor.units.length === 0 && <p>Для демо наполнен 8 этаж. Остальные этажи показывают механику выбора.</p>}
+
+      {selectedFloor && selectedFloor.units.length > 0 && (
+        <div className="unit-list">
+          {selectedFloor.units.map((unit) => (
+            <button key={unit.id} type="button" onClick={() => onChooseUnit(unit)} className={selectedUnit?.id === unit.id ? 'active' : ''}>
+              Квартира {unit.number} · {unit.area_m2} м² · {unit.price}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {selectedUnit && (
+        <div className="unit-plan">
+          <h3>Top-down план квартиры {selectedUnit.number}</h3>
+          <div className="room-grid">
+            {selectedUnit.rooms.map((room) => (
+              <div key={room.id} className="room-card">
+                <strong>{room.name}</strong>
+                <span>{room.area_m2} м²</span>
+                {room.polygon.length > 0 && <small>Room polygon: {polygonPoints(room)}</small>}
+              </div>
+            ))}
+          </div>
+          {firstViewpoint && (
+            <button type="button" className="walk-button" onClick={() => onEnterWalkMode(firstViewpoint)}>
+              {firstViewpoint.label}
+            </button>
+          )}
+          {activeWindow && (
+            <button type="button" className="window-button" onClick={onShowWindowView}>
+              {activeWindow.label}
+            </button>
+          )}
+        </div>
+      )}
+
+      {viewerState === 'window_view' && activeWindow && (
+        <div className="window-view-card">
+          <p className="eyebrow">Панорама из окна</p>
+          <h3>{activeWindow.label}</h3>
+          <p>Заготовленный вид: {activeWindow.image_url}</p>
+          <p>Направление камеры: {activeWindow.direction_degrees}°</p>
+        </div>
+      )}
+
+      {selectedUnit && <LeadCta leadMessage={leadMessage} onSubmit={onSubmitLead} />}
+    </aside>
+  );
+}
