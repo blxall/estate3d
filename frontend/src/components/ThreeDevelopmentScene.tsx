@@ -6,6 +6,7 @@ import {
   buildCameraPlan,
   buildRoomFootprints,
   buildUnitFootprints,
+  buildViewpointAnchors,
   buildWindowHotspots,
   type RoomFootprintPrimitive,
   type UnitFootprintPrimitive,
@@ -19,6 +20,7 @@ type Props = {
   viewerState: ViewerState;
   selectedFloor?: DevelopmentFloor | null;
   selectedUnit?: DevelopmentUnit | null;
+  selectedViewpoint?: DevelopmentViewpoint | null;
   selectedFloorId?: string | null;
   onChooseFloor: (floorId: string) => void;
   onChooseUnit: (unit: DevelopmentUnit) => void;
@@ -141,14 +143,15 @@ function WindowHotspotMeshes({ hotspots, onChooseWindowById }: WindowHotspotMesh
   );
 }
 
-export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedFloorId, onChooseFloor, onChooseUnit, onEnterWalkMode, onShowWindowView }: Props) {
+export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint, selectedFloorId, onChooseFloor, onChooseUnit, onEnterWalkMode, onShowWindowView }: Props) {
   const webGlAvailable = canUseWebGl();
   const [hoveredFloorId, setHoveredFloorId] = useState<string | null>(null);
   const selectedLabel = floorLabel(scene, selectedFloorId);
   const hoveredLabel = floorLabel(scene, hoveredFloorId);
-  const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit });
+  const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit, selectedViewpoint });
   const unitFootprints = buildUnitFootprints(selectedFloor);
   const roomFootprints = buildRoomFootprints(selectedUnit, selectedFloor);
+  const viewpointAnchors = buildViewpointAnchors(selectedUnit, selectedFloor);
   const windowHotspots = buildWindowHotspots(selectedUnit, selectedFloor);
 
   function chooseUnitById(unitId: string) {
@@ -187,6 +190,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>Hover floor: {hoveredLabel}</span>
         <span>Unit footprints: {unitFootprints.length}</span>
         <span>Room footprints: {roomFootprints.length}</span>
+        <span>Active viewpoint: {selectedViewpoint?.label ?? 'none'}</span>
         <span>Window hotspots: {windowHotspots.length}</span>
       </div>
       <div className="r3f-building-shell" aria-label={`R3F building shell: ${scene.building.name}`} />
@@ -253,6 +257,11 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
       <div className="r3f-room-footprints" aria-label="R3F room footprint readout">
         {roomFootprints.map((room) => (
           <span key={room.id}>Room footprint: {room.label} · {room.areaM2} м²</span>
+        ))}
+      </div>
+      <div className="r3f-viewpoint-anchors" aria-label="R3F viewpoint anchor readout">
+        {viewpointAnchors.map((viewpoint) => (
+          <span key={viewpoint.id}>Viewpoint anchor: {viewpoint.label} · {viewpoint.target.join(',')}</span>
         ))}
       </div>
       <div className="r3f-window-hotspots" aria-label="3D window hotspot bridge">

@@ -4,6 +4,7 @@ import {
   buildCameraPlan,
   buildRoomFootprints,
   buildUnitFootprints,
+  buildViewpointAnchors,
   buildViewerScene,
   buildWindowHotspots,
   cameraMessageForState,
@@ -179,5 +180,29 @@ describe('viewer scene adapter', () => {
         size: [0.36, 0.1, 0.1],
       },
     ]);
+  });
+
+  it('builds room viewpoint anchors and targets walk mode camera from the selected viewpoint', () => {
+    const scene = buildViewerScene(payload);
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+    const viewpoint = unit.viewpoints[0];
+
+    expect(buildViewpointAnchors(unit, floor)).toEqual([
+      {
+        id: 'vp_living',
+        roomId: 'room_living',
+        label: 'Войти в гостиную',
+        position: [0, 2.25, 0.33],
+        target: [0.67, 2.05, 1.33],
+      },
+    ]);
+    expect(buildCameraPlan({ scene, viewerState: 'walk_mode', selectedFloor: floor, selectedUnit: unit, selectedViewpoint: viewpoint })).toEqual({
+      frame: 'vp_living',
+      position: [0, 2.25, 0.33],
+      target: [0.67, 2.05, 1.33],
+      zoom: 1.72,
+      label: 'Viewpoint camera: Войти в гостиную',
+    });
   });
 });

@@ -33,6 +33,13 @@ for _ in {1..60}; do
   sleep 0.5
 done
 
+for _ in {1..60}; do
+  if curl -fsS "http://127.0.0.1:$FRONTEND_PORT/" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.5
+done
+
 curl -fsS "http://127.0.0.1:$BACKEND_PORT/health" | grep -q 'estate3d-backend'
 curl -fsS "http://127.0.0.1:$FRONTEND_PORT/" | grep -q 'Estate3D'
 

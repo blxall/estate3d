@@ -72,6 +72,14 @@ export type WindowHotspotPrimitive = {
   size: [number, number, number];
 };
 
+export type ViewpointAnchorPrimitive = {
+  id: string;
+  roomId: string;
+  label: string;
+  position: [number, number, number];
+  target: [number, number, number];
+};
+
 export function buildViewerScene(development: DevelopmentViewerPayload): ViewerScene {
   const building = development.buildings[0];
   const floors = [...building.floors];
@@ -240,6 +248,24 @@ export function buildWindowHotspots(unit?: DevelopmentUnit | null, floor?: Devel
   });
 }
 
+function viewpointVector(point: DevelopmentViewpoint['position'], floor?: DevelopmentFloor | null): [number, number, number] {
+  const y = floorTargetY(floor);
+  return [rounded(point.x / 3), rounded(y + point.z), rounded(point.y / 3)];
+}
+
+export function buildViewpointAnchors(unit?: DevelopmentUnit | null, floor?: DevelopmentFloor | null): ViewpointAnchorPrimitive[] {
+  if (!unit) {
+    return [];
+  }
+  return unit.viewpoints.map((viewpoint) => ({
+    id: viewpoint.id,
+    roomId: viewpoint.room_id,
+    label: viewpoint.label,
+    position: viewpointVector(viewpoint.position, floor),
+    target: viewpointVector(viewpoint.target, floor),
+  }));
+}
+
 function pct(value: number): string {
   const rounded = Math.round(value * 100) / 100;
   return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded}%`;
@@ -295,12 +321,23 @@ export function buildCameraPlan({
   viewerState,
   selectedFloor,
   selectedUnit,
+  selectedViewpoint,
 }: {
   scene: ViewerScene;
   viewerState: ViewerState;
   selectedFloor?: DevelopmentFloor | null;
   selectedUnit?: DevelopmentUnit | null;
+  selectedViewpoint?: DevelopmentViewpoint | null;
 }): CameraPlan {
+  if (viewerState === 'walk_mode' && selectedFloor && selectedViewpoint) {
+    return {
+      frame: selectedViewpoint.id,
+      position: viewpointVector(selectedViewpoint.position, selectedFloor),
+      target: viewpointVector(selectedViewpoint.target, selectedFloor),
+      zoom: 1.72,
+      label: `Viewpoint camera: ${selectedViewpoint.label}`,
+    };
+  }
   if ((viewerState === 'unit_top_down' || viewerState === 'walk_mode' || viewerState === 'window_view') && selectedFloor && selectedUnit) {
     const y = floorTargetY(selectedFloor);
     return {

@@ -225,6 +225,12 @@ describe('Premium development viewer route', () => {
 
     expect(await screen.findByText('State: walk_mode')).toBeInTheDocument();
     expect(screen.getAllByText(/Walk mode: Войти в гостиную/i).length).toBeGreaterThan(0);
+    expect(await screen.findByText('Active viewpoint: Войти в гостиную')).toBeInTheDocument();
+    expect(await screen.findByText('Viewpoint anchor: Войти в гостиную · 0.33,4,0.33')).toBeInTheDocument();
+    expect(await screen.findByText('Camera frame: vp_living')).toBeInTheDocument();
+    expect(await screen.findByText('Camera target: 0.33,4,0.33')).toBeInTheDocument();
+    expect(await screen.findByText('Camera position: 0,4.2,0')).toBeInTheDocument();
+    expect(await screen.findByText('Viewpoint camera: Войти в гостиную')).toBeInTheDocument();
   });
 
   it('uses the R3F window hotspot bridge to open the selected window view', async () => {
