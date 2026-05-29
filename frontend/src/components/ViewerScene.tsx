@@ -1,7 +1,11 @@
+import { lazy, Suspense } from 'react';
+
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint } from '../types';
 import { cameraMessageForState, type ViewerScene as ViewerSceneModel, type ViewerState } from '../viewer/sceneAdapter';
 import { ApartmentPlan } from './ApartmentPlan';
 import { WalkModePanel } from './WalkModePanel';
+
+const ThreeDevelopmentScene = lazy(() => import('./ThreeDevelopmentScene').then((module) => ({ default: module.ThreeDevelopmentScene })));
 
 type Props = {
   scene: ViewerSceneModel;
@@ -20,7 +24,10 @@ export function ViewerScene({ scene, viewerState, selectedFloor, selectedUnit, s
     <div className="viewer-scene">
       <div className="state-pill">State: {viewerState}</div>
       <div className="camera-path">{cameraMessage}</div>
-      <div className="procedural-tower" aria-label={scene.building.name}>
+      <Suspense fallback={<div className="r3f-scene-shell r3f-loading">Loading R3F scene…</div>}>
+        <ThreeDevelopmentScene scene={scene} selectedFloorId={selectedFloor?.id} onChooseFloor={onChooseFloor} />
+      </Suspense>
+      <div className="procedural-tower dom-fallback" aria-label={scene.building.name}>
         {scene.towerFloors.map((floor) => (
           <button
             key={floor.id}

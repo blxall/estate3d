@@ -287,15 +287,18 @@ button {
   font-weight: 800;
 }
 
-.procedural-tower {
-  position: relative;
-  z-index: 1;
-  width: min(360px, 72vw);
+.procedural-tower.dom-fallback {
+  position: absolute;
+  z-index: 2;
+  right: 28px;
+  bottom: 28px;
+  width: min(190px, 32vw);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   transform: perspective(900px) rotateX(55deg) rotateZ(-28deg);
   transition: transform 420ms ease, opacity 420ms ease;
+  opacity: 0.72;
 }
 
 .state-unit_top_down .procedural-tower,
@@ -306,7 +309,7 @@ button {
 }
 
 .tower-floor {
-  height: 32px;
+  height: 22px;
   border-radius: 8px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   background: linear-gradient(90deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.88));
@@ -318,6 +321,80 @@ button {
 .tower-floor.active {
   background: linear-gradient(90deg, #d7b56d, #38bdf8);
   color: #020617;
+}
+
+.r3f-scene-shell {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 86vw);
+  height: min(560px, 72vh);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 36px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.22), transparent 34%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.94));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 32px 90px rgba(0, 0, 0, 0.34);
+}
+
+.r3f-scene-meta {
+  position: absolute;
+  z-index: 3;
+  left: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 4px;
+  color: #dbeafe;
+  font-weight: 800;
+}
+
+.r3f-scene-meta small {
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.r3f-canvas-frame,
+.r3f-canvas-frame canvas,
+.r3f-canvas-fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.r3f-canvas-fallback {
+  display: grid;
+  place-items: center;
+  color: rgba(219, 234, 254, 0.42);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.r3f-floor-hitboxes {
+  position: absolute;
+  z-index: 4;
+  inset: 18% 34% 16% 34%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  transform: perspective(900px) rotateX(55deg) rotateZ(-28deg);
+}
+
+.r3f-floor-hitbox {
+  flex: 1;
+  min-height: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.12);
+  color: transparent;
+  font-size: 1px;
+  box-shadow: 10px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.r3f-floor-hitbox.has-units,
+.r3f-floor-hitbox.active,
+.r3f-floor-hitbox:hover {
+  background: linear-gradient(90deg, rgba(215, 181, 109, 0.58), rgba(56, 189, 248, 0.44));
+  border-color: rgba(248, 231, 183, 0.6);
 }
 
 .viewer-hud {
