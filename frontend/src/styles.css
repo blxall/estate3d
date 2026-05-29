@@ -353,6 +353,41 @@ button {
   font-weight: 600;
 }
 
+.r3f-camera-readout {
+  position: absolute;
+  z-index: 5;
+  top: 18px;
+  left: 18px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: rgba(2, 6, 23, 0.62);
+  color: #bfdbfe;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.r3f-building-shell {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 340px;
+  height: 420px;
+  transform: translate(-50%, -50%) perspective(900px) rotateX(55deg) rotateZ(-28deg);
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 24px 24px 12px 12px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    rgba(15, 23, 42, 0.16);
+  background-size: 34px 24px;
+  box-shadow: 20px 26px 0 rgba(0, 0, 0, 0.1), inset 0 0 60px rgba(56, 189, 248, 0.08);
+  pointer-events: none;
+}
+
 .r3f-canvas-frame,
 .r3f-canvas-frame canvas,
 .r3f-canvas-fallback {
@@ -392,6 +427,7 @@ button {
 
 .r3f-floor-hitbox.has-units,
 .r3f-floor-hitbox.active,
+.r3f-floor-hitbox.hovered,
 .r3f-floor-hitbox:hover {
   background: linear-gradient(90deg, rgba(215, 181, 109, 0.58), rgba(56, 189, 248, 0.44));
   border-color: rgba(248, 231, 183, 0.6);

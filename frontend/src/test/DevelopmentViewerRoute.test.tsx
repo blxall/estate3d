@@ -164,11 +164,18 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
     expect(await screen.findByLabelText('R3F scene slice for Корпус A')).toBeInTheDocument();
     expect(screen.getByText(/R3F-ready tower geometry/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /3D floor mesh: 8 этаж/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('R3F building shell: Корпус A')).toBeInTheDocument();
+    expect(screen.getByText('Camera frame: overview')).toBeInTheDocument();
+    const meshFloor = screen.getByRole('button', { name: /3D floor mesh: 8 этаж/i });
+    expect(meshFloor).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^8 этаж$/i })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    fireEvent.mouseEnter(meshFloor);
+    expect(await screen.findByText('Hover floor: 8 этаж')).toBeInTheDocument();
+    fireEvent.click(meshFloor);
 
+    expect(await screen.findByText('Selected mesh: 8 этаж')).toBeInTheDocument();
+    expect(await screen.findByText('Camera frame: floor_8')).toBeInTheDocument();
     expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
     expect(await screen.findByText(/Камера поднимается на 8 этаж/i)).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: /Квартира 81/i })).toBeInTheDocument();
