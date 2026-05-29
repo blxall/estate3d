@@ -136,6 +136,10 @@ describe('Premium development viewer route', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /вид из окна/i })[1]);
     expect(await screen.findByText('State: window_view')).toBeInTheDocument();
 
+    expect(screen.getByText('Unit card: Квартира 81 · 2 комнаты · 58.7 м² · от 24.8 млн ₽ · Доступна')).toBeInTheDocument();
+    expect(screen.getByText('Готова к просмотру: планировка, прогулка и вид из окна доступны.')).toBeInTheDocument();
+    expect(screen.getByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
     expect(await screen.findByText(/Заявка отправлена: #lead_123/i)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
@@ -149,7 +153,7 @@ describe('Premium development viewer route', () => {
         contact_name: '',
         contact_phone: '',
         contact_email: '',
-        message: 'Viewer lead from Estate3D premium demo',
+        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город.',
       }),
     });
   });

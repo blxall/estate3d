@@ -1,4 +1,5 @@
 import type {
+  DevelopmentBuilding,
   DevelopmentFloor,
   DevelopmentRoom,
   DevelopmentUnit,
@@ -79,6 +80,21 @@ export type AvailabilityState = {
   hudMessage: string;
 };
 
+export type UnitCard = {
+  title: string;
+  subtitle: string;
+  statusBadge: string;
+  statusTone: string;
+  availabilityCopy: string;
+  ariaLabel: string;
+  selectedLabel: string;
+};
+
+export type LeadContextSummary = {
+  label: string;
+  message: string;
+};
+
 export type UnitFootprintPrimitive = {
   id: string;
   number: string;
@@ -139,7 +155,7 @@ export function buildAvailabilityState({
   const canChooseUnit = Boolean(selectedFloor && unitCount > 0 && !unavailableUnit);
   const canWalk = Boolean(selectedUnit && viewpointCount > 0 && !unavailableUnit);
   const canOpenWindow = Boolean(selectedUnit && windowCount > 0 && !unavailableUnit);
-  const label = `Availability: ${state.replaceAll('-', ' ')} · units ${unitCount} · viewpoints ${viewpointCount} · windows ${windowCount}`;
+  const label = `Availability: ${state.replace(/-/g, ' ')} · units ${unitCount} · viewpoints ${viewpointCount} · windows ${windowCount}`;
 
   if (state === 'empty-floor') {
     return {
@@ -190,6 +206,86 @@ export function buildAvailabilityState({
     canOpenWindow,
     label,
     hudMessage: state === 'floor-ready' ? 'Выберите доступную квартиру на этаже, чтобы открыть планировку.' : 'Интерактивный просмотр готов: планировка, прогулка и виды из окна доступны.',
+  };
+}
+
+export function buildUnitCard({ floor, unit, active = false }: { floor: DevelopmentFloor; unit: DevelopmentUnit; active?: boolean }): UnitCard {
+  const statusCopy: Record<string, { badge: string; tone: string; copy: string }> = {
+    available: {
+      badge: 'Доступна',
+      tone: 'available',
+      copy: unit.viewpoints.length > 0 || unit.window_views.length > 0 ? 'Готова к просмотру: планировка, прогулка и вид из окна доступны.' : 'Доступна для заявки: покажите планировку и уточните детали у менеджера.',
+    },
+    reserved: {
+      badge: 'Забронирована',
+      tone: 'reserved',
+      copy: `В резерве — менеджер уточнит статус и похожие варианты на ${floor.label}.`,
+    },
+    sold: {
+      badge: 'Продана',
+      tone: 'sold',
+      copy: `Недоступна для покупки, но менеджер может предложить похожие варианты на ${floor.label}.`,
+    },
+    hidden: {
+      badge: 'Скрыта',
+      tone: 'hidden',
+      copy: `Недоступна в публичном выборе, но контекст ${floor.label} можно передать менеджеру.`,
+    },
+  };
+  const status = statusCopy[unit.status] ?? { badge: unit.status, tone: unit.status, copy: `Статус квартиры: ${unit.status}. Менеджер уточнит детали.` };
+  const roomsWord = unit.rooms_count === 1 ? 'комната' : unit.rooms_count > 1 && unit.rooms_count < 5 ? 'комнаты' : 'комнат';
+  const title = `Квартира ${unit.number}`;
+  const subtitle = `${unit.rooms_count} ${roomsWord} · ${unit.area_m2} м² · ${unit.price}`;
+  return {
+    title,
+    subtitle,
+    statusBadge: status.badge,
+    statusTone: status.tone,
+    availabilityCopy: status.copy,
+    ariaLabel: `${title} · ${subtitle} · ${status.badge}`,
+    selectedLabel: active ? 'Выбрана для заявки' : '',
+  };
+}
+
+export function buildLeadContextSummary({
+  development,
+  building,
+  selectedFloor,
+  selectedUnit,
+  selectedViewpoint,
+  activeWindow,
+  viewerState,
+}: {
+  development: DevelopmentViewerPayload;
+  building: DevelopmentBuilding;
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+  selectedViewpoint?: DevelopmentViewpoint | null;
+  activeWindow?: DevelopmentWindowView | null;
+  viewerState: ViewerState;
+}): LeadContextSummary {
+  const floorLabel = selectedFloor?.label ?? 'этаж не выбран';
+  const unitLabel = selectedUnit ? `квартира ${selectedUnit.number}` : 'квартира не выбрана';
+  const optionalLabelParts = [selectedViewpoint?.label, activeWindow?.label].filter(Boolean);
+  const label = `Lead context: ${[development.name, building.name, floorLabel, unitLabel, viewerState, ...optionalLabelParts].join(' · ')}`;
+
+  if (!selectedFloor || !selectedUnit) {
+    return {
+      label,
+      message: `Покупатель смотрит ${development.name}, ${building.name}. Состояние viewer: ${viewerState}. Этаж и квартира пока не выбраны.`,
+    };
+  }
+
+  const details = [`Покупатель смотрит ${development.name}, ${building.name}, ${selectedFloor.label}, квартира ${selectedUnit.number} (${selectedUnit.rooms_count} ${selectedUnit.rooms_count === 1 ? 'комната' : selectedUnit.rooms_count > 1 && selectedUnit.rooms_count < 5 ? 'комнаты' : 'комнат'}, ${selectedUnit.area_m2} м², ${selectedUnit.price}).`, `Состояние viewer: ${viewerState}.`];
+  if (selectedViewpoint) {
+    details.push(`Точка просмотра: ${selectedViewpoint.label}.`);
+  }
+  if (activeWindow) {
+    details.push(`Вид из окна: ${activeWindow.label}.`);
+  }
+  return {
+    label,
+    message: details.join(' '),
   };
 }
 

@@ -4,8 +4,10 @@ import {
   buildCameraControlState,
   buildCameraPlan,
   buildAvailabilityState,
+  buildLeadContextSummary,
   buildMaterialTheme,
   buildRoomFootprints,
+  buildUnitCard,
   buildUnitFootprints,
   buildViewpointAnchors,
   buildViewerScene,
@@ -228,6 +230,51 @@ describe('viewer scene adapter', () => {
       canOpenWindow: false,
       label: 'Availability: unavailable unit · units 1 · viewpoints 0 · windows 0',
       hudMessage: 'Квартира 21 сейчас недоступна для выбора, но её можно оставить в заявке менеджеру.',
+    });
+  });
+
+  it('builds data-rich premium unit cards with status and sales copy', () => {
+    const floor = payload.buildings[0].floors[1];
+    const availableUnit = floor.units[0];
+    const soldUnit = { ...availableUnit, status: 'sold' };
+
+    expect(buildUnitCard({ floor, unit: availableUnit, active: true })).toEqual({
+      title: 'Квартира 21',
+      subtitle: '2 комнаты · 61 м² · от 20 млн ₽',
+      statusBadge: 'Доступна',
+      statusTone: 'available',
+      availabilityCopy: 'Готова к просмотру: планировка, прогулка и вид из окна доступны.',
+      ariaLabel: 'Квартира 21 · 2 комнаты · 61 м² · от 20 млн ₽ · Доступна',
+      selectedLabel: 'Выбрана для заявки',
+    });
+    expect(buildUnitCard({ floor, unit: soldUnit, active: false })).toMatchObject({
+      statusBadge: 'Продана',
+      statusTone: 'sold',
+      availabilityCopy: 'Недоступна для покупки, но менеджер может предложить похожие варианты на 2 этаж.',
+      selectedLabel: '',
+    });
+  });
+
+  it('summarizes lead context across development, building, floor, unit, viewer state, viewpoint, and window', () => {
+    const building = payload.buildings[0];
+    const floor = building.floors[1];
+    const unit = floor.units[0];
+    const viewpoint = unit.viewpoints[0];
+    const windowView = unit.window_views[0];
+
+    expect(
+      buildLeadContextSummary({
+        development: payload,
+        building,
+        selectedFloor: floor,
+        selectedUnit: unit,
+        selectedViewpoint: viewpoint,
+        activeWindow: windowView,
+        viewerState: 'window_view',
+      }),
+    ).toEqual({
+      label: 'Lead context: Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Войти в гостиную · Вид из окна',
+      message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 2 этаж, квартира 21 (2 комнаты, 61 м², от 20 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна.',
     });
   });
 

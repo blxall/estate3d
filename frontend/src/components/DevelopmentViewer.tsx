@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildViewerScene, type ViewerState } from '../viewer/sceneAdapter';
+import { buildLeadContextSummary, buildViewerScene, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -61,6 +61,15 @@ export function DevelopmentViewer({ development }: Props) {
     }
 
     setLeadMessage('Отправляем заявку менеджеру…');
+    const leadContext = buildLeadContextSummary({
+      development,
+      building,
+      selectedFloor,
+      selectedUnit,
+      selectedViewpoint,
+      activeWindow,
+      viewerState,
+    });
     try {
       const lead = await submitDevelopmentLead('demo-premium', {
         building_id: building.id,
@@ -70,7 +79,7 @@ export function DevelopmentViewer({ development }: Props) {
         contact_name: '',
         contact_phone: '',
         contact_email: '',
-        message: 'Viewer lead from Estate3D premium demo',
+        message: leadContext.message,
       });
       setLeadMessage(`Заявка отправлена: #${lead.id} · ${lead.development_name}, ${building.name}, ${selectedFloor.label}, квартира ${lead.unit_number}`);
     } catch {
@@ -101,16 +110,18 @@ export function DevelopmentViewer({ development }: Props) {
           onShowWindowView={showWindowView}
         />
         <ViewerHud
+          development={development}
           building={building}
           selectedFloor={selectedFloor}
           selectedUnit={selectedUnit}
+          selectedViewpoint={selectedViewpoint}
           activeWindow={activeWindow ?? firstWindow}
           firstViewpoint={firstViewpoint}
           viewerState={viewerState}
           leadMessage={leadMessage}
           onChooseUnit={chooseUnit}
           onEnterWalkMode={enterWalkMode}
-          onShowWindowView={showWindowView}
+          onShowWindowView={() => showWindowView()}
           onSubmitLead={submitLead}
         />
       </section>

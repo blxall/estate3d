@@ -1,11 +1,13 @@
-import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildAvailabilityState, polygonPoints, type ViewerState } from '../viewer/sceneAdapter';
+import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
+import { buildAvailabilityState, buildLeadContextSummary, buildUnitCard, polygonPoints, type LeadContextSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { LeadCta } from './LeadCta';
 
 type Props = {
+  development: DevelopmentViewerPayload;
   building: DevelopmentBuilding;
   selectedFloor: DevelopmentFloor | null;
   selectedUnit: DevelopmentUnit | null;
+  selectedViewpoint: DevelopmentViewpoint | null;
   activeWindow: DevelopmentWindowView | null;
   firstViewpoint: DevelopmentViewpoint | null;
   viewerState: ViewerState;
@@ -17,9 +19,11 @@ type Props = {
 };
 
 export function ViewerHud({
+  development,
   building,
   selectedFloor,
   selectedUnit,
+  selectedViewpoint,
   activeWindow,
   firstViewpoint,
   viewerState,
@@ -30,6 +34,18 @@ export function ViewerHud({
   onSubmitLead,
 }: Props) {
   const availability = buildAvailabilityState({ selectedFloor, selectedUnit });
+  const unitCards = selectedFloor?.units.map((unit) => ({ unit, card: buildUnitCard({ floor: selectedFloor, unit, active: selectedUnit?.id === unit.id }) })) ?? [];
+  const leadContext: LeadContextSummary | null = selectedUnit
+    ? buildLeadContextSummary({
+        development,
+        building,
+        selectedFloor,
+        selectedUnit,
+        selectedViewpoint,
+        activeWindow: viewerState === 'window_view' ? activeWindow : null,
+        viewerState,
+      })
+    : null;
 
   return (
     <aside className="viewer-hud">
@@ -47,9 +63,12 @@ export function ViewerHud({
 
       {selectedFloor && selectedFloor.units.length > 0 && (
         <div className="unit-list">
-          {selectedFloor.units.map((unit) => (
-            <button key={unit.id} type="button" onClick={() => onChooseUnit(unit)} className={selectedUnit?.id === unit.id ? 'active' : ''}>
-              Квартира {unit.number} · {unit.area_m2} м² · {unit.price}
+          {unitCards.map(({ unit, card }) => (
+            <button key={unit.id} type="button" onClick={() => onChooseUnit(unit)} className={selectedUnit?.id === unit.id ? 'active' : ''} aria-label={card.ariaLabel}>
+              <span>Unit card: {card.title} · {card.subtitle} · {card.statusBadge}</span>
+              <small className={`unit-status ${card.statusTone}`}>{card.statusBadge}</small>
+              <small>{card.availabilityCopy}</small>
+              {card.selectedLabel && <strong>{card.selectedLabel}</strong>}
             </button>
           ))}
         </div>
@@ -89,7 +108,7 @@ export function ViewerHud({
         </div>
       )}
 
-      {selectedUnit && <LeadCta leadMessage={leadMessage} onSubmit={onSubmitLead} />}
+      {selectedUnit && <LeadCta leadMessage={leadMessage} leadContext={leadContext} onSubmit={onSubmitLead} />}
     </aside>
   );
 }
