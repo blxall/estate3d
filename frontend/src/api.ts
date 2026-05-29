@@ -1,4 +1,4 @@
-import type { AuthPayload, AuthResponse, DevelopmentViewerPayload, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
+import type { AuthPayload, AuthResponse, DevelopmentLead, DevelopmentLeadPayload, DevelopmentViewerPayload, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
 
 const API_BASE = '/api';
 
@@ -88,4 +88,12 @@ export async function fetchPublicTour(slug: string): Promise<PublicTourPayload> 
 
 export async function fetchDevelopmentViewer(developmentSlug: string): Promise<DevelopmentViewerPayload> {
   return requestJson<DevelopmentViewerPayload>(`${API_BASE}/developments/${developmentSlug}/viewer`);
+}
+
+export async function submitDevelopmentLead(developmentSlug: string, payload: DevelopmentLeadPayload): Promise<DevelopmentLead> {
+  return requestJson<DevelopmentLead>(`${API_BASE}/developments/${developmentSlug}/leads`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
 }

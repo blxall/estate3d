@@ -193,6 +193,23 @@ class AnalyticsEvent(BaseModel):
     created_at: datetime = Field(default_factory=_utcnow)
 
 
+class DevelopmentLead(BaseModel):
+    id: str = Field(default_factory=lambda: _id("lead"))
+    development_id: str
+    development_name: str
+    building_id: str
+    floor_id: str
+    unit_id: str
+    unit_number: str
+    viewer_state: str
+    contact_name: str = ""
+    contact_phone: str = ""
+    contact_email: str = ""
+    message: str = ""
+    status: str = "new"
+    created_at: datetime = Field(default_factory=_utcnow)
+
+
 def detect_media_file_type(filename: str, mime_type: str) -> MediaFileType:
     suffix = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     mime = mime_type.lower()

@@ -11,8 +11,8 @@ from fastapi import FastAPI, Header, HTTPException, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.domain import AnalyticsEvent, ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType, User, UserRole
-from app.repository import analytics_repository, job_repository, media_repository, property_repository, session_repository, tour_repository, user_repository
+from app.domain import AnalyticsEvent, DevelopmentLead, ProcessingJob, ProcessingJobStatus, Property, PropertyMedia, PropertyStatus, PropertyType, Tour, TourType, User, UserRole
+from app.repository import analytics_repository, development_lead_repository, job_repository, media_repository, property_repository, session_repository, tour_repository, user_repository
 
 app = FastAPI(title="Estate3D Backend", version="0.1.0")
 
@@ -172,6 +172,17 @@ class DevelopmentViewerResponse(BaseModel):
     buildings: list[Building]
 
 
+class DevelopmentLeadCreateRequest(BaseModel):
+    building_id: str
+    floor_id: str
+    unit_id: str
+    viewer_state: str
+    contact_name: str = ""
+    contact_phone: str = ""
+    contact_email: str = ""
+    message: str = ""
+
+
 @app.get("/health")
 def healthcheck() -> dict[str, str]:
     return {"status": "ok", "service": "estate3d-backend"}
@@ -180,6 +191,29 @@ def healthcheck() -> dict[str, str]:
 @app.get("/developments/demo-premium/viewer", response_model=DevelopmentViewerResponse)
 def get_demo_development_viewer() -> DevelopmentViewerResponse:
     return _demo_development_viewer()
+
+
+@app.post("/developments/demo-premium/leads", response_model=DevelopmentLead, status_code=status.HTTP_201_CREATED)
+def create_demo_development_lead(payload: DevelopmentLeadCreateRequest) -> DevelopmentLead:
+    development = _demo_development_viewer()
+    unit = _find_demo_unit(development, payload.building_id, payload.floor_id, payload.unit_id)
+    if unit is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
+
+    lead = DevelopmentLead(
+        development_id=development.id,
+        development_name=development.name,
+        building_id=payload.building_id,
+        floor_id=payload.floor_id,
+        unit_id=payload.unit_id,
+        unit_number=unit.number,
+        viewer_state=payload.viewer_state,
+        contact_name=payload.contact_name,
+        contact_phone=payload.contact_phone,
+        contact_email=payload.contact_email,
+        message=payload.message,
+    )
+    return development_lead_repository.create(lead)
 
 
 @app.post("/auth/register", response_model=AuthTokenResponse, status_code=status.HTTP_201_CREATED)
@@ -528,6 +562,19 @@ def _demo_floor(level: int) -> Floor:
     if level == 8:
         units = [_demo_unit("unit_8_1", "81", -6.2), _demo_unit("unit_8_2", "82", 0.8), _demo_unit("unit_8_3", "83", 7.8)]
     return Floor(id=f"floor_{level}", level=level, label=f"{level} этаж", elevation=level * 3.25, units=units)
+
+
+def _find_demo_unit(development: DevelopmentViewerResponse, building_id: str, floor_id: str, unit_id: str) -> Unit | None:
+    for building in development.buildings:
+        if building.id != building_id:
+            continue
+        for floor in building.floors:
+            if floor.id != floor_id:
+                continue
+            for unit in floor.units:
+                if unit.id == unit_id:
+                    return unit
+    return None
 
 
 def _demo_development_viewer() -> DevelopmentViewerResponse:

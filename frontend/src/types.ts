@@ -140,3 +140,23 @@ export type DevelopmentViewerPayload = {
   viewer_config: Record<string, unknown>;
   buildings: DevelopmentBuilding[];
 };
+
+export type DevelopmentLeadPayload = {
+  building_id: string;
+  floor_id: string;
+  unit_id: string;
+  viewer_state: string;
+  contact_name: string;
+  contact_phone: string;
+  contact_email: string;
+  message: string;
+};
+
+export type DevelopmentLead = DevelopmentLeadPayload & {
+  id: string;
+  development_id: string;
+  development_name: string;
+  unit_number: string;
+  status: string;
+  created_at: string;
+};

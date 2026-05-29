@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentRoom, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint } from '../types';
 
 type Props = {
@@ -68,8 +69,28 @@ export function DevelopmentViewer({ development }: Props) {
     setLeadMessage('');
   }
 
-  function prepareLead() {
-    setLeadMessage(`Заявка подготовлена: ${development.name}, ${building.name}, ${selectedFloor?.label ?? 'этаж не выбран'}, квартира ${selectedUnit?.number ?? 'не выбрана'}`);
+  async function prepareLead() {
+    if (!selectedFloor || !selectedUnit) {
+      setLeadMessage('Выберите этаж и квартиру перед заявкой');
+      return;
+    }
+
+    setLeadMessage('Отправляем заявку менеджеру…');
+    try {
+      const lead = await submitDevelopmentLead('demo-premium', {
+        building_id: building.id,
+        floor_id: selectedFloor.id,
+        unit_id: selectedUnit.id,
+        viewer_state: viewerState,
+        contact_name: '',
+        contact_phone: '',
+        contact_email: '',
+        message: 'Viewer lead from Estate3D premium demo',
+      });
+      setLeadMessage(`Заявка отправлена: #${lead.id} · ${lead.development_name}, ${building.name}, ${selectedFloor.label}, квартира ${lead.unit_number}`);
+    } catch {
+      setLeadMessage('Не удалось отправить заявку. Попробуйте еще раз.');
+    }
   }
 
   const cameraMessage =

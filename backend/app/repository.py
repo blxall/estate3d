@@ -9,7 +9,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
-from app.domain import AnalyticsEvent, ProcessingJob, Property, PropertyMedia, Tour, User
+from app.domain import AnalyticsEvent, DevelopmentLead, ProcessingJob, Property, PropertyMedia, Tour, User
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
@@ -241,6 +241,17 @@ class AnalyticsRepository(SQLiteRepository[AnalyticsEvent]):
         return [event for event in self._list() if event.property_id == property_id]
 
 
+class DevelopmentLeadRepository(SQLiteRepository[DevelopmentLead]):
+    collection = "development_leads"
+    model_type = DevelopmentLead
+
+    def create(self, lead: DevelopmentLead) -> DevelopmentLead:
+        return self._save(lead)
+
+    def list_for_development(self, development_id: str) -> list[DevelopmentLead]:
+        return [lead for lead in self._list() if lead.development_id == development_id]
+
+
 _default_store: SQLiteStore | None = None
 
 
@@ -259,3 +270,4 @@ media_repository = MediaRepository(_store)
 job_repository = JobRepository(_store)
 tour_repository = TourRepository(_store)
 analytics_repository = AnalyticsRepository(_store)
+development_lead_repository = DevelopmentLeadRepository(_store)

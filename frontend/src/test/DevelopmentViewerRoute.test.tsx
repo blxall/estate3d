@@ -96,7 +96,27 @@ describe('Premium development viewer route', () => {
 
   it('drives explicit camera states, walk mode, room plan geometry, and lead CTA', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
-    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, json: async () => demoPayload })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: 'lead_123',
+          development_id: 'dev_demo_premium',
+          development_name: 'Estate3D Skyline',
+          building_id: 'building_a',
+          floor_id: 'floor_8',
+          unit_id: 'unit_8_1',
+          unit_number: '81',
+          viewer_state: 'window_view',
+          contact_name: '',
+          contact_phone: '',
+          contact_email: '',
+          message: '',
+          status: 'new',
+          created_at: '2026-05-29T00:00:00Z',
+        }),
+      });
     vi.stubGlobal('fetch', fetchMock);
 
     render(<App />);
@@ -117,6 +137,20 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('State: window_view')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
-    expect(await screen.findByText(/Заявка подготовлена/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Заявка отправлена: #lead_123/i)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        building_id: 'building_a',
+        floor_id: 'floor_8',
+        unit_id: 'unit_8_1',
+        viewer_state: 'window_view',
+        contact_name: '',
+        contact_phone: '',
+        contact_email: '',
+        message: 'Viewer lead from Estate3D premium demo',
+      }),
+    });
   });
 });
