@@ -140,6 +140,8 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Готова к просмотру: планировка, прогулка и вид из окна доступны.')).toBeInTheDocument();
     expect(screen.getByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
+    expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · window_view' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
     expect(await screen.findByText(/Заявка отправлена: #lead_123/i)).toBeInTheDocument();

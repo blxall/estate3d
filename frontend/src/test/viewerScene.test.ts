@@ -7,6 +7,7 @@ import {
   buildLeadContextSummary,
   buildMaterialTheme,
   buildResponsiveHudState,
+  buildShareHandoffSummary,
   buildViewerDeepLinkSearch,
   buildViewerDeepLinkState,
   buildRoomFootprints,
@@ -293,6 +294,17 @@ describe('viewer scene adapter', () => {
       stageClass: 'viewer-stage responsive-desktop state-floor_focus no-unit no-lead-context',
       hudClass: 'viewer-hud desktop-panel',
       label: 'Responsive HUD: desktop panel · exploratory browsing',
+    });
+  });
+
+  it('builds copy-ready share handoff summaries for selected units', () => {
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+
+    expect(buildShareHandoffSummary({ selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city' })).toEqual({
+      label: 'Share handoff: 2 этаж · квартира 21 · window_view',
+      copy: 'Ссылка для клиента: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city',
+      ariaLabel: 'Copy share link: 2 этаж · квартира 21 · window_view',
     });
   });
 

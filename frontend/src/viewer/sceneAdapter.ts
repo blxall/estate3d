@@ -95,6 +95,12 @@ export type LeadContextSummary = {
   message: string;
 };
 
+export type ShareHandoffSummary = {
+  label: string;
+  copy: string;
+  ariaLabel: string;
+};
+
 export type ResponsiveHudState = {
   mode: 'mobile' | 'desktop';
   stageClass: string;
@@ -325,6 +331,28 @@ export function buildResponsiveHudState({
     ? `Responsive HUD: ${mode === 'mobile' ? 'mobile stack' : 'desktop panel'} · sticky CTA · lead context visible`
     : `Responsive HUD: ${mode === 'mobile' ? 'mobile stack' : 'desktop panel'} · exploratory browsing`;
   return { mode, stageClass, hudClass, label };
+}
+
+export function buildShareHandoffSummary({
+  selectedFloor,
+  selectedUnit,
+  viewerState,
+  shareLink,
+}: {
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+  viewerState: ViewerState;
+  shareLink: string;
+}): ShareHandoffSummary | null {
+  if (!selectedFloor || !selectedUnit) {
+    return null;
+  }
+  const context = `${selectedFloor.label} · квартира ${selectedUnit.number} · ${viewerState}`;
+  return {
+    label: `Share handoff: ${context}`,
+    copy: `Ссылка для клиента: ${shareLink}`,
+    ariaLabel: `Copy share link: ${context}`,
+  };
 }
 
 function isViewerState(value: string | null): value is ViewerState {

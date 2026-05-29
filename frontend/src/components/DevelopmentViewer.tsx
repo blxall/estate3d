@@ -149,6 +149,7 @@ export function DevelopmentViewer({ development }: Props) {
           firstViewpoint={firstViewpoint}
           viewerState={viewerState}
           leadMessage={leadMessage}
+          shareLink={shareLink}
           onChooseUnit={chooseUnit}
           onEnterWalkMode={enterWalkMode}
           onShowWindowView={() => showWindowView()}
