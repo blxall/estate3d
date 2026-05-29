@@ -270,6 +270,31 @@ describe('Premium development viewer route', () => {
     expect(screen.getAllByText(/Панорама из окна: Вид из окна на город/i).length).toBeGreaterThan(0);
   });
 
+  it('syncs the shareable URL as users drill through R3F selection bridges', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    await screen.findByText('State: floor_focus');
+    expect(window.location.search).toBe('?floor=floor_8&view=floor_focus');
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    await screen.findByText('State: unit_top_down');
+    expect(window.location.search).toBe('?floor=floor_8&unit=unit_8_1&view=unit_top_down');
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D room mesh: Гостиная-кухня/i }));
+    await screen.findByText('State: walk_mode');
+    expect(window.location.search).toBe('?floor=floor_8&unit=unit_8_1&view=walk_mode&viewpoint=vp_living');
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D window hotspot: Вид из окна на город/i }));
+    await screen.findByText('State: window_view');
+    expect(window.location.search).toBe('?floor=floor_8&unit=unit_8_1&view=window_view&viewpoint=vp_living&window=window_city');
+    expect(await screen.findByText('Share link: /developments/demo-premium/viewer?floor=floor_8&unit=unit_8_1&view=window_view&viewpoint=vp_living&window=window_city')).toBeInTheDocument();
+  });
+
   it('hydrates shareable deep-link viewer state for sales handoff links', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer?floor=floor_8&unit=unit_8_1&view=window_view&window=window_city');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });

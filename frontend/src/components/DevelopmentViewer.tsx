@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
@@ -43,6 +43,13 @@ export function DevelopmentViewer({ development }: Props) {
     activeWindow,
     viewerState,
   })}`;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    window.history.replaceState({}, '', shareLink);
+  }, [shareLink]);
 
   function chooseFloor(floorId: string) {
     const floor = building.floors.find((candidate) => candidate.id === floorId) ?? null;
