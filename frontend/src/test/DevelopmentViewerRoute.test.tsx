@@ -270,6 +270,20 @@ describe('Premium development viewer route', () => {
     expect(screen.getAllByText(/Панорама из окна: Вид из окна на город/i).length).toBeGreaterThan(0);
   });
 
+  it('hydrates shareable deep-link viewer state for sales handoff links', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer?floor=floor_8&unit=unit_8_1&view=window_view&window=window_city');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    expect(await screen.findByText('State: window_view')).toBeInTheDocument();
+    expect(await screen.findByText('Deep link: 8 этаж · квартира 81 · window_view · Вид из окна на город')).toBeInTheDocument();
+    expect(await screen.findByText('Share link: /developments/demo-premium/viewer?floor=floor_8&unit=unit_8_1&view=window_view&viewpoint=vp_living&window=window_city')).toBeInTheDocument();
+    expect(await screen.findByText('Camera frame: window_city')).toBeInTheDocument();
+    expect(await screen.findByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
+  });
+
   it('shows premium empty states for floors and units without walkthrough media', async () => {
     const sparsePayload = structuredClone(demoPayload);
     sparsePayload.buildings[0].floors[7].units[0].viewpoints = [];

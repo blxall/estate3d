@@ -102,6 +102,15 @@ export type ResponsiveHudState = {
   label: string;
 };
 
+export type ViewerDeepLinkState = {
+  viewerState: ViewerState;
+  selectedFloorId: string | null;
+  selectedUnitId: string | null;
+  selectedViewpointId: string | null;
+  activeWindowId: string | null;
+  label: string;
+};
+
 export type UnitFootprintPrimitive = {
   id: string;
   number: string;
@@ -316,6 +325,91 @@ export function buildResponsiveHudState({
     ? `Responsive HUD: ${mode === 'mobile' ? 'mobile stack' : 'desktop panel'} · sticky CTA · lead context visible`
     : `Responsive HUD: ${mode === 'mobile' ? 'mobile stack' : 'desktop panel'} · exploratory browsing`;
   return { mode, stageClass, hudClass, label };
+}
+
+function isViewerState(value: string | null): value is ViewerState {
+  return value === 'development_overview' || value === 'floor_focus' || value === 'unit_top_down' || value === 'walk_mode' || value === 'window_view';
+}
+
+export function buildViewerDeepLinkState({ building, search }: { building: DevelopmentBuilding; search: string }): ViewerDeepLinkState {
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+  const floor = building.floors.find((candidate) => candidate.id === params.get('floor')) ?? null;
+  const unit = floor?.units.find((candidate) => candidate.id === params.get('unit')) ?? null;
+  const requestedView = isViewerState(params.get('view')) ? params.get('view') : null;
+
+  if (!floor) {
+    return {
+      viewerState: 'development_overview',
+      selectedFloorId: null,
+      selectedUnitId: null,
+      selectedViewpointId: null,
+      activeWindowId: null,
+      label: 'Deep link: overview fallback',
+    };
+  }
+
+  if (!unit) {
+    return {
+      viewerState: 'floor_focus',
+      selectedFloorId: floor.id,
+      selectedUnitId: null,
+      selectedViewpointId: null,
+      activeWindowId: null,
+      label: `Deep link: ${floor.label} · floor_focus`,
+    };
+  }
+
+  const requestedWindow = unit.window_views.find((candidate) => candidate.id === params.get('window')) ?? null;
+  const selectedViewpoint = unit.viewpoints.find((candidate) => candidate.id === params.get('viewpoint')) ?? unit.viewpoints.find((candidate) => candidate.room_id === requestedWindow?.room_id) ?? unit.viewpoints[0] ?? null;
+  const viewerState: ViewerState = requestedView === 'window_view' && requestedWindow
+    ? 'window_view'
+    : requestedView === 'walk_mode' && selectedViewpoint
+      ? 'walk_mode'
+      : requestedView === 'floor_focus'
+        ? 'floor_focus'
+        : 'unit_top_down';
+  const activeWindow = viewerState === 'window_view' ? requestedWindow : null;
+  const labelParts = [floor.label, `квартира ${unit.number}`, viewerState, activeWindow?.label].filter(Boolean);
+
+  return {
+    viewerState,
+    selectedFloorId: floor.id,
+    selectedUnitId: unit.id,
+    selectedViewpointId: selectedViewpoint?.id ?? null,
+    activeWindowId: activeWindow?.id ?? null,
+    label: `Deep link: ${labelParts.join(' · ')}`,
+  };
+}
+
+export function buildViewerDeepLinkSearch({
+  selectedFloor,
+  selectedUnit,
+  selectedViewpoint,
+  activeWindow,
+  viewerState,
+}: {
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+  selectedViewpoint?: DevelopmentViewpoint | null;
+  activeWindow?: DevelopmentWindowView | null;
+  viewerState: ViewerState;
+}): string {
+  const params = new URLSearchParams();
+  if (selectedFloor) {
+    params.set('floor', selectedFloor.id);
+  }
+  if (selectedUnit) {
+    params.set('unit', selectedUnit.id);
+  }
+  params.set('view', viewerState);
+  if (selectedViewpoint) {
+    params.set('viewpoint', selectedViewpoint.id);
+  }
+  if (activeWindow) {
+    params.set('window', activeWindow.id);
+  }
+  const serialized = params.toString();
+  return serialized ? `?${serialized}` : '';
 }
 
 export function buildMaterialTheme({

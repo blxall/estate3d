@@ -7,6 +7,8 @@ import {
   buildLeadContextSummary,
   buildMaterialTheme,
   buildResponsiveHudState,
+  buildViewerDeepLinkSearch,
+  buildViewerDeepLinkState,
   buildRoomFootprints,
   buildUnitCard,
   buildUnitFootprints,
@@ -291,6 +293,30 @@ describe('viewer scene adapter', () => {
       stageClass: 'viewer-stage responsive-desktop state-floor_focus no-unit no-lead-context',
       hudClass: 'viewer-hud desktop-panel',
       label: 'Responsive HUD: desktop panel · exploratory browsing',
+    });
+  });
+
+  it('parses and serializes shareable deep links into safe viewer selection state', () => {
+    const building = payload.buildings[0];
+    const floor = building.floors[1];
+    const unit = floor.units[0];
+
+    expect(buildViewerDeepLinkState({ building, search: '?floor=floor_2&unit=unit_2_1&view=window_view&window=window_city' })).toEqual({
+      viewerState: 'window_view',
+      selectedFloorId: 'floor_2',
+      selectedUnitId: 'unit_2_1',
+      selectedViewpointId: 'vp_living',
+      activeWindowId: 'window_city',
+      label: 'Deep link: 2 этаж · квартира 21 · window_view · Вид из окна',
+    });
+    expect(buildViewerDeepLinkSearch({ selectedFloor: floor, selectedUnit: unit, selectedViewpoint: unit.viewpoints[0], activeWindow: unit.window_views[0], viewerState: 'window_view' })).toBe('?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city');
+    expect(buildViewerDeepLinkState({ building, search: '?floor=missing&unit=bad&view=window_view' })).toEqual({
+      viewerState: 'development_overview',
+      selectedFloorId: null,
+      selectedUnitId: null,
+      selectedViewpointId: null,
+      activeWindowId: null,
+      label: 'Deep link: overview fallback',
     });
   });
 
