@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildViewerScene, cameraMessageForState, polygonPoints, roomPlanStyle } from '../viewer/sceneAdapter';
+import { buildCameraPlan, buildViewerScene, cameraMessageForState, polygonPoints, roomPlanStyle } from '../viewer/sceneAdapter';
 import type { DevelopmentViewerPayload } from '../types';
 
 const payload: DevelopmentViewerPayload = {
@@ -95,5 +95,33 @@ describe('viewer scene adapter', () => {
     expect(cameraMessageForState({ viewerState: 'unit_top_down', selectedUnit: unit })).toBe('Top-down план квартиры 21');
     expect(cameraMessageForState({ viewerState: 'walk_mode', selectedViewpoint: viewpoint })).toBe('Walk mode: Войти в гостиную');
     expect(cameraMessageForState({ viewerState: 'window_view', activeWindow: windowView })).toBe('Панорама из окна: Вид из окна');
+  });
+
+  it('builds deterministic camera target plans for overview, floor, and unit focus', () => {
+    const scene = buildViewerScene(payload);
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+
+    expect(buildCameraPlan({ scene, viewerState: 'development_overview' })).toEqual({
+      frame: 'overview',
+      position: [4.8, 4.2, 7.2],
+      target: [0, 1.6, 0],
+      zoom: 1,
+      label: 'Overview camera: Корпус A',
+    });
+    expect(buildCameraPlan({ scene, viewerState: 'floor_focus', selectedFloor: floor })).toEqual({
+      frame: 'floor_2',
+      position: [3.8, 3.4, 5.6],
+      target: [0, 0.65, 0],
+      zoom: 1.18,
+      label: 'Floor camera: 2 этаж',
+    });
+    expect(buildCameraPlan({ scene, viewerState: 'unit_top_down', selectedFloor: floor, selectedUnit: unit })).toEqual({
+      frame: 'unit_2_1',
+      position: [0, 6.15, 0.01],
+      target: [0, 0.65, 0],
+      zoom: 1.45,
+      label: 'Unit camera: квартира 21',
+    });
   });
 });

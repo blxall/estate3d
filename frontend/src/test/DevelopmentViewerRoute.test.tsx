@@ -83,7 +83,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('ЖК → корпус → этаж → квартира → окно')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith('/api/developments/demo-premium/viewer');
 
-    fireEvent.click(screen.getByRole('button', { name: /^8 этаж$/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
     expect(await screen.findByText(/Камера поднимается на 8 этаж/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /квартира 81/i }));
@@ -122,7 +122,7 @@ describe('Premium development viewer route', () => {
     render(<App />);
 
     expect(await screen.findByText('State: development_overview')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /^8 этаж$/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
     expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /квартира 81/i }));
     expect(await screen.findByText('State: unit_top_down')).toBeInTheDocument();
@@ -168,7 +168,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Camera frame: overview')).toBeInTheDocument();
     const meshFloor = screen.getByRole('button', { name: /3D floor mesh: 8 этаж/i });
     expect(meshFloor).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^8 этаж$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Backup floor control: 8 этаж/i })).toBeInTheDocument();
 
     fireEvent.mouseEnter(meshFloor);
     expect(await screen.findByText('Hover floor: 8 этаж')).toBeInTheDocument();
@@ -176,6 +176,9 @@ describe('Premium development viewer route', () => {
 
     expect(await screen.findByText('Selected mesh: 8 этаж')).toBeInTheDocument();
     expect(await screen.findByText('Camera frame: floor_8')).toBeInTheDocument();
+    expect(await screen.findByText('Camera target: 0,2.6,0')).toBeInTheDocument();
+    expect(await screen.findByText('Camera position: 3.8,5.35,5.6')).toBeInTheDocument();
+    expect(await screen.findByText('Floor camera: 8 этаж')).toBeInTheDocument();
     expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
     expect(await screen.findByText(/Камера поднимается на 8 этаж/i)).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: /Квартира 81/i })).toBeInTheDocument();

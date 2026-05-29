@@ -1,10 +1,14 @@
 import { Canvas } from '@react-three/fiber';
 import { useState } from 'react';
 
-import type { ViewerScene as ViewerSceneModel } from '../viewer/sceneAdapter';
+import type { DevelopmentFloor, DevelopmentUnit } from '../types';
+import { buildCameraPlan, type ViewerScene as ViewerSceneModel, type ViewerState } from '../viewer/sceneAdapter';
 
 type Props = {
   scene: ViewerSceneModel;
+  viewerState: ViewerState;
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
   selectedFloorId?: string | null;
   onChooseFloor: (floorId: string) => void;
 };
@@ -66,12 +70,12 @@ function TowerMeshes({ scene, selectedFloorId, hoveredFloorId, onChooseFloor, on
   );
 }
 
-export function ThreeDevelopmentScene({ scene, selectedFloorId, onChooseFloor }: Props) {
+export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selectedUnit, selectedFloorId, onChooseFloor }: Props) {
   const webGlAvailable = canUseWebGl();
   const [hoveredFloorId, setHoveredFloorId] = useState<string | null>(null);
   const selectedLabel = floorLabel(scene, selectedFloorId);
   const hoveredLabel = floorLabel(scene, hoveredFloorId);
-  const cameraFrame = selectedFloorId ?? 'overview';
+  const cameraPlan = buildCameraPlan({ scene, viewerState, selectedFloor, selectedUnit });
 
   return (
     <div className="r3f-scene-shell" aria-label={`R3F scene slice for ${scene.building.name}`}>
@@ -80,14 +84,17 @@ export function ThreeDevelopmentScene({ scene, selectedFloorId, onChooseFloor }:
         <small>{webGlAvailable ? 'WebGL canvas active' : 'Semantic fallback active'}</small>
       </div>
       <div className="r3f-camera-readout" aria-live="polite">
-        <span>Camera frame: {cameraFrame}</span>
+        <span>Camera frame: {cameraPlan.frame}</span>
+        <span>Camera target: {cameraPlan.target.join(',')}</span>
+        <span>Camera position: {cameraPlan.position.join(',')}</span>
+        <span>{cameraPlan.label}</span>
         <span>Selected mesh: {selectedLabel}</span>
         <span>Hover floor: {hoveredLabel}</span>
       </div>
       <div className="r3f-building-shell" aria-label={`R3F building shell: ${scene.building.name}`} />
       <div className="r3f-canvas-frame" aria-hidden="true">
         {webGlAvailable ? (
-          <Canvas camera={{ position: [3, 2.6, 5], fov: 38 }}>
+          <Canvas camera={{ position: cameraPlan.position, fov: 38, zoom: cameraPlan.zoom }}>
             <ambientLight intensity={0.8} />
             <directionalLight position={[4, 5, 4]} intensity={1.5} />
             <TowerMeshes

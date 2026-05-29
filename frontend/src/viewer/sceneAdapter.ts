@@ -37,6 +37,14 @@ export type ViewerScene = {
   unitsByFloor: Record<string, UnitPrimitive[]>;
 };
 
+export type CameraPlan = {
+  frame: string;
+  position: [number, number, number];
+  target: [number, number, number];
+  zoom: number;
+  label: string;
+};
+
 export function buildViewerScene(development: DevelopmentViewerPayload): ViewerScene {
   const building = development.buildings[0];
   const floors = [...building.floors];
@@ -138,4 +146,55 @@ export function cameraMessageForState({
     return `Камера поднимается на ${selectedFloor.label}`;
   }
   return 'Общий вид ЖК и плавный подлет к корпусу';
+}
+
+function rounded(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function floorTargetY(floor?: DevelopmentFloor | null): number {
+  if (!floor) {
+    return 1.6;
+  }
+  return rounded(floor.elevation / 10);
+}
+
+export function buildCameraPlan({
+  scene,
+  viewerState,
+  selectedFloor,
+  selectedUnit,
+}: {
+  scene: ViewerScene;
+  viewerState: ViewerState;
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+}): CameraPlan {
+  if ((viewerState === 'unit_top_down' || viewerState === 'walk_mode' || viewerState === 'window_view') && selectedFloor && selectedUnit) {
+    const y = floorTargetY(selectedFloor);
+    return {
+      frame: selectedUnit.id,
+      position: [0, rounded(y + 5.5), 0.01],
+      target: [0, y, 0],
+      zoom: 1.45,
+      label: `Unit camera: квартира ${selectedUnit.number}`,
+    };
+  }
+  if (viewerState === 'floor_focus' && selectedFloor) {
+    const y = floorTargetY(selectedFloor);
+    return {
+      frame: selectedFloor.id,
+      position: [3.8, rounded(y + 2.75), 5.6],
+      target: [0, y, 0],
+      zoom: 1.18,
+      label: `Floor camera: ${selectedFloor.label}`,
+    };
+  }
+  return {
+    frame: 'overview',
+    position: [4.8, 4.2, 7.2],
+    target: [0, 1.6, 0],
+    zoom: 1,
+    label: `Overview camera: ${scene.building.name}`,
+  };
 }
