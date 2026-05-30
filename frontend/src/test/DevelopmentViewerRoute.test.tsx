@@ -155,7 +155,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
     const shareHandoff = screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
     expect(shareHandoff).toHaveClass('glass-card', 'desktop-inline');
-    expect(screen.getByText(/Ссылка для клиента:/i)).toHaveClass('share-handoff-copy', 'copy-ready');
+    expect(screen.getByText(/^Ссылка для клиента:/i)).toHaveClass('share-handoff-copy', 'copy-ready');
     expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · window_view' })).toHaveClass('share-copy-button', 'premium-outline');
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
@@ -165,6 +165,9 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText(/Менеджер получает контекст просмотра и ссылку для продолжения:/i)).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: success · manager handoff ready')).toBeInTheDocument();
     expect(screen.getByText('Digest готов для менеджера')).toHaveClass('lead-handoff-persistence-badge');
+    expect(screen.getByText('CRM export payload: Estate3D Skyline · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText(/CRM payload: Estate3D Skyline \| Корпус A \| 8 этаж \| квартира 81 \| window_view/i)).toHaveClass('lead-export-payload-copy');
+    expect(screen.getByText('Export note: квартира 81 · window_view · share+digest+next-step ready.')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -176,7 +179,7 @@ describe('Premium development viewer route', () => {
         contact_name: '',
         contact_phone: '',
         contact_email: '',
-        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город. Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город. CRM note: Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город · follow-up for available unit. Broker script note: квартира 81 · available · window_view · follow-up ready. Digest note: квартира 81 · available · window_view · share ready · follow-up ready.',
+        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город. Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город. CRM note: Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город · follow-up for available unit. Broker script note: квартира 81 · available · window_view · follow-up ready. Digest note: квартира 81 · available · window_view · share ready · follow-up ready. Export note: квартира 81 · window_view · share+digest+next-step ready.',
       }),
     });
   });

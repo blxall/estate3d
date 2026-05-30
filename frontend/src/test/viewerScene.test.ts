@@ -12,6 +12,7 @@ import {
   buildBrokerNextStepScript,
   buildLeadHandoffDigest,
   buildLeadHandoffPersistenceState,
+  buildLeadExportPayload,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -498,6 +499,56 @@ describe('viewer scene adapter', () => {
       cardClass: 'lead-handoff-persistence-card success copy-ready',
     });
     expect(buildLeadHandoffPersistenceState({ digest: null, status: 'success' })).toBeNull();
+  });
+
+  it('builds CRM export-ready lead payload copy from digest and handoff blocks', () => {
+    const leadContext = {
+      label: 'Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город',
+      message: 'Клиент смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 в режиме window_view.',
+      payload: {
+        development: 'Estate3D Skyline',
+        building: 'Корпус A',
+        floor: '8 этаж',
+        unit: 'квартира 81',
+        viewer_state: 'window_view',
+      },
+    };
+    const shareHandoff = {
+      label: 'Share handoff: 8 этаж · квартира 81 · window_view',
+      copy: 'Copy-ready link: /developments/demo-premium/viewer?floor=floor_8',
+      ariaLabel: 'Скопировать ссылку для менеджера: 8 этаж · квартира 81 · window_view',
+      cardClass: 'share-handoff-card glass-card copy-ready',
+      buttonClass: 'share-handoff-button',
+      copyClass: 'share-handoff-copy',
+    };
+    const digest = {
+      label: 'Sales-room digest: квартира 81 · window_view · 5 блоков',
+      recap: 'Клиент смотрел квартира 81 в режиме window_view; путь: Путь клиента: 8 этаж → квартира 81 → Вид из окна; следующий шаг: отправить ссылку',
+      managerOneLiner: 'Digest note: квартира 81 · available · window_view · share ready · follow-up ready.',
+      cardClass: 'lead-handoff-digest-card glass-card sales-room-ready',
+    };
+    const persistence = buildLeadHandoffPersistenceState({ digest, status: 'success' });
+    const managerFollowUp = {
+      label: 'Manager follow-up: 4 шага · квартира 81',
+      items: ['Открыть ссылку', 'Подтвердить интерес'],
+      copy: 'Follow-up note: открыть ссылку и подтвердить интерес.',
+      cardClass: 'manager-follow-up-card glass-card crm-ready',
+    };
+    const brokerScript = {
+      label: 'Broker script: квартира 81 · share-ready',
+      opener: 'Здравствуйте! Отправляю ссылку на квартиру 81.',
+      clientNextStep: 'Следующий шаг: открыть ссылку и выбрать время звонка.',
+      managerNote: 'Broker note: отправить ссылку и назначить звонок.',
+      cardClass: 'broker-script-card glass-card client-ready',
+    };
+
+    expect(buildLeadExportPayload({ leadContext, shareHandoff, digest, persistence, managerFollowUp, brokerScript })).toEqual({
+      label: 'CRM export payload: Estate3D Skyline · квартира 81 · window_view',
+      copy: 'CRM payload: Estate3D Skyline | Корпус A | 8 этаж | квартира 81 | window_view | Copy-ready link: /developments/demo-premium/viewer?floor=floor_8 | Digest note: квартира 81 · available · window_view · share ready · follow-up ready. | Digest готов для менеджера | Следующий шаг: открыть ссылку и выбрать время звонка.',
+      managerOneLiner: 'Export note: квартира 81 · window_view · share+digest+next-step ready.',
+      cardClass: 'lead-export-payload-card glass-card crm-export-ready',
+    });
+    expect(buildLeadExportPayload({ leadContext: null, shareHandoff, digest, persistence, managerFollowUp, brokerScript })).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

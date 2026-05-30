@@ -1,4 +1,4 @@
-import { buildLeadCtaState, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -16,6 +16,7 @@ type Props = {
 export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, leadHandoffDigest, onSubmit }: Props) {
   const leadCtaState = buildLeadCtaState(leadStatus);
   const digestPersistence = buildLeadHandoffPersistenceState({ digest: leadHandoffDigest, status: leadStatus });
+  const leadExportPayload = buildLeadExportPayload({ leadContext, shareHandoff, digest: leadHandoffDigest, persistence: digestPersistence, managerFollowUp, brokerScript });
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -69,6 +70,13 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <p>{digestPersistence.label}</p>
           <small className="lead-handoff-persistence-copy">{digestPersistence.copy}</small>
           <small className="lead-handoff-persistence-badge">{digestPersistence.badge}</small>
+        </div>
+      )}
+      {leadExportPayload && (
+        <div className={leadExportPayload.cardClass}>
+          <p>{leadExportPayload.label}</p>
+          <small className="lead-export-payload-copy">{leadExportPayload.copy}</small>
+          <small className="lead-export-payload-note">{leadExportPayload.managerOneLiner}</small>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

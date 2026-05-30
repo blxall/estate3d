@@ -146,6 +146,13 @@ export type LeadHandoffPersistenceState = {
   cardClass: string;
 };
 
+export type LeadExportPayload = {
+  label: string;
+  copy: string;
+  managerOneLiner: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -689,6 +696,46 @@ export function buildLeadHandoffPersistenceState({ digest, status }: { digest: L
     copy: `Менеджерский handoff готов: ${digestCopy}.`,
     badge: 'Digest готов для менеджера',
     cardClass: 'lead-handoff-persistence-card success copy-ready',
+  };
+}
+
+export function buildLeadExportPayload({
+  leadContext,
+  shareHandoff,
+  digest,
+  persistence,
+  managerFollowUp,
+  brokerScript,
+}: {
+  leadContext: LeadContextSummary | null;
+  shareHandoff: ShareHandoffSummary | null;
+  digest: LeadHandoffDigest | null;
+  persistence: LeadHandoffPersistenceState | null;
+  managerFollowUp: ManagerFollowUpChecklist | null;
+  brokerScript: BrokerNextStepScript | null;
+}): LeadExportPayload | null {
+  if (!leadContext || !shareHandoff || !digest) {
+    return null;
+  }
+  const leadParts = leadContext.label.replace(/^Lead context: /, '').split(' · ');
+  const [development = 'development', building = 'building', floor = 'floor', unit = 'unit', viewerState = 'viewer'] = leadParts;
+  const nextStep = brokerScript?.clientNextStep ?? managerFollowUp?.items[0] ?? 'Связаться с клиентом.';
+  const segments = [
+    development,
+    building,
+    floor,
+    unit,
+    viewerState,
+    shareHandoff.copy,
+    digest.managerOneLiner,
+    persistence?.badge,
+    nextStep,
+  ].filter(Boolean);
+  return {
+    label: `CRM export payload: ${development} · ${unit} · ${viewerState}`,
+    copy: `CRM payload: ${segments.join(' | ')}`,
+    managerOneLiner: `Export note: ${unit} · ${viewerState} · share+digest+next-step ready.`,
+    cardClass: 'lead-export-payload-card glass-card crm-export-ready',
   };
 }
 
