@@ -1,4 +1,4 @@
-import { buildLeadCtaState, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -7,10 +7,11 @@ type Props = {
   leadSuccess: LeadSuccessSummary | null;
   interactionTrail: InteractionTrailSummary | null;
   shareHandoff: ShareHandoffSummary | null;
+  managerFollowUp: ManagerFollowUpChecklist | null;
   onSubmit: () => void;
 };
 
-export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, onSubmit }: Props) {
   const leadCtaState = buildLeadCtaState(leadStatus);
   return (
     <div className="lead-card">
@@ -35,6 +36,15 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <p>{shareHandoff.label}</p>
           <small className={shareHandoff.copyClass}>{shareHandoff.copy}</small>
           <button type="button" className={shareHandoff.buttonClass} aria-label={shareHandoff.ariaLabel}>Ссылка готова к отправке</button>
+        </div>
+      )}
+      {managerFollowUp && (
+        <div className={managerFollowUp.cardClass}>
+          <p>{managerFollowUp.label}</p>
+          <ul>
+            {managerFollowUp.items.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+          <small className="manager-follow-up-copy">{managerFollowUp.copy}</small>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

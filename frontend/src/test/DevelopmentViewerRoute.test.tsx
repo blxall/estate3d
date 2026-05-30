@@ -142,6 +142,9 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Interaction trail: select_floor → select_unit → enter_walk_mode → open_window_view')).toBeInTheDocument();
     expect(screen.getByText('Путь клиента: 8 этаж → квартира 81 → Войти в гостиную → Вид из окна на город')).toBeInTheDocument();
     expect(screen.getByText('Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город.')).toHaveClass('interaction-manager-note');
+    expect(screen.getByText('Manager follow-up: квартира 81 · available · 3 шага')).toBeInTheDocument();
+    expect(screen.getByText('Уточнить бюджет и срок покупки по квартире 81.')).toBeInTheDocument();
+    expect(screen.getByText(/CRM note: Lead context: Estate3D Skyline/i)).toHaveClass('manager-follow-up-copy');
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
     const shareHandoff = screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
     expect(shareHandoff).toHaveClass('glass-card', 'desktop-inline');
@@ -164,7 +167,7 @@ describe('Premium development viewer route', () => {
         contact_name: '',
         contact_phone: '',
         contact_email: '',
-        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город. Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город.',
+        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город. Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город. CRM note: Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город · follow-up for available unit.',
       }),
     });
   });

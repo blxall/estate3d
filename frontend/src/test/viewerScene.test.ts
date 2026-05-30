@@ -8,6 +8,7 @@ import {
   buildLeadCtaState,
   buildInteractionTrailSummary,
   buildLeadSuccessSummary,
+  buildManagerFollowUpChecklist,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -381,6 +382,37 @@ describe('viewer scene adapter', () => {
     });
 
     expect(buildInteractionTrailSummary([])).toBeNull();
+  });
+
+  it('builds manager follow-up checklist from lead context, interaction trail, and share handoff', () => {
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+    const leadContext = buildLeadContextSummary({
+      development: payload,
+      building: payload.buildings[0],
+      selectedFloor: floor,
+      selectedUnit: unit,
+      selectedViewpoint: unit.viewpoints[0],
+      activeWindow: unit.window_views[0],
+      viewerState: 'window_view',
+    });
+    const interactionTrail = buildInteractionTrailSummary([
+      'Analytics: select_floor · Estate3D Skyline · Корпус A · 2 этаж · floor_focus',
+      'Analytics: select_unit · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · unit_top_down',
+      'Analytics: open_window_view · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Вид из окна',
+    ]);
+    const shareHandoff = buildShareHandoffSummary({ selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view' });
+
+    expect(buildManagerFollowUpChecklist({ leadContext, interactionTrail, shareHandoff, selectedUnit: unit })).toEqual({
+      label: 'Manager follow-up: квартира 21 · available · 3 шага',
+      items: [
+        'Уточнить бюджет и срок покупки по квартире 21.',
+        'Отправить клиенту ссылку: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view',
+        'Обсудить просмотренный путь: Путь клиента: 2 этаж → квартира 21 → Вид из окна',
+      ],
+      copy: 'CRM note: Lead context: Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Войти в гостиную · Вид из окна · follow-up for available unit.',
+      cardClass: 'manager-follow-up-card glass-card crm-ready',
+    });
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

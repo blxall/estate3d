@@ -117,6 +117,13 @@ export type InteractionTrailSummary = {
   cardClass: string;
 };
 
+export type ManagerFollowUpChecklist = {
+  label: string;
+  items: string[];
+  copy: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -513,11 +520,13 @@ export function buildInteractionTrailSummary(labels: string[]): InteractionTrail
   const unitLabel = pickAnalyticsPart(lastForAction(labels, 'select_unit') ?? '', (part) => part.startsWith('квартира '));
   const viewpointLabel = (() => {
     const label = lastForAction(labels, 'enter_walk_mode');
-    return label?.split(' · ').at(-1) ?? null;
+    const parts = label?.split(' · ') ?? [];
+    return parts.length > 0 ? parts[parts.length - 1] : null;
   })();
   const windowLabel = (() => {
     const label = lastForAction(labels, 'open_window_view');
-    return label?.split(' · ').at(-1) ?? null;
+    const parts = label?.split(' · ') ?? [];
+    return parts.length > 0 ? parts[parts.length - 1] : null;
   })();
 
   const journey = [floorLabel, unitLabel, viewpointLabel, windowLabel].filter((part): part is string => Boolean(part));
@@ -529,7 +538,7 @@ export function buildInteractionTrailSummary(labels: string[]): InteractionTrail
   ].filter((part): part is string => Boolean(part));
 
   const managerNote = managerParts.length > 1
-    ? `Менеджеру: клиент последовательно ${managerParts.slice(0, -1).join(', ')} и ${managerParts.at(-1)}.`
+    ? `Менеджеру: клиент последовательно ${managerParts.slice(0, -1).join(', ')} и ${managerParts[managerParts.length - 1]}.`
     : `Менеджеру: клиент ${managerParts[0]}.`;
 
   return {
@@ -537,6 +546,36 @@ export function buildInteractionTrailSummary(labels: string[]): InteractionTrail
     copy: `Путь клиента: ${journey.join(' → ')}`,
     managerNote,
     cardClass: 'interaction-trail-card glass-card manager-notes-ready',
+  };
+}
+
+export function buildManagerFollowUpChecklist({
+  leadContext,
+  interactionTrail,
+  shareHandoff,
+  selectedUnit,
+}: {
+  leadContext: LeadContextSummary | null;
+  interactionTrail: InteractionTrailSummary | null;
+  shareHandoff: ShareHandoffSummary | null;
+  selectedUnit?: DevelopmentUnit | null;
+}): ManagerFollowUpChecklist | null {
+  if (!leadContext || !selectedUnit) {
+    return null;
+  }
+  const unitLabel = `квартира ${selectedUnit.number}`;
+  const items = [
+    `Уточнить бюджет и срок покупки по квартире ${selectedUnit.number}.`,
+    shareHandoff ? shareHandoff.copy.replace('Ссылка для клиента: ', 'Отправить клиенту ссылку: ') : 'Подготовить ссылку на выбранный вариант для клиента.',
+  ];
+  if (interactionTrail) {
+    items.push(`Обсудить просмотренный путь: ${interactionTrail.copy}`);
+  }
+  return {
+    label: `Manager follow-up: ${unitLabel} · ${selectedUnit.status} · ${items.length} шага`,
+    items,
+    copy: `CRM note: ${leadContext.label} · follow-up for ${selectedUnit.status} unit.`,
+    cardClass: 'manager-follow-up-card glass-card crm-ready',
   };
 }
 
