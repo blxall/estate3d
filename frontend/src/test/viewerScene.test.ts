@@ -9,6 +9,7 @@ import {
   buildInteractionTrailSummary,
   buildLeadSuccessSummary,
   buildManagerFollowUpChecklist,
+  buildBrokerNextStepScript,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -413,6 +414,31 @@ describe('viewer scene adapter', () => {
       copy: 'CRM note: Lead context: Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Войти в гостиную · Вид из окна · follow-up for available unit.',
       cardClass: 'manager-follow-up-card glass-card crm-ready',
     });
+  });
+
+  it('builds broker next-step script from manager follow-up and share context', () => {
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+    const leadContext = buildLeadContextSummary({
+      development: payload,
+      building: payload.buildings[0],
+      selectedFloor: floor,
+      selectedUnit: unit,
+      selectedViewpoint: unit.viewpoints[0],
+      activeWindow: unit.window_views[0],
+      viewerState: 'window_view',
+    });
+    const shareHandoff = buildShareHandoffSummary({ selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view' });
+    const managerFollowUp = buildManagerFollowUpChecklist({ leadContext, interactionTrail: null, shareHandoff, selectedUnit: unit });
+
+    expect(buildBrokerNextStepScript({ leadContext, managerFollowUp, shareHandoff, selectedUnit: unit })).toEqual({
+      label: 'Broker script: квартира 21 · window_view · ready to send',
+      opener: 'Здравствуйте! Видел ваш интерес к квартире 21 в Estate3D Skyline — могу прислать короткую подборку и ответить по бюджету/срокам.',
+      clientNextStep: 'Предложить клиенту открыть ссылку и выбрать удобное время для звонка: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view',
+      managerNote: 'Broker script note: квартира 21 · available · window_view · follow-up ready.',
+      cardClass: 'broker-script-card glass-card client-ready',
+    });
+    expect(buildBrokerNextStepScript({ leadContext: null, managerFollowUp, shareHandoff, selectedUnit: unit })).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

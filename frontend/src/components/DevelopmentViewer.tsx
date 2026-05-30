@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildLeadContextSummary, buildInteractionTrailSummary, buildLeadSuccessSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
+import { buildBrokerNextStepScript, buildLeadContextSummary, buildInteractionTrailSummary, buildLeadSuccessSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -147,14 +147,16 @@ export function DevelopmentViewer({ development }: Props) {
       activeWindow,
       viewerState,
     });
+    const shareHandoff = buildShareHandoffSummary({ selectedFloor, selectedUnit, viewerState, shareLink });
     const managerFollowUp = buildManagerFollowUpChecklist({
       leadContext,
       interactionTrail,
-      shareHandoff: buildShareHandoffSummary({ selectedFloor, selectedUnit, viewerState, shareLink }),
+      shareHandoff,
       selectedUnit,
     });
+    const brokerScript = buildBrokerNextStepScript({ leadContext, managerFollowUp, shareHandoff, selectedUnit });
     try {
-      const leadMessageWithTrail = [leadContext.message, interactionTrail?.managerNote, managerFollowUp?.copy].filter(Boolean).join(' ');
+      const leadMessageWithTrail = [leadContext.message, interactionTrail?.managerNote, managerFollowUp?.copy, brokerScript?.managerNote].filter(Boolean).join(' ');
       const lead = await submitDevelopmentLead('demo-premium', {
         building_id: building.id,
         floor_id: selectedFloor.id,

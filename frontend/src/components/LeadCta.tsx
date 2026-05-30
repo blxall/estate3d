@@ -1,4 +1,4 @@
-import { buildLeadCtaState, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -8,10 +8,11 @@ type Props = {
   interactionTrail: InteractionTrailSummary | null;
   shareHandoff: ShareHandoffSummary | null;
   managerFollowUp: ManagerFollowUpChecklist | null;
+  brokerScript: BrokerNextStepScript | null;
   onSubmit: () => void;
 };
 
-export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, onSubmit }: Props) {
   const leadCtaState = buildLeadCtaState(leadStatus);
   return (
     <div className="lead-card">
@@ -45,6 +46,13 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
             {managerFollowUp.items.map((item) => <li key={item}>{item}</li>)}
           </ul>
           <small className="manager-follow-up-copy">{managerFollowUp.copy}</small>
+        </div>
+      )}
+      {brokerScript && (
+        <div className={brokerScript.cardClass}>
+          <p>{brokerScript.label}</p>
+          <small className="broker-script-opener">{brokerScript.opener}</small>
+          <small className="broker-script-next-step">{brokerScript.clientNextStep}</small>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

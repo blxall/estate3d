@@ -124,6 +124,14 @@ export type ManagerFollowUpChecklist = {
   cardClass: string;
 };
 
+export type BrokerNextStepScript = {
+  label: string;
+  opener: string;
+  clientNextStep: string;
+  managerNote: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -576,6 +584,35 @@ export function buildManagerFollowUpChecklist({
     items,
     copy: `CRM note: ${leadContext.label} · follow-up for ${selectedUnit.status} unit.`,
     cardClass: 'manager-follow-up-card glass-card crm-ready',
+  };
+}
+
+export function buildBrokerNextStepScript({
+  leadContext,
+  managerFollowUp,
+  shareHandoff,
+  selectedUnit,
+}: {
+  leadContext: LeadContextSummary | null;
+  managerFollowUp: ManagerFollowUpChecklist | null;
+  shareHandoff: ShareHandoffSummary | null;
+  selectedUnit?: DevelopmentUnit | null;
+}): BrokerNextStepScript | null {
+  if (!leadContext || !managerFollowUp || !shareHandoff || !selectedUnit) {
+    return null;
+  }
+  const unitLabel = `квартира ${selectedUnit.number}`;
+  const leadParts = leadContext.label.split(' · ');
+  const developmentName = leadParts[0].replace('Lead context: ', '');
+  const viewerState = leadParts[4] ?? 'viewer';
+  const shareLink = shareHandoff.copy.replace('Ссылка для клиента: ', '');
+
+  return {
+    label: `Broker script: ${unitLabel} · ${viewerState} · ready to send`,
+    opener: `Здравствуйте! Видел ваш интерес к квартире ${selectedUnit.number} в ${developmentName} — могу прислать короткую подборку и ответить по бюджету/срокам.`,
+    clientNextStep: `Предложить клиенту открыть ссылку и выбрать удобное время для звонка: ${shareLink}`,
+    managerNote: `Broker script note: ${unitLabel} · ${selectedUnit.status} · ${viewerState} · follow-up ready.`,
+    cardClass: 'broker-script-card glass-card client-ready',
   };
 }
 

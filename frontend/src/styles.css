@@ -627,6 +627,32 @@ button {
   overflow-wrap: anywhere;
 }
 
+.broker-script-card.glass-card {
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 18px;
+  padding: 13px;
+  background:
+    linear-gradient(135deg, rgba(45, 212, 191, 0.13), rgba(248, 231, 183, 0.08)),
+    rgba(2, 6, 23, 0.44);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 46px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+.broker-script-card p {
+  margin: 0;
+  color: #99f6e4;
+  font-weight: 900;
+}
+
+.broker-script-opener,
+.broker-script-next-step {
+  color: #dbeafe;
+  line-height: 1.45;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;
