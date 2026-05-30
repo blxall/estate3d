@@ -139,6 +139,13 @@ export type LeadHandoffDigest = {
   cardClass: string;
 };
 
+export type LeadHandoffPersistenceState = {
+  label: string;
+  copy: string;
+  badge: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -653,6 +660,35 @@ export function buildLeadHandoffDigest({
     recap: `Клиент смотрел ${unitLabel} в режиме ${viewerState}; путь: ${trailCopy}; следующий шаг: ${nextStep}`,
     managerOneLiner: `Digest note: ${unitLabel} · ${selectedUnit.status} · ${viewerState} · ${shareHandoff ? 'share ready' : 'share pending'} · ${managerFollowUp ? 'follow-up ready' : 'follow-up pending'}.`,
     cardClass: 'lead-handoff-digest-card glass-card sales-room-ready',
+  };
+}
+
+export function buildLeadHandoffPersistenceState({ digest, status }: { digest: LeadHandoffDigest | null; status: LeadCtaStatus }): LeadHandoffPersistenceState | null {
+  if (!digest || status === 'idle') {
+    return null;
+  }
+  const digestCopy = digest.managerOneLiner.replace(/^Digest note: /, '').replace(/\.$/, '');
+  if (status === 'sending') {
+    return {
+      label: 'Digest persistence: sending · sales-room context locked',
+      copy: `Сохраняем digest рядом с заявкой: ${digestCopy}.`,
+      badge: 'Digest закреплен при отправке',
+      cardClass: 'lead-handoff-persistence-card sending copy-ready',
+    };
+  }
+  if (status === 'error') {
+    return {
+      label: 'Digest persistence: error · retry keeps sales-room context',
+      copy: `Повтор отправки сохранит digest: ${digestCopy}.`,
+      badge: 'Digest сохранен для повтора',
+      cardClass: 'lead-handoff-persistence-card error copy-ready',
+    };
+  }
+  return {
+    label: 'Digest persistence: success · manager handoff ready',
+    copy: `Менеджерский handoff готов: ${digestCopy}.`,
+    badge: 'Digest готов для менеджера',
+    cardClass: 'lead-handoff-persistence-card success copy-ready',
   };
 }
 

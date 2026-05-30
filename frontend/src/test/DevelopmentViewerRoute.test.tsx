@@ -163,6 +163,8 @@ describe('Premium development viewer route', () => {
     const successCard = screen.getByText('Заявка отправлена: #lead_123 · 8 этаж · квартира 81 · window_view').closest('.lead-success-card');
     expect(successCard).toHaveClass('glass-card', 'follow-up-ready');
     expect(screen.getByText(/Менеджер получает контекст просмотра и ссылку для продолжения:/i)).toBeInTheDocument();
+    expect(screen.getByText('Digest persistence: success · manager handoff ready')).toBeInTheDocument();
+    expect(screen.getByText('Digest готов для менеджера')).toHaveClass('lead-handoff-persistence-badge');
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -318,6 +320,8 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
     expect(screen.getByText('Interaction trail: select_floor → select_unit → enter_walk_mode → open_window_view')).toBeInTheDocument();
     expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText('Digest persistence: sending · sales-room context locked')).toBeInTheDocument();
+    expect(screen.getByText('Digest закреплен при отправке')).toHaveClass('lead-handoff-persistence-badge');
 
     rejectLead(new Error('network unavailable'));
 
@@ -326,6 +330,8 @@ describe('Premium development viewer route', () => {
     expect(retryButton).toHaveClass('lead-submit-button', 'retry');
     expect(screen.getByText('Не удалось отправить заявку. Попробуйте еще раз.')).toHaveClass('lead-feedback', 'error-card');
     expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText('Digest persistence: error · retry keeps sales-room context')).toBeInTheDocument();
+    expect(screen.getByText('Digest сохранен для повтора')).toHaveClass('lead-handoff-persistence-badge');
   });
 
   it('shows lightweight analytics readouts for premium viewer interactions and lead failures', async () => {

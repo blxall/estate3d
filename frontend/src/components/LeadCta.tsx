@@ -1,4 +1,4 @@
-import { buildLeadCtaState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -15,6 +15,7 @@ type Props = {
 
 export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, leadHandoffDigest, onSubmit }: Props) {
   const leadCtaState = buildLeadCtaState(leadStatus);
+  const digestPersistence = buildLeadHandoffPersistenceState({ digest: leadHandoffDigest, status: leadStatus });
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -61,6 +62,13 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <p>{leadHandoffDigest.label}</p>
           <small className="lead-handoff-digest-recap">{leadHandoffDigest.recap}</small>
           <small className="lead-handoff-digest-note">{leadHandoffDigest.managerOneLiner}</small>
+        </div>
+      )}
+      {digestPersistence && (
+        <div className={digestPersistence.cardClass}>
+          <p>{digestPersistence.label}</p>
+          <small className="lead-handoff-persistence-copy">{digestPersistence.copy}</small>
+          <small className="lead-handoff-persistence-badge">{digestPersistence.badge}</small>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

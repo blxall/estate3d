@@ -684,6 +684,46 @@ button {
   color: #fef3c7;
 }
 
+.lead-handoff-persistence-card.copy-ready {
+  margin: 10px 0 12px;
+  display: grid;
+  gap: 7px;
+  border-radius: 16px;
+  padding: 11px;
+  background: rgba(2, 6, 23, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.lead-handoff-persistence-card.sending {
+  border-color: rgba(56, 189, 248, 0.38);
+}
+
+.lead-handoff-persistence-card.error {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.lead-handoff-persistence-card.success {
+  border-color: rgba(134, 239, 172, 0.42);
+}
+
+.lead-handoff-persistence-card p {
+  margin: 0;
+  color: #bfdbfe;
+  font-weight: 900;
+}
+
+.lead-handoff-persistence-copy,
+.lead-handoff-persistence-badge {
+  color: #dbeafe;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.lead-handoff-persistence-badge {
+  color: #f8e7b7;
+  font-weight: 900;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;

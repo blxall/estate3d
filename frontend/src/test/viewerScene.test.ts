@@ -11,6 +11,7 @@ import {
   buildManagerFollowUpChecklist,
   buildBrokerNextStepScript,
   buildLeadHandoffDigest,
+  buildLeadHandoffPersistenceState,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -470,6 +471,33 @@ describe('viewer scene adapter', () => {
       cardClass: 'lead-handoff-digest-card glass-card sales-room-ready',
     });
     expect(buildLeadHandoffDigest({ leadContext: null, interactionTrail, managerFollowUp, brokerScript, shareHandoff, selectedUnit: unit })).toBeNull();
+  });
+
+  it('builds lead handoff persistence states for sending, error, and success', () => {
+    const digest = {
+      label: 'Sales-room digest: квартира 21 · window_view · 5 блоков',
+      recap: 'Клиент смотрел квартира 21 в режиме window_view; путь: Путь клиента: 2 этаж → квартира 21 → Вид из окна; следующий шаг: отправить ссылку',
+      managerOneLiner: 'Digest note: квартира 21 · available · window_view · share ready · follow-up ready.',
+      cardClass: 'lead-handoff-digest-card glass-card sales-room-ready',
+    };
+
+    expect(buildLeadHandoffPersistenceState({ digest, status: 'sending' })).toEqual({
+      label: 'Digest persistence: sending · sales-room context locked',
+      copy: 'Сохраняем digest рядом с заявкой: квартира 21 · available · window_view · share ready · follow-up ready.',
+      badge: 'Digest закреплен при отправке',
+      cardClass: 'lead-handoff-persistence-card sending copy-ready',
+    });
+    expect(buildLeadHandoffPersistenceState({ digest, status: 'error' })).toMatchObject({
+      label: 'Digest persistence: error · retry keeps sales-room context',
+      badge: 'Digest сохранен для повтора',
+      cardClass: 'lead-handoff-persistence-card error copy-ready',
+    });
+    expect(buildLeadHandoffPersistenceState({ digest, status: 'success' })).toMatchObject({
+      label: 'Digest persistence: success · manager handoff ready',
+      badge: 'Digest готов для менеджера',
+      cardClass: 'lead-handoff-persistence-card success copy-ready',
+    });
+    expect(buildLeadHandoffPersistenceState({ digest: null, status: 'success' })).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {
