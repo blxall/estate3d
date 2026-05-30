@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildLeadContextSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
+import { buildLeadContextSummary, buildInteractionTrailSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -46,6 +46,7 @@ export function DevelopmentViewer({ development }: Props) {
     activeWindow,
     viewerState,
   })}`;
+  const interactionTrail = buildInteractionTrailSummary(analyticsLabels);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -147,6 +148,7 @@ export function DevelopmentViewer({ development }: Props) {
       viewerState,
     });
     try {
+      const leadMessageWithTrail = interactionTrail ? `${leadContext.message} ${interactionTrail.managerNote}` : leadContext.message;
       const lead = await submitDevelopmentLead('demo-premium', {
         building_id: building.id,
         floor_id: selectedFloor.id,
@@ -155,7 +157,7 @@ export function DevelopmentViewer({ development }: Props) {
         contact_name: '',
         contact_phone: '',
         contact_email: '',
-        message: leadContext.message,
+        message: leadMessageWithTrail,
       });
       setLeadSuccess(buildLeadSuccessSummary({ leadId: lead.id, selectedFloor, selectedUnit, viewerState, shareLink }));
       setLeadMessage('');
@@ -207,6 +209,7 @@ export function DevelopmentViewer({ development }: Props) {
           leadMessage={leadMessage}
           leadStatus={leadStatus}
           leadSuccess={leadSuccess}
+          interactionTrail={interactionTrail}
           shareLink={shareLink}
           onChooseUnit={chooseUnit}
           onEnterWalkMode={enterWalkMode}

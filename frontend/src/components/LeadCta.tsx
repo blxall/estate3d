@@ -1,15 +1,16 @@
-import { buildLeadCtaState, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
   leadStatus: LeadCtaStatus;
   leadContext: LeadContextSummary | null;
   leadSuccess: LeadSuccessSummary | null;
+  interactionTrail: InteractionTrailSummary | null;
   shareHandoff: ShareHandoffSummary | null;
   onSubmit: () => void;
 };
 
-export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, shareHandoff, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, onSubmit }: Props) {
   const leadCtaState = buildLeadCtaState(leadStatus);
   return (
     <div className="lead-card">
@@ -20,6 +21,13 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, sha
         <div className="lead-context">
           <p>{leadContext.label}</p>
           <small>{leadContext.message}</small>
+        </div>
+      )}
+      {interactionTrail && (
+        <div className={interactionTrail.cardClass}>
+          <p>{interactionTrail.label}</p>
+          <small>{interactionTrail.copy}</small>
+          <small className="interaction-manager-note">{interactionTrail.managerNote}</small>
         </div>
       )}
       {shareHandoff && (

@@ -110,6 +110,13 @@ export type LeadSuccessSummary = {
   cardClass: string;
 };
 
+export type InteractionTrailSummary = {
+  label: string;
+  copy: string;
+  managerNote: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -476,6 +483,60 @@ export function buildViewerAnalyticsEvent({
     eventName: `premium_viewer_${action}`,
     label: `Analytics: ${action} · ${parts.join(' · ')}`,
     payload,
+  };
+}
+
+function actionFromAnalyticsLabel(label: string): ViewerAnalyticsAction | null {
+  const match = label.match(/^Analytics: ([a-z_]+)/);
+  if (!match) {
+    return null;
+  }
+  const action = match[1];
+  return action === 'select_floor' || action === 'select_unit' || action === 'enter_walk_mode' || action === 'open_window_view' || action === 'lead_click' || action === 'lead_success' || action === 'lead_error' ? action : null;
+}
+
+function pickAnalyticsPart(label: string, predicate: (part: string) => boolean): string | null {
+  return label.split(' · ').map((part) => part.trim()).find(predicate) ?? null;
+}
+
+function lastForAction(labels: string[], action: ViewerAnalyticsAction): string | null {
+  return [...labels].reverse().find((label) => actionFromAnalyticsLabel(label) === action) ?? null;
+}
+
+export function buildInteractionTrailSummary(labels: string[]): InteractionTrailSummary | null {
+  const actions = labels.map(actionFromAnalyticsLabel).filter((action): action is ViewerAnalyticsAction => Boolean(action)).filter((action) => action === 'select_floor' || action === 'select_unit' || action === 'enter_walk_mode' || action === 'open_window_view');
+  if (actions.length === 0) {
+    return null;
+  }
+
+  const floorLabel = pickAnalyticsPart(lastForAction(labels, 'select_floor') ?? '', (part) => /этаж$/.test(part));
+  const unitLabel = pickAnalyticsPart(lastForAction(labels, 'select_unit') ?? '', (part) => part.startsWith('квартира '));
+  const viewpointLabel = (() => {
+    const label = lastForAction(labels, 'enter_walk_mode');
+    return label?.split(' · ').at(-1) ?? null;
+  })();
+  const windowLabel = (() => {
+    const label = lastForAction(labels, 'open_window_view');
+    return label?.split(' · ').at(-1) ?? null;
+  })();
+
+  const journey = [floorLabel, unitLabel, viewpointLabel, windowLabel].filter((part): part is string => Boolean(part));
+  const managerParts = [
+    floorLabel ? `выбрал ${floorLabel}` : null,
+    unitLabel ? unitLabel.replace(/^квартира /, 'квартиру ') : null,
+    viewpointLabel ? `вошел в ${viewpointLabel}` : null,
+    windowLabel ? `открыл ${windowLabel}` : null,
+  ].filter((part): part is string => Boolean(part));
+
+  const managerNote = managerParts.length > 1
+    ? `Менеджеру: клиент последовательно ${managerParts.slice(0, -1).join(', ')} и ${managerParts.at(-1)}.`
+    : `Менеджеру: клиент ${managerParts[0]}.`;
+
+  return {
+    label: `Interaction trail: ${actions.join(' → ')}`,
+    copy: `Путь клиента: ${journey.join(' → ')}`,
+    managerNote,
+    cardClass: 'interaction-trail-card glass-card manager-notes-ready',
   };
 }
 

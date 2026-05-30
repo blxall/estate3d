@@ -6,6 +6,7 @@ import {
   buildAvailabilityState,
   buildLeadContextSummary,
   buildLeadCtaState,
+  buildInteractionTrailSummary,
   buildLeadSuccessSummary,
   buildMaterialTheme,
   buildResponsiveHudState,
@@ -362,6 +363,24 @@ describe('viewer scene adapter', () => {
     expect(buildViewerAnalyticsEvent({ action: 'lead_error', development: payload, building, selectedFloor: floor, selectedUnit: unit, selectedViewpoint: viewpoint, activeWindow: windowView, viewerState: 'window_view' }).label).toBe(
       'Analytics: lead_error · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Войти в гостиную · Вид из окна',
     );
+  });
+
+  it('summarizes recent premium viewer interactions for sales handoff notes', () => {
+    expect(
+      buildInteractionTrailSummary([
+        'Analytics: select_floor · Estate3D Skyline · Корпус A · 8 этаж · floor_focus',
+        'Analytics: select_unit · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · unit_top_down',
+        'Analytics: enter_walk_mode · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · walk_mode · Войти в гостиную',
+        'Analytics: open_window_view · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город',
+      ]),
+    ).toEqual({
+      label: 'Interaction trail: select_floor → select_unit → enter_walk_mode → open_window_view',
+      copy: 'Путь клиента: 8 этаж → квартира 81 → Войти в гостиную → Вид из окна на город',
+      managerNote: 'Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город.',
+      cardClass: 'interaction-trail-card glass-card manager-notes-ready',
+    });
+
+    expect(buildInteractionTrailSummary([])).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

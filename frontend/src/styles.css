@@ -566,6 +566,35 @@ button {
   background: rgba(2, 6, 23, 0.34);
 }
 
+.interaction-trail-card.glass-card {
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 18px;
+  padding: 13px;
+  background:
+    linear-gradient(135deg, rgba(167, 139, 250, 0.14), rgba(56, 189, 248, 0.08)),
+    rgba(2, 6, 23, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 46px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+.interaction-trail-card p {
+  margin: 0;
+  color: #ddd6fe;
+  font-weight: 900;
+}
+
+.interaction-trail-card small {
+  color: #dbeafe;
+  line-height: 1.45;
+}
+
+.interaction-manager-note {
+  color: #fef3c7;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;
