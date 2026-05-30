@@ -10,6 +10,7 @@ import {
   buildLeadSuccessSummary,
   buildManagerFollowUpChecklist,
   buildBrokerNextStepScript,
+  buildLeadHandoffDigest,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -439,6 +440,36 @@ describe('viewer scene adapter', () => {
       cardClass: 'broker-script-card glass-card client-ready',
     });
     expect(buildBrokerNextStepScript({ leadContext: null, managerFollowUp, shareHandoff, selectedUnit: unit })).toBeNull();
+  });
+
+  it('builds compact premium lead handoff digest from sales handoff blocks', () => {
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+    const leadContext = buildLeadContextSummary({
+      development: payload,
+      building: payload.buildings[0],
+      selectedFloor: floor,
+      selectedUnit: unit,
+      selectedViewpoint: unit.viewpoints[0],
+      activeWindow: unit.window_views[0],
+      viewerState: 'window_view',
+    });
+    const interactionTrail = buildInteractionTrailSummary([
+      'Analytics: select_floor · Estate3D Skyline · Корпус A · 2 этаж · floor_focus',
+      'Analytics: select_unit · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · unit_top_down',
+      'Analytics: open_window_view · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Вид из окна',
+    ]);
+    const shareHandoff = buildShareHandoffSummary({ selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view' });
+    const managerFollowUp = buildManagerFollowUpChecklist({ leadContext, interactionTrail, shareHandoff, selectedUnit: unit });
+    const brokerScript = buildBrokerNextStepScript({ leadContext, managerFollowUp, shareHandoff, selectedUnit: unit });
+
+    expect(buildLeadHandoffDigest({ leadContext, interactionTrail, managerFollowUp, brokerScript, shareHandoff, selectedUnit: unit })).toEqual({
+      label: 'Sales-room digest: квартира 21 · window_view · 5 блоков',
+      recap: 'Клиент смотрел квартира 21 в режиме window_view; путь: Путь клиента: 2 этаж → квартира 21 → Вид из окна; следующий шаг: Предложить клиенту открыть ссылку и выбрать удобное время для звонка: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view',
+      managerOneLiner: 'Digest note: квартира 21 · available · window_view · share ready · follow-up ready.',
+      cardClass: 'lead-handoff-digest-card glass-card sales-room-ready',
+    });
+    expect(buildLeadHandoffDigest({ leadContext: null, interactionTrail, managerFollowUp, brokerScript, shareHandoff, selectedUnit: unit })).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

@@ -1,4 +1,4 @@
-import { buildLeadCtaState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -9,10 +9,11 @@ type Props = {
   shareHandoff: ShareHandoffSummary | null;
   managerFollowUp: ManagerFollowUpChecklist | null;
   brokerScript: BrokerNextStepScript | null;
+  leadHandoffDigest: LeadHandoffDigest | null;
   onSubmit: () => void;
 };
 
-export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, leadHandoffDigest, onSubmit }: Props) {
   const leadCtaState = buildLeadCtaState(leadStatus);
   return (
     <div className="lead-card">
@@ -53,6 +54,13 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <p>{brokerScript.label}</p>
           <small className="broker-script-opener">{brokerScript.opener}</small>
           <small className="broker-script-next-step">{brokerScript.clientNextStep}</small>
+        </div>
+      )}
+      {leadHandoffDigest && (
+        <div className={leadHandoffDigest.cardClass}>
+          <p>{leadHandoffDigest.label}</p>
+          <small className="lead-handoff-digest-recap">{leadHandoffDigest.recap}</small>
+          <small className="lead-handoff-digest-note">{leadHandoffDigest.managerOneLiner}</small>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

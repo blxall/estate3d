@@ -132,6 +132,13 @@ export type BrokerNextStepScript = {
   cardClass: string;
 };
 
+export type LeadHandoffDigest = {
+  label: string;
+  recap: string;
+  managerOneLiner: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -613,6 +620,39 @@ export function buildBrokerNextStepScript({
     clientNextStep: `Предложить клиенту открыть ссылку и выбрать удобное время для звонка: ${shareLink}`,
     managerNote: `Broker script note: ${unitLabel} · ${selectedUnit.status} · ${viewerState} · follow-up ready.`,
     cardClass: 'broker-script-card glass-card client-ready',
+  };
+}
+
+export function buildLeadHandoffDigest({
+  leadContext,
+  interactionTrail,
+  managerFollowUp,
+  brokerScript,
+  shareHandoff,
+  selectedUnit,
+}: {
+  leadContext: LeadContextSummary | null;
+  interactionTrail: InteractionTrailSummary | null;
+  managerFollowUp: ManagerFollowUpChecklist | null;
+  brokerScript: BrokerNextStepScript | null;
+  shareHandoff: ShareHandoffSummary | null;
+  selectedUnit?: DevelopmentUnit | null;
+}): LeadHandoffDigest | null {
+  if (!leadContext || !selectedUnit) {
+    return null;
+  }
+  const leadParts = leadContext.label.split(' · ');
+  const unitLabel = `квартира ${selectedUnit.number}`;
+  const viewerState = leadParts[4] ?? 'viewer';
+  const blockCount = [leadContext, interactionTrail, managerFollowUp, brokerScript, shareHandoff].filter(Boolean).length;
+  const trailCopy = interactionTrail?.copy ?? 'Путь клиента пока не собран';
+  const nextStep = brokerScript?.clientNextStep ?? shareHandoff?.copy ?? managerFollowUp?.items[0] ?? 'Связаться с клиентом и уточнить интерес.';
+
+  return {
+    label: `Sales-room digest: ${unitLabel} · ${viewerState} · ${blockCount} блоков`,
+    recap: `Клиент смотрел ${unitLabel} в режиме ${viewerState}; путь: ${trailCopy}; следующий шаг: ${nextStep}`,
+    managerOneLiner: `Digest note: ${unitLabel} · ${selectedUnit.status} · ${viewerState} · ${shareHandoff ? 'share ready' : 'share pending'} · ${managerFollowUp ? 'follow-up ready' : 'follow-up pending'}.`,
+    cardClass: 'lead-handoff-digest-card glass-card sales-room-ready',
   };
 }
 

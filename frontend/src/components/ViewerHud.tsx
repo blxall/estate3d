@@ -1,5 +1,5 @@
 import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildAvailabilityState, buildBrokerNextStepScript, buildLeadContextSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildUnitCard, polygonPoints, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
+import { buildAvailabilityState, buildBrokerNextStepScript, buildLeadContextSummary, buildLeadHandoffDigest, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildUnitCard, polygonPoints, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { LeadCta } from './LeadCta';
 
 type Props = {
@@ -63,6 +63,7 @@ export function ViewerHud({
   const shareHandoff = buildShareHandoffSummary({ selectedFloor, selectedUnit, viewerState, shareLink });
   const managerFollowUp = buildManagerFollowUpChecklist({ leadContext, interactionTrail, shareHandoff, selectedUnit });
   const brokerScript = buildBrokerNextStepScript({ leadContext, managerFollowUp, shareHandoff, selectedUnit });
+  const leadHandoffDigest = buildLeadHandoffDigest({ leadContext, interactionTrail, managerFollowUp, brokerScript, shareHandoff, selectedUnit });
 
   return (
     <aside className={responsiveHud.hudClass}>
@@ -126,7 +127,7 @@ export function ViewerHud({
         </div>
       )}
 
-      {selectedUnit && <LeadCta leadMessage={leadMessage} leadStatus={leadStatus} leadContext={leadContext} leadSuccess={leadSuccess} interactionTrail={interactionTrail} shareHandoff={shareHandoff} managerFollowUp={managerFollowUp} brokerScript={brokerScript} onSubmit={onSubmitLead} />}
+      {selectedUnit && <LeadCta leadMessage={leadMessage} leadStatus={leadStatus} leadContext={leadContext} leadSuccess={leadSuccess} interactionTrail={interactionTrail} shareHandoff={shareHandoff} managerFollowUp={managerFollowUp} brokerScript={brokerScript} leadHandoffDigest={leadHandoffDigest} onSubmit={onSubmitLead} />}
     </aside>
   );
 }

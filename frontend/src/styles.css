@@ -653,6 +653,37 @@ button {
   line-height: 1.45;
 }
 
+.lead-handoff-digest-card.glass-card {
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(216, 180, 254, 0.34);
+  border-radius: 18px;
+  padding: 13px;
+  background:
+    linear-gradient(135deg, rgba(216, 180, 254, 0.14), rgba(45, 212, 191, 0.09)),
+    rgba(2, 6, 23, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 46px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+.lead-handoff-digest-card p {
+  margin: 0;
+  color: #e9d5ff;
+  font-weight: 900;
+}
+
+.lead-handoff-digest-recap,
+.lead-handoff-digest-note {
+  color: #dbeafe;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.lead-handoff-digest-note {
+  color: #fef3c7;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;

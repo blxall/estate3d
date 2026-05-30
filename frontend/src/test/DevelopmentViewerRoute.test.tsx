@@ -147,7 +147,11 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText(/CRM note: Lead context: Estate3D Skyline/i)).toHaveClass('manager-follow-up-copy');
     expect(screen.getByText('Broker script: квартира 81 · window_view · ready to send')).toBeInTheDocument();
     expect(screen.getByText(/Здравствуйте! Видел ваш интерес к квартире 81/)).toHaveClass('broker-script-opener');
-    expect(screen.getByText(/Предложить клиенту открыть ссылку/)).toHaveClass('broker-script-next-step');
+    expect(screen.getByText(/Предложить клиенту открыть ссылку/, { selector: '.broker-script-next-step' })).toHaveClass('broker-script-next-step');
+    const digestCard = screen.getByText('Sales-room digest: квартира 81 · window_view · 5 блоков').closest('.lead-handoff-digest-card');
+    expect(digestCard).toHaveClass('glass-card', 'sales-room-ready');
+    expect(screen.getByText(/Клиент смотрел квартира 81 в режиме window_view/)).toHaveClass('lead-handoff-digest-recap');
+    expect(screen.getByText('Digest note: квартира 81 · available · window_view · share ready · follow-up ready.')).toHaveClass('lead-handoff-digest-note');
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
     const shareHandoff = screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
     expect(shareHandoff).toHaveClass('glass-card', 'desktop-inline');
@@ -170,7 +174,7 @@ describe('Premium development viewer route', () => {
         contact_name: '',
         contact_phone: '',
         contact_email: '',
-        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город. Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город. CRM note: Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город · follow-up for available unit. Broker script note: квартира 81 · available · window_view · follow-up ready.',
+        message: 'Покупатель смотрит Estate3D Skyline, Корпус A, 8 этаж, квартира 81 (2 комнаты, 58.7 м², от 24.8 млн ₽). Состояние viewer: window_view. Точка просмотра: Войти в гостиную. Вид из окна: Вид из окна на город. Менеджеру: клиент последовательно выбрал 8 этаж, квартиру 81, вошел в Войти в гостиную и открыл Вид из окна на город. CRM note: Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город · follow-up for available unit. Broker script note: квартира 81 · available · window_view · follow-up ready. Digest note: квартира 81 · available · window_view · share ready · follow-up ready.',
       }),
     });
   });
