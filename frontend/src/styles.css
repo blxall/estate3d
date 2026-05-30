@@ -534,6 +534,24 @@ button {
   line-height: 1.45;
 }
 
+.analytics-readout {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 12px;
+}
+
+.analytics-readout p {
+  margin: 0;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(2, 6, 23, 0.28);
+  color: #bae6fd;
+  font-size: 0.78rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
 .responsive-hud-readout {
   margin: 0 0 12px;
   font-size: 0.8rem;

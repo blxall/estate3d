@@ -10,6 +10,7 @@ import {
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
+  buildViewerAnalyticsEvent,
   buildViewerDeepLinkSearch,
   buildViewerDeepLinkState,
   buildRoomFootprints,
@@ -334,6 +335,33 @@ describe('viewer scene adapter', () => {
       feedbackClass: 'lead-feedback error-card',
       buttonLabel: 'Повторить отправку',
     });
+  });
+
+  it('builds lightweight premium viewer analytics events with selected context', () => {
+    const building = payload.buildings[0];
+    const floor = building.floors[1];
+    const unit = floor.units[0];
+    const viewpoint = unit.viewpoints[0];
+    const windowView = unit.window_views[0];
+
+    expect(buildViewerAnalyticsEvent({ action: 'select_unit', development: payload, building, selectedFloor: floor, selectedUnit: unit, viewerState: 'unit_top_down' })).toEqual({
+      eventName: 'premium_viewer_select_unit',
+      label: 'Analytics: select_unit · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · unit_top_down',
+      payload: {
+        development_id: 'dev_demo_premium',
+        development_name: 'Estate3D Skyline',
+        building_id: 'building_a',
+        building_name: 'Корпус A',
+        floor_id: 'floor_2',
+        floor_label: '2 этаж',
+        unit_id: 'unit_2_1',
+        unit_number: '21',
+        viewer_state: 'unit_top_down',
+      },
+    });
+    expect(buildViewerAnalyticsEvent({ action: 'lead_error', development: payload, building, selectedFloor: floor, selectedUnit: unit, selectedViewpoint: viewpoint, activeWindow: windowView, viewerState: 'window_view' }).label).toBe(
+      'Analytics: lead_error · Estate3D Skyline · Корпус A · 2 этаж · квартира 21 · window_view · Войти в гостиную · Вид из окна',
+    );
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

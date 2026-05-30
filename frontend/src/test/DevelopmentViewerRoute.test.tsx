@@ -314,6 +314,38 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
   });
 
+  it('shows lightweight analytics readouts for premium viewer interactions and lead failures', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    let rejectLead: (error: Error) => void = () => undefined;
+    const pendingLead = new Promise((_, reject) => {
+      rejectLead = reject;
+    });
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, json: async () => demoPayload })
+      .mockReturnValueOnce(pendingLead);
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    expect(await screen.findByText('Analytics: select_floor · Estate3D Skyline · Корпус A · 8 этаж · floor_focus')).toBeInTheDocument();
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    expect(await screen.findByText('Analytics: select_unit · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · unit_top_down')).toBeInTheDocument();
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D room mesh: Гостиная-кухня/i }));
+    expect(await screen.findByText('Analytics: enter_walk_mode · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · walk_mode · Войти в гостиную')).toBeInTheDocument();
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D window hotspot: Вид из окна на город/i }));
+    expect(await screen.findByText('Analytics: open_window_view · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
+    expect(await screen.findByText('Analytics: lead_click · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
+
+    rejectLead(new Error('network unavailable'));
+    expect(await screen.findByText('Analytics: lead_error · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
+  });
+
   it('syncs the shareable URL as users drill through R3F selection bridges', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });

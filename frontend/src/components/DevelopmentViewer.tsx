@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildLeadContextSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
+import { buildLeadContextSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -29,6 +29,7 @@ export function DevelopmentViewer({ development }: Props) {
   const [leadMessage, setLeadMessage] = useState('');
   const [leadStatus, setLeadStatus] = useState<LeadCtaStatus>('idle');
   const [leadSuccess, setLeadSuccess] = useState<LeadSuccessSummary | null>(null);
+  const [analyticsLabels, setAnalyticsLabels] = useState<string[]>([]);
 
   const firstViewpoint = selectedUnit?.viewpoints[0] ?? null;
   const firstWindow = selectedUnit?.window_views[0] ?? null;
@@ -53,8 +54,37 @@ export function DevelopmentViewer({ development }: Props) {
     window.history.replaceState({}, '', shareLink);
   }, [shareLink]);
 
+  function trackViewerEvent({
+    action,
+    floor = selectedFloor,
+    unit = selectedUnit,
+    viewpoint = selectedViewpoint,
+    windowView = activeWindow,
+    state = viewerState,
+  }: {
+    action: ViewerAnalyticsAction;
+    floor?: DevelopmentFloor | null;
+    unit?: DevelopmentUnit | null;
+    viewpoint?: DevelopmentViewpoint | null;
+    windowView?: DevelopmentWindowView | null;
+    state?: ViewerState;
+  }) {
+    const event = buildViewerAnalyticsEvent({
+      action,
+      development,
+      building,
+      selectedFloor: floor,
+      selectedUnit: unit,
+      selectedViewpoint: viewpoint,
+      activeWindow: windowView,
+      viewerState: state,
+    });
+    setAnalyticsLabels((labels) => [...labels.slice(-5), event.label]);
+  }
+
   function chooseFloor(floorId: string) {
     const floor = building.floors.find((candidate) => candidate.id === floorId) ?? null;
+    trackViewerEvent({ action: 'select_floor', floor, unit: null, viewpoint: null, windowView: null, state: 'floor_focus' });
     setSelectedFloor(floor);
     setSelectedUnit(null);
     setSelectedViewpoint(null);
@@ -66,6 +96,7 @@ export function DevelopmentViewer({ development }: Props) {
   }
 
   function chooseUnit(unit: DevelopmentUnit) {
+    trackViewerEvent({ action: 'select_unit', unit, viewpoint: null, windowView: null, state: 'unit_top_down' });
     setSelectedUnit(unit);
     setSelectedViewpoint(null);
     setActiveWindow(null);
@@ -76,6 +107,7 @@ export function DevelopmentViewer({ development }: Props) {
   }
 
   function enterWalkMode(viewpoint: DevelopmentViewpoint) {
+    trackViewerEvent({ action: 'enter_walk_mode', viewpoint, windowView: null, state: 'walk_mode' });
     setSelectedViewpoint(viewpoint);
     setActiveWindow(null);
     setLeadMessage('');
@@ -85,7 +117,9 @@ export function DevelopmentViewer({ development }: Props) {
   }
 
   function showWindowView(windowView?: DevelopmentWindowView) {
-    setActiveWindow(windowView ?? firstWindow ?? null);
+    const nextWindow = windowView ?? firstWindow ?? null;
+    trackViewerEvent({ action: 'open_window_view', windowView: nextWindow, state: 'window_view' });
+    setActiveWindow(nextWindow);
     setLeadMessage('');
     setLeadSuccess(null);
     setLeadStatus('idle');
@@ -102,6 +136,7 @@ export function DevelopmentViewer({ development }: Props) {
     setLeadMessage('Отправляем заявку менеджеру…');
     setLeadStatus('sending');
     setLeadSuccess(null);
+    trackViewerEvent({ action: 'lead_click' });
     const leadContext = buildLeadContextSummary({
       development,
       building,
@@ -125,9 +160,11 @@ export function DevelopmentViewer({ development }: Props) {
       setLeadSuccess(buildLeadSuccessSummary({ leadId: lead.id, selectedFloor, selectedUnit, viewerState, shareLink }));
       setLeadMessage('');
       setLeadStatus('success');
+      trackViewerEvent({ action: 'lead_success' });
     } catch {
       setLeadMessage('Не удалось отправить заявку. Попробуйте еще раз.');
       setLeadStatus('error');
+      trackViewerEvent({ action: 'lead_error' });
     }
   }
 
@@ -143,6 +180,9 @@ export function DevelopmentViewer({ development }: Props) {
       <section className={responsiveStage.stageClass} aria-label="Интерактивная 3D сцена ЖК">
         <p className="deep-link-readout">{deepLinkState.label}</p>
         <p className="share-link-readout">Share link: {shareLink}</p>
+        <div className="analytics-readout" aria-label="Premium viewer analytics readout">
+          {analyticsLabels.map((label) => <p key={label}>{label}</p>)}
+        </div>
         <ViewerScene
           scene={scene}
           viewerState={viewerState}

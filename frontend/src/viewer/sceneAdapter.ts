@@ -120,6 +120,14 @@ export type LeadCtaState = {
   buttonLabel: string;
 };
 
+export type ViewerAnalyticsAction = 'select_floor' | 'select_unit' | 'enter_walk_mode' | 'open_window_view' | 'lead_click' | 'lead_success' | 'lead_error';
+
+export type ViewerAnalyticsEvent = {
+  eventName: string;
+  label: string;
+  payload: Record<string, string>;
+};
+
 export type ResponsiveHudState = {
   mode: 'mobile' | 'desktop';
   stageClass: string;
@@ -411,6 +419,63 @@ export function buildLeadCtaState(status: LeadCtaStatus): LeadCtaState {
     buttonClass: 'lead-submit-button ready',
     feedbackClass: 'lead-feedback idle',
     buttonLabel: 'Оставить заявку',
+  };
+}
+
+export function buildViewerAnalyticsEvent({
+  action,
+  development,
+  building,
+  selectedFloor,
+  selectedUnit,
+  selectedViewpoint,
+  activeWindow,
+  viewerState,
+}: {
+  action: ViewerAnalyticsAction;
+  development: DevelopmentViewerPayload;
+  building: DevelopmentBuilding;
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+  selectedViewpoint?: DevelopmentViewpoint | null;
+  activeWindow?: DevelopmentWindowView | null;
+  viewerState: ViewerState;
+}): ViewerAnalyticsEvent {
+  const payload: Record<string, string> = {
+    development_id: development.id,
+    development_name: development.name,
+    building_id: building.id,
+    building_name: building.name,
+    viewer_state: viewerState,
+  };
+  const parts = [development.name, building.name];
+
+  if (selectedFloor) {
+    payload.floor_id = selectedFloor.id;
+    payload.floor_label = selectedFloor.label;
+    parts.push(selectedFloor.label);
+  }
+  if (selectedUnit) {
+    payload.unit_id = selectedUnit.id;
+    payload.unit_number = selectedUnit.number;
+    parts.push(`квартира ${selectedUnit.number}`);
+  }
+  parts.push(viewerState);
+  if (selectedViewpoint) {
+    payload.viewpoint_id = selectedViewpoint.id;
+    payload.viewpoint_label = selectedViewpoint.label;
+    parts.push(selectedViewpoint.label);
+  }
+  if (activeWindow) {
+    payload.window_id = activeWindow.id;
+    payload.window_label = activeWindow.label;
+    parts.push(activeWindow.label);
+  }
+
+  return {
+    eventName: `premium_viewer_${action}`,
+    label: `Analytics: ${action} · ${parts.join(' · ')}`,
+    payload,
   };
 }
 
