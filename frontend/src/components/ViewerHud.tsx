@@ -1,5 +1,5 @@
 import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildAvailabilityState, buildLeadContextSummary, buildResponsiveHudState, buildShareHandoffSummary, buildUnitCard, polygonPoints, type LeadContextSummary, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
+import { buildAvailabilityState, buildLeadContextSummary, buildResponsiveHudState, buildShareHandoffSummary, buildUnitCard, polygonPoints, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { LeadCta } from './LeadCta';
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
   firstViewpoint: DevelopmentViewpoint | null;
   viewerState: ViewerState;
   leadMessage: string;
+  leadStatus: LeadCtaStatus;
   leadSuccess: LeadSuccessSummary | null;
   shareLink: string;
   onChooseUnit: (unit: DevelopmentUnit) => void;
@@ -30,6 +31,7 @@ export function ViewerHud({
   firstViewpoint,
   viewerState,
   leadMessage,
+  leadStatus,
   leadSuccess,
   shareLink,
   onChooseUnit,
@@ -120,7 +122,7 @@ export function ViewerHud({
         </div>
       )}
 
-      {selectedUnit && <LeadCta leadMessage={leadMessage} leadContext={leadContext} leadSuccess={leadSuccess} shareHandoff={shareHandoff} onSubmit={onSubmitLead} />}
+      {selectedUnit && <LeadCta leadMessage={leadMessage} leadStatus={leadStatus} leadContext={leadContext} leadSuccess={leadSuccess} shareHandoff={shareHandoff} onSubmit={onSubmitLead} />}
     </aside>
   );
 }

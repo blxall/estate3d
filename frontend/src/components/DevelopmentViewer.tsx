@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildLeadContextSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
+import { buildLeadContextSummary, buildLeadSuccessSummary, buildResponsiveHudState, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -27,6 +27,7 @@ export function DevelopmentViewer({ development }: Props) {
   const [selectedViewpoint, setSelectedViewpoint] = useState<DevelopmentViewpoint | null>(initialViewpoint);
   const [activeWindow, setActiveWindow] = useState<DevelopmentWindowView | null>(initialWindow);
   const [leadMessage, setLeadMessage] = useState('');
+  const [leadStatus, setLeadStatus] = useState<LeadCtaStatus>('idle');
   const [leadSuccess, setLeadSuccess] = useState<LeadSuccessSummary | null>(null);
 
   const firstViewpoint = selectedUnit?.viewpoints[0] ?? null;
@@ -60,6 +61,7 @@ export function DevelopmentViewer({ development }: Props) {
     setActiveWindow(null);
     setLeadMessage('');
     setLeadSuccess(null);
+    setLeadStatus('idle');
     setViewerState('floor_focus');
   }
 
@@ -69,6 +71,7 @@ export function DevelopmentViewer({ development }: Props) {
     setActiveWindow(null);
     setLeadMessage('');
     setLeadSuccess(null);
+    setLeadStatus('idle');
     setViewerState('unit_top_down');
   }
 
@@ -77,6 +80,7 @@ export function DevelopmentViewer({ development }: Props) {
     setActiveWindow(null);
     setLeadMessage('');
     setLeadSuccess(null);
+    setLeadStatus('idle');
     setViewerState('walk_mode');
   }
 
@@ -84,16 +88,19 @@ export function DevelopmentViewer({ development }: Props) {
     setActiveWindow(windowView ?? firstWindow ?? null);
     setLeadMessage('');
     setLeadSuccess(null);
+    setLeadStatus('idle');
     setViewerState('window_view');
   }
 
   async function submitLead() {
     if (!selectedFloor || !selectedUnit) {
       setLeadMessage('Выберите этаж и квартиру перед заявкой');
+      setLeadStatus('error');
       return;
     }
 
     setLeadMessage('Отправляем заявку менеджеру…');
+    setLeadStatus('sending');
     setLeadSuccess(null);
     const leadContext = buildLeadContextSummary({
       development,
@@ -117,8 +124,10 @@ export function DevelopmentViewer({ development }: Props) {
       });
       setLeadSuccess(buildLeadSuccessSummary({ leadId: lead.id, selectedFloor, selectedUnit, viewerState, shareLink }));
       setLeadMessage('');
+      setLeadStatus('success');
     } catch {
       setLeadMessage('Не удалось отправить заявку. Попробуйте еще раз.');
+      setLeadStatus('error');
     }
   }
 
@@ -156,6 +165,7 @@ export function DevelopmentViewer({ development }: Props) {
           firstViewpoint={firstViewpoint}
           viewerState={viewerState}
           leadMessage={leadMessage}
+          leadStatus={leadStatus}
           leadSuccess={leadSuccess}
           shareLink={shareLink}
           onChooseUnit={chooseUnit}

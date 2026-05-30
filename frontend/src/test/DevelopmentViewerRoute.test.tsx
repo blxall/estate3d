@@ -277,6 +277,43 @@ describe('Premium development viewer route', () => {
     expect(screen.getAllByText(/Панорама из окна: Вид из окна на город/i).length).toBeGreaterThan(0);
   });
 
+  it('shows premium sending and retry states without losing lead context or share handoff', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    let rejectLead: (error: Error) => void = () => undefined;
+    const pendingLead = new Promise((_, reject) => {
+      rejectLead = reject;
+    });
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, json: async () => demoPayload })
+      .mockReturnValueOnce(pendingLead);
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D room mesh: Гостиная-кухня/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D window hotspot: Вид из окна на город/i }));
+    await screen.findByText('State: window_view');
+
+    fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
+
+    const sendingButton = await screen.findByRole('button', { name: 'Отправляем заявку…' });
+    expect(sendingButton).toBeDisabled();
+    expect(sendingButton).toHaveClass('lead-submit-button', 'sending');
+    expect(screen.getByText('Отправляем заявку менеджеру…')).toHaveClass('lead-feedback', 'sending');
+    expect(screen.getByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
+    expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+
+    rejectLead(new Error('network unavailable'));
+
+    const retryButton = await screen.findByRole('button', { name: 'Повторить отправку' });
+    expect(retryButton).not.toBeDisabled();
+    expect(retryButton).toHaveClass('lead-submit-button', 'retry');
+    expect(screen.getByText('Не удалось отправить заявку. Попробуйте еще раз.')).toHaveClass('lead-feedback', 'error-card');
+    expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+  });
+
   it('syncs the shareable URL as users drill through R3F selection bridges', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });

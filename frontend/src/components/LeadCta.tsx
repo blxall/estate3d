@@ -1,14 +1,16 @@
-import type { LeadContextSummary, LeadSuccessSummary, ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildLeadCtaState, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
+  leadStatus: LeadCtaStatus;
   leadContext: LeadContextSummary | null;
   leadSuccess: LeadSuccessSummary | null;
   shareHandoff: ShareHandoffSummary | null;
   onSubmit: () => void;
 };
 
-export function LeadCta({ leadMessage, leadContext, leadSuccess, shareHandoff, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, shareHandoff, onSubmit }: Props) {
+  const leadCtaState = buildLeadCtaState(leadStatus);
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -27,14 +29,14 @@ export function LeadCta({ leadMessage, leadContext, leadSuccess, shareHandoff, o
           <button type="button" className={shareHandoff.buttonClass} aria-label={shareHandoff.ariaLabel}>Ссылка готова к отправке</button>
         </div>
       )}
-      <button type="button" onClick={onSubmit}>Оставить заявку</button>
+      <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>
       {leadSuccess && (
         <div className={leadSuccess.cardClass}>
           <p>{leadSuccess.label}</p>
           <small>{leadSuccess.nextAction}</small>
         </div>
       )}
-      {leadMessage && <p className="lead-message">{leadMessage}</p>}
+      {leadMessage && <p className={leadCtaState.feedbackClass}>{leadMessage}</p>}
     </div>
   );
 }

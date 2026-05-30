@@ -5,6 +5,7 @@ import {
   buildCameraPlan,
   buildAvailabilityState,
   buildLeadContextSummary,
+  buildLeadCtaState,
   buildLeadSuccessSummary,
   buildMaterialTheme,
   buildResponsiveHudState,
@@ -309,6 +310,29 @@ describe('viewer scene adapter', () => {
       cardClass: 'share-handoff-card glass-card desktop-inline',
       copyClass: 'share-handoff-copy copy-ready',
       buttonClass: 'share-copy-button premium-outline',
+    });
+  });
+
+  it('builds premium lead CTA state contracts for idle, sending, success, and error flows', () => {
+    expect(buildLeadCtaState('idle')).toEqual({
+      status: 'idle',
+      buttonDisabled: false,
+      buttonClass: 'lead-submit-button ready',
+      feedbackClass: 'lead-feedback idle',
+      buttonLabel: 'Оставить заявку',
+    });
+    expect(buildLeadCtaState('sending')).toEqual({
+      status: 'sending',
+      buttonDisabled: true,
+      buttonClass: 'lead-submit-button sending',
+      feedbackClass: 'lead-feedback sending',
+      buttonLabel: 'Отправляем заявку…',
+    });
+    expect(buildLeadCtaState('error')).toMatchObject({
+      buttonDisabled: false,
+      buttonClass: 'lead-submit-button retry',
+      feedbackClass: 'lead-feedback error-card',
+      buttonLabel: 'Повторить отправку',
     });
   });
 

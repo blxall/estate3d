@@ -640,6 +640,51 @@ button {
   width: 100%;
 }
 
+.lead-submit-button.sending {
+  cursor: wait;
+  border-color: rgba(125, 211, 252, 0.52);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(248, 231, 183, 0.12));
+  color: #e0f2fe;
+  opacity: 0.86;
+}
+
+.lead-submit-button.retry {
+  border-color: rgba(251, 146, 60, 0.58);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(248, 113, 113, 0.12));
+  color: #fed7aa;
+}
+
+.lead-submit-button.success-ready {
+  border-color: rgba(134, 239, 172, 0.5);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(56, 189, 248, 0.1));
+  color: #bbf7d0;
+}
+
+.lead-feedback {
+  margin: 10px 0 0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.lead-feedback.idle,
+.lead-feedback.success {
+  color: #86efac;
+}
+
+.lead-feedback.sending {
+  border: 1px solid rgba(125, 211, 252, 0.26);
+  background: rgba(14, 165, 233, 0.12);
+  color: #bae6fd;
+}
+
+.lead-feedback.error-card {
+  border: 1px solid rgba(251, 146, 60, 0.32);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.14), rgba(127, 29, 29, 0.18));
+  color: #fed7aa;
+}
+
 .lead-message {
   color: #86efac;
   font-weight: 800;

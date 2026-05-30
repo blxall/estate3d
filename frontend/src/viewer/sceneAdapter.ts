@@ -110,6 +110,16 @@ export type LeadSuccessSummary = {
   cardClass: string;
 };
 
+export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
+
+export type LeadCtaState = {
+  status: LeadCtaStatus;
+  buttonDisabled: boolean;
+  buttonClass: string;
+  feedbackClass: string;
+  buttonLabel: string;
+};
+
 export type ResponsiveHudState = {
   mode: 'mobile' | 'desktop';
   stageClass: string;
@@ -364,6 +374,43 @@ export function buildShareHandoffSummary({
     cardClass: 'share-handoff-card glass-card desktop-inline',
     copyClass: 'share-handoff-copy copy-ready',
     buttonClass: 'share-copy-button premium-outline',
+  };
+}
+
+export function buildLeadCtaState(status: LeadCtaStatus): LeadCtaState {
+  if (status === 'sending') {
+    return {
+      status,
+      buttonDisabled: true,
+      buttonClass: 'lead-submit-button sending',
+      feedbackClass: 'lead-feedback sending',
+      buttonLabel: 'Отправляем заявку…',
+    };
+  }
+  if (status === 'error') {
+    return {
+      status,
+      buttonDisabled: false,
+      buttonClass: 'lead-submit-button retry',
+      feedbackClass: 'lead-feedback error-card',
+      buttonLabel: 'Повторить отправку',
+    };
+  }
+  if (status === 'success') {
+    return {
+      status,
+      buttonDisabled: false,
+      buttonClass: 'lead-submit-button success-ready',
+      feedbackClass: 'lead-feedback success',
+      buttonLabel: 'Отправить еще одну заявку',
+    };
+  }
+  return {
+    status,
+    buttonDisabled: false,
+    buttonClass: 'lead-submit-button ready',
+    feedbackClass: 'lead-feedback idle',
+    buttonLabel: 'Оставить заявку',
   };
 }
 
