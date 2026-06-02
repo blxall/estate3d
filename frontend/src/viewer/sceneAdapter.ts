@@ -159,6 +159,16 @@ export type GroupedLeadExportFields = {
   cardClass: string;
 };
 
+export type CrmExportAction = {
+  label: string;
+  buttonLabel: string;
+  ariaLabel: string;
+  plainText: string;
+  cardClass: string;
+  textClass: string;
+  buttonClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -773,6 +783,28 @@ export function buildGroupedLeadExportFields(exportPayload: LeadExportPayload | 
     label: `CRM fields: ${development} · ${unit} · ${viewerState} · ${groups.length} группы`,
     groups,
     cardClass: 'lead-export-fields-card glass-card crm-field-groups copy-ready',
+  };
+}
+
+export function buildCrmExportAction(groupedFields: GroupedLeadExportFields | null): CrmExportAction | null {
+  if (!groupedFields) {
+    return null;
+  }
+  const labelParts = groupedFields.label.replace(/^CRM fields: /, '').split(' · ');
+  const [, unit = 'unit', viewerState = 'viewer'] = labelParts;
+  const fieldCount = groupedFields.groups.reduce((total, group) => total + group.rows.length, 0);
+  const plainText = groupedFields.groups
+    .map((group) => `${group.title}\n${group.rows.map((row) => `- ${row}`).join('\n')}`)
+    .join('\n\n');
+
+  return {
+    label: `CRM copy action: ${unit} · ${viewerState} · ${fieldCount} полей`,
+    buttonLabel: 'Скопировать CRM block',
+    ariaLabel: `Copy CRM export block: ${unit} · ${viewerState}`,
+    plainText,
+    cardClass: 'crm-export-action-card glass-card copy-action-ready',
+    textClass: 'crm-export-action-text copy-ready',
+    buttonClass: 'crm-export-action-button premium-outline',
   };
 }
 

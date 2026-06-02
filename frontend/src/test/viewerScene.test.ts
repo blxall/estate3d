@@ -14,6 +14,7 @@ import {
   buildLeadHandoffPersistenceState,
   buildLeadExportPayload,
   buildGroupedLeadExportFields,
+  buildCrmExportAction,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -571,6 +572,30 @@ describe('viewer scene adapter', () => {
       cardClass: 'lead-export-fields-card glass-card crm-field-groups copy-ready',
     });
     expect(buildGroupedLeadExportFields(null)).toBeNull();
+  });
+
+  it('builds copy-ready CRM export action text from grouped field rows', () => {
+    const groupedFields = {
+      label: 'CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы',
+      groups: [
+        { title: 'Context', rows: ['ЖК: Estate3D Skyline', 'Корпус: Корпус A', 'Этаж: 8 этаж', 'Квартира: квартира 81', 'Viewer state: window_view'] },
+        { title: 'Share', rows: ['Copy-ready link: /developments/demo-premium/viewer?floor=floor_8'] },
+        { title: 'Digest', rows: ['Digest note: квартира 81 · available · window_view · share ready · follow-up ready.', 'Digest готов для менеджера'] },
+        { title: 'Next step', rows: ['Следующий шаг: открыть ссылку и выбрать время звонка.'] },
+      ],
+      cardClass: 'lead-export-fields-card glass-card crm-field-groups copy-ready',
+    };
+
+    expect(buildCrmExportAction(groupedFields)).toEqual({
+      label: 'CRM copy action: квартира 81 · window_view · 9 полей',
+      buttonLabel: 'Скопировать CRM block',
+      ariaLabel: 'Copy CRM export block: квартира 81 · window_view',
+      plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A\n- Этаж: 8 этаж\n- Квартира: квартира 81\n- Viewer state: window_view\n\nShare\n- Copy-ready link: /developments/demo-premium/viewer?floor=floor_8\n\nDigest\n- Digest note: квартира 81 · available · window_view · share ready · follow-up ready.\n- Digest готов для менеджера\n\nNext step\n- Следующий шаг: открыть ссылку и выбрать время звонка.',
+      cardClass: 'crm-export-action-card glass-card copy-action-ready',
+      textClass: 'crm-export-action-text copy-ready',
+      buttonClass: 'crm-export-action-button premium-outline',
+    });
+    expect(buildCrmExportAction(null)).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

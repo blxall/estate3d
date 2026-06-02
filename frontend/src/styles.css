@@ -790,6 +790,37 @@ button {
   line-height: 1.42;
 }
 
+.crm-export-action-card.copy-action-ready {
+  margin: 10px 0 12px;
+  display: grid;
+  gap: 9px;
+  border-radius: 18px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.76), rgba(14, 165, 233, 0.16));
+  border: 1px solid rgba(248, 231, 183, 0.3);
+}
+
+.crm-export-action-card p {
+  margin: 0;
+  color: #fef3c7;
+  font-weight: 900;
+}
+
+.crm-export-action-text.copy-ready {
+  display: block;
+  white-space: pre-line;
+  color: #dbeafe;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.lead-card .crm-export-action-button.premium-outline {
+  width: 100%;
+  border: 1px solid rgba(125, 211, 252, 0.42);
+  background: rgba(2, 6, 23, 0.34);
+  color: #bae6fd;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;

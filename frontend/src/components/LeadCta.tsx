@@ -1,4 +1,4 @@
-import { buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildCrmExportAction, buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -18,6 +18,7 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
   const digestPersistence = buildLeadHandoffPersistenceState({ digest: leadHandoffDigest, status: leadStatus });
   const leadExportPayload = buildLeadExportPayload({ leadContext, shareHandoff, digest: leadHandoffDigest, persistence: digestPersistence, managerFollowUp, brokerScript });
   const groupedLeadExportFields = buildGroupedLeadExportFields(leadExportPayload);
+  const crmExportAction = buildCrmExportAction(groupedLeadExportFields);
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -89,6 +90,13 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
               {group.rows.map((row) => <small className="lead-export-field-row" key={`${group.title}:${row}`}>{row}</small>)}
             </div>
           ))}
+        </div>
+      )}
+      {crmExportAction && (
+        <div className={crmExportAction.cardClass}>
+          <p>{crmExportAction.label}</p>
+          <small className={crmExportAction.textClass}>{crmExportAction.plainText}</small>
+          <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel}>{crmExportAction.buttonLabel}</button>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

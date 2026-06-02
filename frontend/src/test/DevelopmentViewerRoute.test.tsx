@@ -178,6 +178,10 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Digest')).toHaveClass('lead-export-field-title');
     expect(screen.getByText('Digest готов для менеджера', { selector: '.lead-export-field-row' })).toHaveClass('lead-export-field-row');
     expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
+    const crmCopyAction = screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей').closest('.crm-export-action-card');
+    expect(crmCopyAction).toHaveClass('glass-card', 'copy-action-ready');
+    expect(screen.getByText(/Context\s+- ЖК: Estate3D Skyline\s+- Корпус: Корпус A/i)).toHaveClass('crm-export-action-text', 'copy-ready');
+    expect(screen.getByRole('button', { name: 'Copy CRM export block: квартира 81 · window_view' })).toHaveClass('crm-export-action-button', 'premium-outline');
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -347,6 +351,8 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Digest сохранен для повтора', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
     expect(screen.getByText('CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы')).toBeInTheDocument();
     expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
+    expect(screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей')).toBeInTheDocument();
+    expect(screen.getByText(/Next step\s+- Предложить клиенту открыть ссылку/i)).toHaveClass('crm-export-action-text', 'copy-ready');
   });
 
   it('shows lightweight analytics readouts for premium viewer interactions and lead failures', async () => {
