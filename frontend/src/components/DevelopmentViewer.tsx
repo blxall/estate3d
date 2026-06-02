@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildBrokerNextStepScript, buildLeadContextSummary, buildInteractionTrailSummary, buildLeadExportPayload, buildLeadHandoffDigest, buildLeadHandoffPersistenceState, buildLeadSuccessSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
+import { buildBrokerNextStepScript, buildLeadContextSummary, buildInteractionTrailSummary, buildLeadExportPayload, buildLeadHandoffDigest, buildLeadHandoffPersistenceState, buildLeadSuccessSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type CrmCopyIntentSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -181,6 +181,10 @@ export function DevelopmentViewer({ development }: Props) {
     }
   }
 
+  function handleCrmCopyIntent(summary: CrmCopyIntentSummary) {
+    trackViewerEvent({ action: summary.analyticsAction });
+  }
+
   return (
     <main className={`development-viewer state-${viewerState}`}>
       <section className="viewer-hero">
@@ -226,6 +230,7 @@ export function DevelopmentViewer({ development }: Props) {
           onEnterWalkMode={enterWalkMode}
           onShowWindowView={() => showWindowView()}
           onSubmitLead={submitLead}
+          onCrmCopyIntent={handleCrmCopyIntent}
         />
       </section>
     </main>

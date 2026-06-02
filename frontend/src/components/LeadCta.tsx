@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { buildCrmExportAction, buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildCrmCopyIntentSummary, buildCrmExportAction, buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type CrmCopyIntentSummary, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -13,10 +13,12 @@ type Props = {
   brokerScript: BrokerNextStepScript | null;
   leadHandoffDigest: LeadHandoffDigest | null;
   onSubmit: () => void;
+  onCrmCopyIntent?: (summary: CrmCopyIntentSummary) => void;
 };
 
-export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, leadHandoffDigest, onSubmit }: Props) {
+export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, leadHandoffDigest, onSubmit, onCrmCopyIntent }: Props) {
   const [crmCopyFeedback, setCrmCopyFeedback] = useState<{ message: string; className: string } | null>(null);
+  const [crmCopyIntent, setCrmCopyIntent] = useState<CrmCopyIntentSummary | null>(null);
   const leadCtaState = buildLeadCtaState(leadStatus);
   const digestPersistence = buildLeadHandoffPersistenceState({ digest: leadHandoffDigest, status: leadStatus });
   const leadExportPayload = buildLeadExportPayload({ leadContext, shareHandoff, digest: leadHandoffDigest, persistence: digestPersistence, managerFollowUp, brokerScript });
@@ -32,9 +34,19 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
         throw new Error('Clipboard API unavailable');
       }
       await clipboard.writeText(crmExportAction.plainText);
+      const summary = buildCrmCopyIntentSummary({ status: 'copied', action: crmExportAction });
       setCrmCopyFeedback({ message: 'CRM block скопирован для менеджера', className: 'crm-export-feedback copied' });
+      setCrmCopyIntent(summary);
+      if (summary) {
+        onCrmCopyIntent?.(summary);
+      }
     } catch {
+      const summary = buildCrmCopyIntentSummary({ status: 'error', action: crmExportAction });
       setCrmCopyFeedback({ message: 'Clipboard недоступен — CRM block можно скопировать вручную', className: 'crm-export-feedback error' });
+      setCrmCopyIntent(summary);
+      if (summary) {
+        onCrmCopyIntent?.(summary);
+      }
     }
   };
   return (
@@ -116,6 +128,12 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <small className={crmExportAction.textClass}>{crmExportAction.plainText}</small>
           <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel} onClick={handleCrmCopy}>{crmExportAction.buttonLabel}</button>
           {crmCopyFeedback && <small className={crmCopyFeedback.className}>{crmCopyFeedback.message}</small>}
+          {crmCopyIntent && (
+            <div className={crmCopyIntent.cardClass}>
+              <small className="crm-copy-audit-label">{crmCopyIntent.label}</small>
+              <small className="crm-copy-audit-note">{crmCopyIntent.managerNote}</small>
+            </div>
+          )}
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>

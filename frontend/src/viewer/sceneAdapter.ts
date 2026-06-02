@@ -169,6 +169,13 @@ export type CrmExportAction = {
   buttonClass: string;
 };
 
+export type CrmCopyIntentSummary = {
+  analyticsAction: 'crm_copy_success' | 'crm_copy_error';
+  label: string;
+  managerNote: string;
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -179,7 +186,7 @@ export type LeadCtaState = {
   buttonLabel: string;
 };
 
-export type ViewerAnalyticsAction = 'select_floor' | 'select_unit' | 'enter_walk_mode' | 'open_window_view' | 'lead_click' | 'lead_success' | 'lead_error';
+export type ViewerAnalyticsAction = 'select_floor' | 'select_unit' | 'enter_walk_mode' | 'open_window_view' | 'lead_click' | 'lead_success' | 'lead_error' | 'crm_copy_success' | 'crm_copy_error';
 
 export type ViewerAnalyticsEvent = {
   eventName: string;
@@ -544,7 +551,7 @@ function actionFromAnalyticsLabel(label: string): ViewerAnalyticsAction | null {
     return null;
   }
   const action = match[1];
-  return action === 'select_floor' || action === 'select_unit' || action === 'enter_walk_mode' || action === 'open_window_view' || action === 'lead_click' || action === 'lead_success' || action === 'lead_error' ? action : null;
+  return action === 'select_floor' || action === 'select_unit' || action === 'enter_walk_mode' || action === 'open_window_view' || action === 'lead_click' || action === 'lead_success' || action === 'lead_error' || action === 'crm_copy_success' || action === 'crm_copy_error' ? action : null;
 }
 
 function pickAnalyticsPart(label: string, predicate: (part: string) => boolean): string | null {
@@ -805,6 +812,28 @@ export function buildCrmExportAction(groupedFields: GroupedLeadExportFields | nu
     cardClass: 'crm-export-action-card glass-card copy-action-ready',
     textClass: 'crm-export-action-text copy-ready',
     buttonClass: 'crm-export-action-button premium-outline',
+  };
+}
+
+export function buildCrmCopyIntentSummary({ status, action }: { status: 'copied' | 'error'; action: CrmExportAction | null }): CrmCopyIntentSummary | null {
+  if (!action) {
+    return null;
+  }
+  const labelParts = action.label.replace(/^CRM copy action: /, '').split(' · ');
+  const [unit = 'unit', viewerState = 'viewer', fieldCount = '0 полей'] = labelParts;
+  if (status === 'copied') {
+    return {
+      analyticsAction: 'crm_copy_success',
+      label: `CRM copy audit: copied · ${unit} · ${viewerState} · ${fieldCount}`,
+      managerNote: `CRM copy audit: менеджер скопировал ${fieldCount} for ${unit} · ${viewerState}.`,
+      cardClass: 'crm-copy-audit-card glass-card copied',
+    };
+  }
+  return {
+    analyticsAction: 'crm_copy_error',
+    label: `CRM copy audit: fallback · ${unit} · ${viewerState} · ${fieldCount}`,
+    managerNote: `CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for ${unit} · ${viewerState}.`,
+    cardClass: 'crm-copy-audit-card glass-card error',
   };
 }
 

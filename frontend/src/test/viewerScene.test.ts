@@ -15,6 +15,7 @@ import {
   buildLeadExportPayload,
   buildGroupedLeadExportFields,
   buildCrmExportAction,
+  buildCrmCopyIntentSummary,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -596,6 +597,32 @@ describe('viewer scene adapter', () => {
       buttonClass: 'crm-export-action-button premium-outline',
     });
     expect(buildCrmExportAction(null)).toBeNull();
+  });
+
+  it('builds CRM copy intent analytics summaries for manager audit trail', () => {
+    const action = {
+      label: 'CRM copy action: квартира 81 · window_view · 9 полей',
+      buttonLabel: 'Скопировать CRM block',
+      ariaLabel: 'Copy CRM export block: квартира 81 · window_view',
+      plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A',
+      cardClass: 'crm-export-action-card glass-card copy-action-ready',
+      textClass: 'crm-export-action-text copy-ready',
+      buttonClass: 'crm-export-action-button premium-outline',
+    };
+
+    expect(buildCrmCopyIntentSummary({ status: 'copied', action })).toEqual({
+      analyticsAction: 'crm_copy_success',
+      label: 'CRM copy audit: copied · квартира 81 · window_view · 9 полей',
+      managerNote: 'CRM copy audit: менеджер скопировал 9 полей for квартира 81 · window_view.',
+      cardClass: 'crm-copy-audit-card glass-card copied',
+    });
+    expect(buildCrmCopyIntentSummary({ status: 'error', action })).toEqual({
+      analyticsAction: 'crm_copy_error',
+      label: 'CRM copy audit: fallback · квартира 81 · window_view · 9 полей',
+      managerNote: 'CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for квартира 81 · window_view.',
+      cardClass: 'crm-copy-audit-card glass-card error',
+    });
+    expect(buildCrmCopyIntentSummary({ status: 'copied', action: null })).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

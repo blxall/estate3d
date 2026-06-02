@@ -841,6 +841,31 @@ button {
   border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
+.crm-copy-audit-card {
+  display: grid;
+  gap: 5px;
+  border-radius: 16px;
+  padding: 10px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.crm-copy-audit-card.copied {
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.crm-copy-audit-card.error {
+  border: 1px solid rgba(251, 146, 60, 0.24);
+}
+
+.crm-copy-audit-label {
+  color: #e0f2fe;
+  font-weight: 800;
+}
+
+.crm-copy-audit-note {
+  color: #bfdbfe;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;

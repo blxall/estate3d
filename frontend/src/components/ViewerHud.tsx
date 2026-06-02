@@ -1,5 +1,5 @@
 import type { DevelopmentBuilding, DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildAvailabilityState, buildBrokerNextStepScript, buildLeadContextSummary, buildLeadHandoffDigest, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildUnitCard, polygonPoints, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
+import { buildAvailabilityState, buildBrokerNextStepScript, buildLeadContextSummary, buildLeadHandoffDigest, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildUnitCard, polygonPoints, type CrmCopyIntentSummary, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerState } from '../viewer/sceneAdapter';
 import { LeadCta } from './LeadCta';
 
 type Props = {
@@ -20,6 +20,7 @@ type Props = {
   onEnterWalkMode: (viewpoint: DevelopmentViewpoint) => void;
   onShowWindowView: () => void;
   onSubmitLead: () => void;
+  onCrmCopyIntent: (summary: CrmCopyIntentSummary) => void;
 };
 
 export function ViewerHud({
@@ -40,6 +41,7 @@ export function ViewerHud({
   onEnterWalkMode,
   onShowWindowView,
   onSubmitLead,
+  onCrmCopyIntent,
 }: Props) {
   const availability = buildAvailabilityState({ selectedFloor, selectedUnit });
   const unitCards = selectedFloor?.units.map((unit) => ({ unit, card: buildUnitCard({ floor: selectedFloor, unit, active: selectedUnit?.id === unit.id }) })) ?? [];
@@ -127,7 +129,7 @@ export function ViewerHud({
         </div>
       )}
 
-      {selectedUnit && <LeadCta leadMessage={leadMessage} leadStatus={leadStatus} leadContext={leadContext} leadSuccess={leadSuccess} interactionTrail={interactionTrail} shareHandoff={shareHandoff} managerFollowUp={managerFollowUp} brokerScript={brokerScript} leadHandoffDigest={leadHandoffDigest} onSubmit={onSubmitLead} />}
+      {selectedUnit && <LeadCta leadMessage={leadMessage} leadStatus={leadStatus} leadContext={leadContext} leadSuccess={leadSuccess} interactionTrail={interactionTrail} shareHandoff={shareHandoff} managerFollowUp={managerFollowUp} brokerScript={brokerScript} leadHandoffDigest={leadHandoffDigest} onSubmit={onSubmitLead} onCrmCopyIntent={onCrmCopyIntent} />}
     </aside>
   );
 }
