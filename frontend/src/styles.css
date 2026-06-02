@@ -821,6 +821,26 @@ button {
   color: #bae6fd;
 }
 
+.crm-export-feedback {
+  display: block;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.crm-export-feedback.copied {
+  background: rgba(34, 197, 94, 0.14);
+  color: #bbf7d0;
+  border: 1px solid rgba(74, 222, 128, 0.28);
+}
+
+.crm-export-feedback.error {
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;

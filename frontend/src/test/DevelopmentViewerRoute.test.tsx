@@ -118,6 +118,8 @@ describe('Premium development viewer route', () => {
         }),
       });
     vi.stubGlobal('fetch', fetchMock);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
 
     render(<App />);
 
@@ -181,7 +183,11 @@ describe('Premium development viewer route', () => {
     const crmCopyAction = screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей').closest('.crm-export-action-card');
     expect(crmCopyAction).toHaveClass('glass-card', 'copy-action-ready');
     expect(screen.getByText(/Context\s+- ЖК: Estate3D Skyline\s+- Корпус: Корпус A/i)).toHaveClass('crm-export-action-text', 'copy-ready');
-    expect(screen.getByRole('button', { name: 'Copy CRM export block: квартира 81 · window_view' })).toHaveClass('crm-export-action-button', 'premium-outline');
+    const crmCopyButton = screen.getByRole('button', { name: 'Copy CRM export block: квартира 81 · window_view' });
+    expect(crmCopyButton).toHaveClass('crm-export-action-button', 'premium-outline');
+    fireEvent.click(crmCopyButton);
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('Context\n- ЖК: Estate3D Skyline')));
+    expect(screen.getByText('CRM block скопирован для менеджера')).toHaveClass('crm-export-feedback', 'copied');
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -319,6 +325,8 @@ describe('Premium development viewer route', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => demoPayload })
       .mockReturnValueOnce(pendingLead);
     vi.stubGlobal('fetch', fetchMock);
+    const writeText = vi.fn().mockRejectedValue(new Error('clipboard unavailable'));
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
 
     render(<App />);
 
@@ -353,6 +361,9 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
     expect(screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей')).toBeInTheDocument();
     expect(screen.getByText(/Next step\s+- Предложить клиенту открыть ссылку/i)).toHaveClass('crm-export-action-text', 'copy-ready');
+    fireEvent.click(screen.getByRole('button', { name: 'Copy CRM export block: квартира 81 · window_view' }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('Next step\n- Предложить клиенту открыть ссылку')));
+    expect(screen.getByText('Clipboard недоступен — CRM block можно скопировать вручную')).toHaveClass('crm-export-feedback', 'error');
   });
 
   it('shows lightweight analytics readouts for premium viewer interactions and lead failures', async () => {

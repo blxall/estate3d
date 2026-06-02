@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { buildCrmExportAction, buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
@@ -14,11 +16,27 @@ type Props = {
 };
 
 export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, interactionTrail, shareHandoff, managerFollowUp, brokerScript, leadHandoffDigest, onSubmit }: Props) {
+  const [crmCopyFeedback, setCrmCopyFeedback] = useState<{ message: string; className: string } | null>(null);
   const leadCtaState = buildLeadCtaState(leadStatus);
   const digestPersistence = buildLeadHandoffPersistenceState({ digest: leadHandoffDigest, status: leadStatus });
   const leadExportPayload = buildLeadExportPayload({ leadContext, shareHandoff, digest: leadHandoffDigest, persistence: digestPersistence, managerFollowUp, brokerScript });
   const groupedLeadExportFields = buildGroupedLeadExportFields(leadExportPayload);
   const crmExportAction = buildCrmExportAction(groupedLeadExportFields);
+  const handleCrmCopy = async () => {
+    if (!crmExportAction) {
+      return;
+    }
+    try {
+      const clipboard = typeof navigator === 'undefined' ? null : navigator.clipboard;
+      if (!clipboard?.writeText) {
+        throw new Error('Clipboard API unavailable');
+      }
+      await clipboard.writeText(crmExportAction.plainText);
+      setCrmCopyFeedback({ message: 'CRM block скопирован для менеджера', className: 'crm-export-feedback copied' });
+    } catch {
+      setCrmCopyFeedback({ message: 'Clipboard недоступен — CRM block можно скопировать вручную', className: 'crm-export-feedback error' });
+    }
+  };
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -96,7 +114,8 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
         <div className={crmExportAction.cardClass}>
           <p>{crmExportAction.label}</p>
           <small className={crmExportAction.textClass}>{crmExportAction.plainText}</small>
-          <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel}>{crmExportAction.buttonLabel}</button>
+          <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel} onClick={handleCrmCopy}>{crmExportAction.buttonLabel}</button>
+          {crmCopyFeedback && <small className={crmCopyFeedback.className}>{crmCopyFeedback.message}</small>}
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>
