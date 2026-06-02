@@ -590,7 +590,7 @@ describe('viewer scene adapter', () => {
     expect(buildCrmExportAction(groupedFields)).toEqual({
       label: 'CRM copy action: квартира 81 · window_view · 9 полей',
       buttonLabel: 'Скопировать CRM block',
-      ariaLabel: 'Copy CRM export block: квартира 81 · window_view',
+      ariaLabel: 'Copy CRM export block to clipboard: квартира 81 · window_view · manager-ready',
       plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A\n- Этаж: 8 этаж\n- Квартира: квартира 81\n- Viewer state: window_view\n\nShare\n- Copy-ready link: /developments/demo-premium/viewer?floor=floor_8\n\nDigest\n- Digest note: квартира 81 · available · window_view · share ready · follow-up ready.\n- Digest готов для менеджера\n\nNext step\n- Следующий шаг: открыть ссылку и выбрать время звонка.',
       cardClass: 'crm-export-action-card glass-card copy-action-ready',
       textClass: 'crm-export-action-text copy-ready',

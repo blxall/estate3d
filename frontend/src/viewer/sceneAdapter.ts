@@ -807,7 +807,7 @@ export function buildCrmExportAction(groupedFields: GroupedLeadExportFields | nu
   return {
     label: `CRM copy action: ${unit} · ${viewerState} · ${fieldCount} полей`,
     buttonLabel: 'Скопировать CRM block',
-    ariaLabel: `Copy CRM export block: ${unit} · ${viewerState}`,
+    ariaLabel: `Copy CRM export block to clipboard: ${unit} · ${viewerState} · manager-ready`,
     plainText,
     cardClass: 'crm-export-action-card glass-card copy-action-ready',
     textClass: 'crm-export-action-text copy-ready',

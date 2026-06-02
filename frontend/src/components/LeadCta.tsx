@@ -127,9 +127,9 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <p>{crmExportAction.label}</p>
           <small className={crmExportAction.textClass}>{crmExportAction.plainText}</small>
           <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel} onClick={handleCrmCopy}>{crmExportAction.buttonLabel}</button>
-          {crmCopyFeedback && <small className={crmCopyFeedback.className}>{crmCopyFeedback.message}</small>}
+          {crmCopyFeedback && <small role="status" aria-live="polite" aria-label="CRM copy status" className={crmCopyFeedback.className}>{crmCopyFeedback.message}</small>}
           {crmCopyIntent && (
-            <div className={crmCopyIntent.cardClass}>
+            <div role="note" aria-label="CRM copy audit trail" className={crmCopyIntent.cardClass}>
               <small className="crm-copy-audit-label">{crmCopyIntent.label}</small>
               <small className="crm-copy-audit-note">{crmCopyIntent.managerNote}</small>
             </div>
