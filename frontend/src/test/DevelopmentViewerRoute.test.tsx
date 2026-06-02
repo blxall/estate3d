@@ -151,11 +151,11 @@ describe('Premium development viewer route', () => {
     const digestCard = screen.getByText('Sales-room digest: квартира 81 · window_view · 5 блоков').closest('.lead-handoff-digest-card');
     expect(digestCard).toHaveClass('glass-card', 'sales-room-ready');
     expect(screen.getByText(/Клиент смотрел квартира 81 в режиме window_view/)).toHaveClass('lead-handoff-digest-recap');
-    expect(screen.getByText('Digest note: квартира 81 · available · window_view · share ready · follow-up ready.')).toHaveClass('lead-handoff-digest-note');
+    expect(screen.getByText('Digest note: квартира 81 · available · window_view · share ready · follow-up ready.', { selector: '.lead-handoff-digest-note' })).toHaveClass('lead-handoff-digest-note');
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
     const shareHandoff = screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
     expect(shareHandoff).toHaveClass('glass-card', 'desktop-inline');
-    expect(screen.getByText(/^Ссылка для клиента:/i)).toHaveClass('share-handoff-copy', 'copy-ready');
+    expect(screen.getByText(/^Ссылка для клиента:/i, { selector: '.share-handoff-copy' })).toHaveClass('share-handoff-copy', 'copy-ready');
     expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · window_view' })).toHaveClass('share-copy-button', 'premium-outline');
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
@@ -164,10 +164,20 @@ describe('Premium development viewer route', () => {
     expect(successCard).toHaveClass('glass-card', 'follow-up-ready');
     expect(screen.getByText(/Менеджер получает контекст просмотра и ссылку для продолжения:/i)).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: success · manager handoff ready')).toBeInTheDocument();
-    expect(screen.getByText('Digest готов для менеджера')).toHaveClass('lead-handoff-persistence-badge');
+    expect(screen.getByText('Digest готов для менеджера', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
     expect(screen.getByText('CRM export payload: Estate3D Skyline · квартира 81 · window_view')).toBeInTheDocument();
     expect(screen.getByText(/CRM payload: Estate3D Skyline \| Корпус A \| 8 этаж \| квартира 81 \| window_view/i)).toHaveClass('lead-export-payload-copy');
     expect(screen.getByText('Export note: квартира 81 · window_view · share+digest+next-step ready.')).toBeInTheDocument();
+    const groupedCrmFields = screen.getByText('CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы').closest('.lead-export-fields-card');
+    expect(groupedCrmFields).toHaveClass('glass-card', 'crm-field-groups', 'copy-ready');
+    expect(screen.getByText('Context')).toHaveClass('lead-export-field-title');
+    expect(screen.getByText('ЖК: Estate3D Skyline')).toHaveClass('lead-export-field-row');
+    expect(screen.getByText('Viewer state: window_view')).toHaveClass('lead-export-field-row');
+    expect(screen.getByText('Share')).toHaveClass('lead-export-field-title');
+    expect(screen.getByText(/^Ссылка для клиента:/i, { selector: '.lead-export-field-row' })).toBeInTheDocument();
+    expect(screen.getByText('Digest')).toHaveClass('lead-export-field-title');
+    expect(screen.getByText('Digest готов для менеджера', { selector: '.lead-export-field-row' })).toHaveClass('lead-export-field-row');
+    expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -324,7 +334,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Interaction trail: select_floor → select_unit → enter_walk_mode → open_window_view')).toBeInTheDocument();
     expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: sending · sales-room context locked')).toBeInTheDocument();
-    expect(screen.getByText('Digest закреплен при отправке')).toHaveClass('lead-handoff-persistence-badge');
+    expect(screen.getByText('Digest закреплен при отправке', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
 
     rejectLead(new Error('network unavailable'));
 
@@ -334,7 +344,9 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Не удалось отправить заявку. Попробуйте еще раз.')).toHaveClass('lead-feedback', 'error-card');
     expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: error · retry keeps sales-room context')).toBeInTheDocument();
-    expect(screen.getByText('Digest сохранен для повтора')).toHaveClass('lead-handoff-persistence-badge');
+    expect(screen.getByText('Digest сохранен для повтора', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
+    expect(screen.getByText('CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы')).toBeInTheDocument();
+    expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
   });
 
   it('shows lightweight analytics readouts for premium viewer interactions and lead failures', async () => {

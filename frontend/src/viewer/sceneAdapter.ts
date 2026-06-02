@@ -153,6 +153,12 @@ export type LeadExportPayload = {
   cardClass: string;
 };
 
+export type GroupedLeadExportFields = {
+  label: string;
+  groups: { title: string; rows: string[] }[];
+  cardClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -736,6 +742,37 @@ export function buildLeadExportPayload({
     copy: `CRM payload: ${segments.join(' | ')}`,
     managerOneLiner: `Export note: ${unit} · ${viewerState} · share+digest+next-step ready.`,
     cardClass: 'lead-export-payload-card glass-card crm-export-ready',
+  };
+}
+
+export function buildGroupedLeadExportFields(exportPayload: LeadExportPayload | null): GroupedLeadExportFields | null {
+  if (!exportPayload) {
+    return null;
+  }
+  const labelParts = exportPayload.label.replace(/^CRM export payload: /, '').split(' · ');
+  const [development = 'development', unit = 'unit', viewerState = 'viewer'] = labelParts;
+  const payloadParts = exportPayload.copy.replace(/^CRM payload: /, '').split(' | ');
+  const [contextDevelopment = development, building = 'building', floor = 'floor', contextUnit = unit, contextViewerState = viewerState, share = '', digest = '', persistence = '', nextStep = ''] = payloadParts;
+  const groups = [
+    {
+      title: 'Context',
+      rows: [
+        `ЖК: ${contextDevelopment}`,
+        `Корпус: ${building}`,
+        `Этаж: ${floor}`,
+        `Квартира: ${contextUnit}`,
+        `Viewer state: ${contextViewerState}`,
+      ],
+    },
+    { title: 'Share', rows: [share].filter(Boolean) },
+    { title: 'Digest', rows: [digest, persistence].filter(Boolean) },
+    { title: 'Next step', rows: [nextStep].filter(Boolean) },
+  ].filter((group) => group.rows.length > 0);
+
+  return {
+    label: `CRM fields: ${development} · ${unit} · ${viewerState} · ${groups.length} группы`,
+    groups,
+    cardClass: 'lead-export-fields-card glass-card crm-field-groups copy-ready',
   };
 }
 

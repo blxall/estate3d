@@ -752,6 +752,44 @@ button {
   font-weight: 900;
 }
 
+.lead-export-fields-card.crm-field-groups {
+  margin: 10px 0 12px;
+  display: grid;
+  gap: 10px;
+  border-radius: 18px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(8, 47, 73, 0.72), rgba(79, 70, 229, 0.18));
+  border: 1px solid rgba(125, 211, 252, 0.32);
+}
+
+.lead-export-fields-card p {
+  margin: 0;
+  color: #bae6fd;
+  font-weight: 900;
+}
+
+.lead-export-field-group {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.lead-export-field-title {
+  color: #f8e7b7;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lead-export-field-row {
+  color: #e0f2fe;
+  overflow-wrap: anywhere;
+  line-height: 1.42;
+}
+
 .share-handoff-card.glass-card {
   margin: 12px 0;
   display: grid;

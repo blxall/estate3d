@@ -13,6 +13,7 @@ import {
   buildLeadHandoffDigest,
   buildLeadHandoffPersistenceState,
   buildLeadExportPayload,
+  buildGroupedLeadExportFields,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -549,6 +550,27 @@ describe('viewer scene adapter', () => {
       cardClass: 'lead-export-payload-card glass-card crm-export-ready',
     });
     expect(buildLeadExportPayload({ leadContext: null, shareHandoff, digest, persistence, managerFollowUp, brokerScript })).toBeNull();
+  });
+
+  it('groups CRM export payload fields into manager-readable sections', () => {
+    const exportPayload = {
+      label: 'CRM export payload: Estate3D Skyline · квартира 81 · window_view',
+      copy: 'CRM payload: Estate3D Skyline | Корпус A | 8 этаж | квартира 81 | window_view | Copy-ready link: /developments/demo-premium/viewer?floor=floor_8 | Digest note: квартира 81 · available · window_view · share ready · follow-up ready. | Digest готов для менеджера | Следующий шаг: открыть ссылку и выбрать время звонка.',
+      managerOneLiner: 'Export note: квартира 81 · window_view · share+digest+next-step ready.',
+      cardClass: 'lead-export-payload-card glass-card crm-export-ready',
+    };
+
+    expect(buildGroupedLeadExportFields(exportPayload)).toEqual({
+      label: 'CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы',
+      groups: [
+        { title: 'Context', rows: ['ЖК: Estate3D Skyline', 'Корпус: Корпус A', 'Этаж: 8 этаж', 'Квартира: квартира 81', 'Viewer state: window_view'] },
+        { title: 'Share', rows: ['Copy-ready link: /developments/demo-premium/viewer?floor=floor_8'] },
+        { title: 'Digest', rows: ['Digest note: квартира 81 · available · window_view · share ready · follow-up ready.', 'Digest готов для менеджера'] },
+        { title: 'Next step', rows: ['Следующий шаг: открыть ссылку и выбрать время звонка.'] },
+      ],
+      cardClass: 'lead-export-fields-card glass-card crm-field-groups copy-ready',
+    });
+    expect(buildGroupedLeadExportFields(null)).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

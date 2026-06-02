@@ -1,4 +1,4 @@
-import { buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -17,6 +17,7 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
   const leadCtaState = buildLeadCtaState(leadStatus);
   const digestPersistence = buildLeadHandoffPersistenceState({ digest: leadHandoffDigest, status: leadStatus });
   const leadExportPayload = buildLeadExportPayload({ leadContext, shareHandoff, digest: leadHandoffDigest, persistence: digestPersistence, managerFollowUp, brokerScript });
+  const groupedLeadExportFields = buildGroupedLeadExportFields(leadExportPayload);
   return (
     <div className="lead-card">
       <p className="eyebrow">Sales CTA</p>
@@ -77,6 +78,17 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           <p>{leadExportPayload.label}</p>
           <small className="lead-export-payload-copy">{leadExportPayload.copy}</small>
           <small className="lead-export-payload-note">{leadExportPayload.managerOneLiner}</small>
+        </div>
+      )}
+      {groupedLeadExportFields && (
+        <div className={groupedLeadExportFields.cardClass}>
+          <p>{groupedLeadExportFields.label}</p>
+          {groupedLeadExportFields.groups.map((group) => (
+            <div className="lead-export-field-group" key={group.title}>
+              <small className="lead-export-field-title">{group.title}</small>
+              {group.rows.map((row) => <small className="lead-export-field-row" key={`${group.title}:${row}`}>{row}</small>)}
+            </div>
+          ))}
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>
