@@ -94,6 +94,25 @@ describe('Premium development viewer route', () => {
     await waitFor(() => expect(screen.getAllByText(/Панорама из окна/i).length).toBeGreaterThan(0));
   });
 
+  it('keeps route/debug readouts in a dedicated full-width band before scene and HUD', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(<App />);
+
+    expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
+    const stage = container.querySelector('.viewer-stage');
+    const children = Array.from(stage?.children ?? []);
+    expect(children.map((child) => (child as HTMLElement).className)).toEqual([
+      'viewer-stage-readouts',
+      'viewer-scene',
+      'viewer-hud desktop-panel',
+    ]);
+    expect(container.querySelector('.viewer-stage-readouts .deep-link-readout')).toHaveTextContent('Deep link: overview fallback');
+    expect(container.querySelector('.viewer-stage-readouts .share-link-readout')).toHaveTextContent('Share link: /developments/demo-premium/viewer?view=development_overview');
+  });
+
   it('drives explicit camera states, walk mode, room plan geometry, and lead CTA', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock

@@ -299,7 +299,36 @@ button {
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-areas:
+    "readouts readouts"
+    "scene hud";
+  align-items: start;
   gap: 22px;
+}
+
+.viewer-stage-readouts {
+  grid-area: readouts;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.deep-link-readout,
+.share-link-readout {
+  margin: 0;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 999px;
+  padding: 0.62rem 0.9rem;
+  background: rgba(2, 6, 23, 0.48);
+  color: #bfdbfe;
+  font-size: 0.82rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.share-link-readout {
+  color: #f8e7b7;
 }
 
 .viewer-scene,
@@ -311,6 +340,7 @@ button {
 }
 
 .viewer-scene {
+  grid-area: scene;
   min-height: 680px;
   padding: 28px;
   display: grid;
@@ -364,7 +394,14 @@ button {
   gap: 3px;
   transform: perspective(900px) rotateX(55deg) rotateZ(-28deg);
   transition: transform 420ms ease, opacity 420ms ease;
-  opacity: 0.72;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.viewer-scene:hover .procedural-tower.dom-fallback,
+.procedural-tower.dom-fallback:focus-within {
+  opacity: 0.5;
+  pointer-events: auto;
 }
 
 .state-unit_top_down .procedural-tower,
@@ -425,14 +462,27 @@ button {
   top: 18px;
   left: 18px;
   display: grid;
-  gap: 6px;
-  border: 1px solid rgba(56, 189, 248, 0.22);
-  border-radius: 18px;
-  padding: 12px 14px;
-  background: rgba(2, 6, 23, 0.62);
+  gap: 4px;
+  max-width: min(340px, calc(100% - 36px));
+  max-height: 2.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 999px;
+  padding: 9px 12px;
+  background: rgba(2, 6, 23, 0.54);
   color: #bfdbfe;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 800;
+  opacity: 0.82;
+  backdrop-filter: blur(14px);
+}
+
+.r3f-camera-readout:hover,
+.r3f-camera-readout:focus-within {
+  max-height: min(72%, 18rem);
+  overflow: auto;
+  border-radius: 18px;
+  opacity: 1;
 }
 
 .r3f-building-shell {
@@ -500,6 +550,7 @@ button {
 }
 
 .viewer-hud {
+  grid-area: hud;
   padding: 24px;
   align-self: stretch;
 }
@@ -1128,6 +1179,14 @@ button {
   }
 
   .viewer-stage {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "readouts"
+      "scene"
+      "hud";
+  }
+
+  .viewer-stage-readouts {
     grid-template-columns: 1fr;
   }
 

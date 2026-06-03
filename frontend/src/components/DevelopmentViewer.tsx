@@ -195,10 +195,12 @@ export function DevelopmentViewer({ development }: Props) {
       </section>
 
       <section className={responsiveStage.stageClass} aria-label="Интерактивная 3D сцена ЖК">
-        <p className="deep-link-readout">{deepLinkState.label}</p>
-        <p className="share-link-readout">Share link: {shareLink}</p>
-        <div className="analytics-readout" aria-label="Premium viewer analytics readout">
-          {analyticsLabels.map((label) => <p key={label}>{label}</p>)}
+        <div className="viewer-stage-readouts" aria-label="Premium viewer state and share readouts">
+          <p className="deep-link-readout">{deepLinkState.label}</p>
+          <p className="share-link-readout">Share link: {shareLink}</p>
+          <div className="analytics-readout" aria-label="Premium viewer analytics readout">
+            {analyticsLabels.map((label) => <p key={label}>{label}</p>)}
+          </div>
         </div>
         <ViewerScene
           scene={scene}
