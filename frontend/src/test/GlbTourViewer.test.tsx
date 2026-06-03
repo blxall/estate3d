@@ -32,4 +32,13 @@ describe('GlbTourViewer', () => {
 
     expect(requestFullscreen).toHaveBeenCalledOnce();
   });
+
+  it('can opt into the PlayCanvas runtime without changing the public tour shell', async () => {
+    render(<GlbTourViewer engine="playcanvas" sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
+
+    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
+    expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
+    expect(await screen.findByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
+  });
 });

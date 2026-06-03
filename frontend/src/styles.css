@@ -193,6 +193,19 @@ button {
   height: 100%;
 }
 
+.playcanvas-canvas-inner {
+  display: grid;
+  place-items: stretch;
+}
+
+.viewer-engine-readout {
+  margin: -8px 18px 18px;
+  color: #7dd3fc;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
 .scene-url {
   color: #94a3b8;
   overflow-wrap: anywhere;

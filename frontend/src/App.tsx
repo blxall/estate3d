@@ -37,6 +37,10 @@ function currentDevelopmentViewerSlug(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function currentViewerEngine(): 'r3f' | 'playcanvas' {
+  return new URLSearchParams(window.location.search).get('engine') === 'playcanvas' ? 'playcanvas' : 'r3f';
+}
+
 function readStoredToken(): string | null {
   if (typeof window.localStorage?.getItem !== 'function') {
     return null;
@@ -58,6 +62,7 @@ function clearStoredToken() {
 
 export function App() {
   const tourSlug = currentTourSlug();
+  const viewerEngine = currentViewerEngine();
   const propertyId = currentPropertyId();
   const developmentViewerSlug = currentDevelopmentViewerSlug();
   const [properties, setProperties] = useState<PropertySummary[]>(demoProperties);
@@ -193,7 +198,7 @@ export function App() {
     if (!publicTour) {
       return <main className="layout">Загружаем тур...</main>;
     }
-    return <GlbTourViewer sceneUrl={publicTour.viewer_config.scene_url} title={publicTour.property.title} />;
+    return <GlbTourViewer engine={viewerEngine} sceneUrl={publicTour.viewer_config.scene_url} title={publicTour.property.title} />;
   }
 
   if (propertyId) {
