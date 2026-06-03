@@ -2674,3 +2674,182 @@ button {
     display: none;
   }
 }
+
+
+/* v3.33: higher-fidelity model presentation — layered massing, customer labels, cleaner 3D focus. */
+.design-audit-clean .high-fidelity-showroom-model {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.design-audit-clean .high-fidelity-showroom-model::before {
+  content: "";
+  position: absolute;
+  inset: 34px 38px 58px;
+  z-index: 0;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.86), transparent 22%),
+    radial-gradient(circle at 36% 68%, rgba(185,203,194,0.26), transparent 26%),
+    linear-gradient(180deg, rgba(255,253,248,0.34), rgba(211,191,159,0.16));
+  filter: blur(0.2px);
+}
+
+.design-audit-clean .r3f-customer-readout {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 9;
+  max-width: min(360px, calc(100% - 36px));
+  padding: 10px 13px;
+  border: 1px solid rgba(84,62,38,0.12);
+  border-radius: 999px;
+  background: rgba(255,253,248,0.78);
+  color: #3a2b1a;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: -0.018em;
+  box-shadow: rgba(92,64,30,0.1) 0 14px 42px -30px;
+  backdrop-filter: blur(14px);
+}
+
+.design-audit-clean .r3f-presentation-labels {
+  position: absolute;
+  z-index: 8;
+  left: 24px;
+  right: 24px;
+  bottom: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.design-audit-clean .r3f-presentation-labels span {
+  padding: 8px 11px;
+  border: 1px solid rgba(84,62,38,0.1);
+  border-radius: 999px;
+  background: rgba(255,253,248,0.66);
+  color: rgba(36,27,18,0.68);
+  font-size: 0.73rem;
+  font-weight: 850;
+  box-shadow: rgba(92,64,30,0.08) 0 12px 34px -28px;
+}
+
+.design-audit-clean .r3f-floor-emphasis-label,
+.design-audit-clean .r3f-unit-emphasis-label {
+  background: rgba(234,210,164,0.72) !important;
+  color: #3a2b1a !important;
+}
+
+.design-audit-clean .r3f-transition-label {
+  background: rgba(185,203,194,0.68) !important;
+}
+
+.design-audit-clean .r3f-skyline-massing {
+  position: absolute;
+  inset: 88px 88px 78px;
+  z-index: 2;
+  pointer-events: none;
+  transform: perspective(900px) rotateX(58deg) rotateZ(-10deg);
+  transform-origin: center 60%;
+}
+
+.design-audit-clean .massing-tower {
+  position: absolute;
+  bottom: 18px;
+  border: 1px solid rgba(84,62,38,0.15);
+  border-radius: 18px 18px 10px 10px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.28) 1px, transparent 1px),
+    linear-gradient(rgba(84,62,38,0.08) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(244,232,209,0.86), rgba(206,190,163,0.74));
+  background-size: 32px 100%, 100% 22px, auto;
+  box-shadow: rgba(84,62,38,0.17) 22px 28px 0 -8px, rgba(92,64,30,0.16) 0 32px 68px -42px;
+}
+
+.design-audit-clean .massing-tower-main {
+  left: 50%;
+  width: 240px;
+  height: 330px;
+  transform: translateX(-50%);
+}
+
+.design-audit-clean .massing-tower-side {
+  left: calc(50% - 190px);
+  width: 130px;
+  height: 220px;
+  opacity: 0.6;
+}
+
+.design-audit-clean .massing-floor-selected {
+  position: absolute;
+  left: calc(50% - 132px);
+  bottom: 142px;
+  width: 264px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(217,181,110,0.88), rgba(185,203,194,0.82));
+  box-shadow: rgba(164,119,51,0.22) 0 18px 36px -20px;
+  opacity: 0;
+}
+
+.design-audit-clean .massing-unit-selected {
+  position: absolute;
+  left: calc(50% + 28px);
+  bottom: 158px;
+  width: 70px;
+  height: 42px;
+  border: 1px solid rgba(84,62,38,0.18);
+  border-radius: 12px;
+  background: rgba(185,203,194,0.86);
+  box-shadow: rgba(54,77,66,0.18) 0 14px 28px -18px;
+  opacity: 0;
+}
+
+.design-audit-clean .selected-floor-emphasis .massing-floor-selected,
+.design-audit-clean .selected-unit-emphasis .massing-unit-selected {
+  opacity: 1;
+}
+
+.design-audit-clean .floor-emphasis .r3f-building-shell,
+.design-audit-clean .unit-emphasis .r3f-building-shell {
+  opacity: 0.2;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.design-audit-clean .unit-emphasis .floating-plan {
+  box-shadow: rgba(92,64,30,0.2) 0 30px 74px -36px, 0 0 0 1px rgba(164,119,51,0.08);
+}
+
+@media (max-width: 620px) {
+  .design-audit-clean .r3f-customer-readout {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    text-align: center;
+  }
+
+  .design-audit-clean .r3f-skyline-massing {
+    inset: 82px 38px 84px;
+    transform: perspective(760px) rotateX(58deg) rotateZ(-9deg) scale(0.9);
+  }
+
+  .design-audit-clean .massing-tower-main {
+    width: 190px;
+    height: 270px;
+  }
+
+  .design-audit-clean .massing-tower-side {
+    left: calc(50% - 145px);
+    width: 95px;
+    height: 180px;
+  }
+
+  .design-audit-clean .r3f-presentation-labels {
+    left: 14px;
+    right: 14px;
+    bottom: 18px;
+  }
+}

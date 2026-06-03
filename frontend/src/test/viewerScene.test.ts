@@ -24,6 +24,7 @@ import {
   buildViewerDeepLinkSearch,
   buildViewerDeepLinkState,
   buildRoomFootprints,
+  buildScenePresentationState,
   buildUnitCard,
   buildUnitFootprints,
   buildViewpointAnchors,
@@ -214,6 +215,24 @@ describe('viewer scene adapter', () => {
     });
     expect(buildMaterialTheme({ kind: 'room' })).toMatchObject({ color: '#c9b79c', opacity: 0.78, label: 'Material room: walkthrough warm-stone' });
     expect(buildMaterialTheme({ kind: 'window-hotspot' })).toMatchObject({ color: '#d9824b', opacity: 0.88, label: 'Material window-hotspot: sunset warm-view' });
+  });
+
+  it('describes a premium 3D presentation layer with customer-facing labels instead of raw debug copy', () => {
+    const scene = buildViewerScene(payload);
+    const floor = payload.buildings[0].floors[1];
+    const unit = floor.units[0];
+    const presentation = buildScenePresentationState({ scene, selectedFloor: floor, selectedUnit: unit });
+
+    expect(presentation).toEqual({
+      shellClass: 'r3f-scene-shell warm-model-shell high-fidelity-showroom-model floor-emphasis unit-emphasis',
+      skylineClass: 'r3f-skyline-massing premium-massing selected-floor-emphasis selected-unit-emphasis',
+      selectedFloorLabel: 'Выбран 2 этаж',
+      selectedUnitLabel: 'Квартира 21 · 61 м² · от 20 млн ₽',
+      unitTransitionLabel: 'Плавный переход к квартире 21',
+      customerReadout: 'Корпус A · 2 этаж · квартира 21 · 1 вид из окна',
+      debugVisibleByDefault: false,
+    });
+    expect(presentation.customerReadout).not.toMatch(/R3F|debug|mesh|footprint/i);
   });
 
   it('describes premium empty and unavailable states for sparse floor/unit data', () => {

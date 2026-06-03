@@ -109,12 +109,16 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Живой выбор квартиры')).toHaveClass('hero-kpi-value');
     expect(screen.getByText('16 этажей')).toHaveClass('hero-kpi-value');
     expect(screen.getByText('Премиум-сцена продаж')).toHaveClass('hero-kpi-value');
-    expect(screen.getByText('Общий вид комплекса')).toHaveClass('showroom-title');
+    expect(screen.getByText('Общий вид комплекса', { selector: '.showroom-title' })).toHaveClass('showroom-title');
     expect(screen.getByText('Выберите подсвеченный этаж, чтобы перейти к квартирам и виду из окна.')).toHaveClass('showroom-copy');
     expect(container.querySelector('.viewer-stage')).toHaveClass('viewer-stage', 'scene-composition');
     expect(container.querySelector('.viewer-scene')).toHaveClass('viewer-scene', 'immersive-model-card', 'warm-gallery-card', 'showroom-stage-balanced');
     expect(container.querySelector('.viewer-hud')).toHaveClass('sales-hud', 'warm-sales-hud', 'curated-sales-panel');
-    expect(container.querySelector('.r3f-scene-shell')).toHaveClass('warm-model-shell');
+    expect(container.querySelector('.r3f-scene-shell')).toHaveClass('warm-model-shell', 'high-fidelity-showroom-model');
+    expect(container.querySelector('.r3f-skyline-massing')).toHaveClass('premium-massing');
+    expect(screen.getByText('Корпус A', { selector: '.r3f-customer-readout' })).toHaveClass('r3f-customer-readout');
+    expect(screen.getByText('Общий вид комплекса', { selector: '.r3f-floor-emphasis-label' })).toBeInTheDocument();
+    expect(screen.getByText('Плавный выбор этажа')).toHaveClass('r3f-transition-label');
     expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed', 'diagnostics-minimized', 'visually-demoted-readouts');
     await screen.findByText('Camera frame: overview');
     expect(container.querySelector('.r3f-camera-readout')).toHaveClass('technical-readout', 'collapsed-diagnostics', 'diagnostic-chip');
@@ -173,6 +177,10 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('State: floor_focus')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /3D unit mesh: квартира 81/i }));
     expect(await screen.findByText('State: unit_top_down')).toBeInTheDocument();
+    expect(screen.getByText('Корпус A · 8 этаж · квартира 81 · 1 вид из окна')).toHaveClass('r3f-customer-readout');
+    expect(screen.getByText('Выбран 8 этаж', { selector: '.r3f-floor-emphasis-label' })).toBeInTheDocument();
+    expect(screen.getByText('Квартира 81 · 58.7 м² · от 24.8 млн ₽')).toHaveClass('r3f-unit-emphasis-label');
+    expect(screen.getByText('Плавный переход к квартире 81')).toHaveClass('r3f-transition-label');
     expect(screen.getByLabelText('Планировка квартиры 81')).toBeInTheDocument();
     expect(screen.getByText('Room polygon: 0,0 5.2,0 5.2,4.6 0,4.6')).toBeInTheDocument();
 

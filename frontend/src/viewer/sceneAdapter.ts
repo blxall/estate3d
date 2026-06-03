@@ -68,6 +68,16 @@ export type MaterialTheme = {
   label: string;
 };
 
+export type ScenePresentationState = {
+  shellClass: string;
+  skylineClass: string;
+  selectedFloorLabel: string;
+  selectedUnitLabel: string;
+  unitTransitionLabel: string;
+  customerReadout: string;
+  debugVisibleByDefault: boolean;
+};
+
 export type AvailabilityState = {
   state: 'overview' | 'empty-floor' | 'floor-ready' | 'unit-ready' | 'no-walkthrough-media' | 'unavailable-unit';
   unitCount: number;
@@ -1065,6 +1075,43 @@ export function buildViewerScene(development: DevelopmentViewerPayload): ViewerS
         })),
       ]),
     ),
+  };
+}
+
+
+export function buildScenePresentationState({
+  scene,
+  selectedFloor,
+  selectedUnit,
+}: {
+  scene: ViewerScene;
+  selectedFloor?: DevelopmentFloor | null;
+  selectedUnit?: DevelopmentUnit | null;
+}): ScenePresentationState {
+  const floorClass = selectedFloor ? ' floor-emphasis' : '';
+  const unitClass = selectedUnit ? ' unit-emphasis' : '';
+  const skylineFloorClass = selectedFloor ? ' selected-floor-emphasis' : '';
+  const skylineUnitClass = selectedUnit ? ' selected-unit-emphasis' : '';
+  const selectedFloorLabel = selectedFloor ? `Выбран ${selectedFloor.label}` : 'Общий вид комплекса';
+  const selectedUnitLabel = selectedUnit ? `Квартира ${selectedUnit.number} · ${selectedUnit.area_m2} м² · ${selectedUnit.price}` : 'Квартира не выбрана';
+  const unitTransitionLabel = selectedUnit ? `Плавный переход к квартире ${selectedUnit.number}` : 'Плавный выбор этажа';
+  const windowCount = selectedUnit?.window_views.length ?? 0;
+  const windowWord = windowCount === 1 ? 'вид из окна' : 'видов из окна';
+  const customerReadout = [
+    scene.building.name,
+    selectedFloor?.label,
+    selectedUnit ? `квартира ${selectedUnit.number}` : null,
+    selectedUnit ? `${windowCount} ${windowWord}` : null,
+  ].filter(Boolean).join(' · ');
+
+  return {
+    shellClass: `r3f-scene-shell warm-model-shell high-fidelity-showroom-model${floorClass}${unitClass}`,
+    skylineClass: `r3f-skyline-massing premium-massing${skylineFloorClass}${skylineUnitClass}`,
+    selectedFloorLabel,
+    selectedUnitLabel,
+    unitTransitionLabel,
+    customerReadout,
+    debugVisibleByDefault: false,
   };
 }
 

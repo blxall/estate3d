@@ -9,6 +9,7 @@ import {
   buildCameraPlan,
   buildMaterialTheme,
   buildRoomFootprints,
+  buildScenePresentationState,
   buildUnitFootprints,
   buildViewpointAnchors,
   buildWindowHotspots,
@@ -188,6 +189,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
     active: Boolean(selectedUnit || selectedFloor),
     hasUnits: Boolean(selectedFloor?.units.length),
   });
+  const presentation = buildScenePresentationState({ scene, selectedFloor, selectedUnit });
 
   function chooseUnitById(unitId: string) {
     const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
@@ -211,10 +213,22 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   }
 
   return (
-    <div className="r3f-scene-shell warm-model-shell" aria-label={`R3F scene slice for ${scene.building.name}`}>
+    <div className={presentation.shellClass} aria-label={`R3F scene slice for ${scene.building.name}`}>
       <div className="r3f-scene-meta">
         <span>R3F-ready tower geometry</span>
         <small>{webGlAvailable ? 'WebGL canvas active' : 'Semantic fallback active'}</small>
+      </div>
+      <div className="r3f-customer-readout" aria-label="Customer-facing scene readout">{presentation.customerReadout}</div>
+      <div className="r3f-presentation-labels" aria-label="Premium 3D presentation labels">
+        <span className="r3f-floor-emphasis-label">{presentation.selectedFloorLabel}</span>
+        <span className="r3f-unit-emphasis-label">{presentation.selectedUnitLabel}</span>
+        <span className="r3f-transition-label">{presentation.unitTransitionLabel}</span>
+      </div>
+      <div className={presentation.skylineClass} aria-hidden="true">
+        <span className="massing-tower massing-tower-main" />
+        <span className="massing-tower massing-tower-side" />
+        <span className="massing-floor-selected" />
+        <span className="massing-unit-selected" />
       </div>
       <div className="r3f-camera-readout technical-readout collapsed-diagnostics diagnostic-chip" aria-live="polite">
         <span>Camera frame: {cameraPlan.frame}</span>
