@@ -380,6 +380,40 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Analytics: crm_copy_error · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
   });
 
+  it('keeps CRM handoff compact and scroll-safe in mobile sales demos', async () => {
+    Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true });
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, json: async () => demoPayload })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'lead_mobile_123' }) });
+    vi.stubGlobal('fetch', fetchMock);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /3D floor mesh: 8 этаж/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D unit mesh: квартира 81/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D room mesh: Гостиная-кухня/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /3D window hotspot: Вид из окна на город/i }));
+    fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
+    expect(await screen.findByText('Digest persistence: success · manager handoff ready')).toBeInTheDocument();
+
+    expect(await screen.findByText('Responsive HUD: mobile stack · sticky CTA · lead context visible')).toBeInTheDocument();
+    expect(await screen.findByText('CRM copy action: квартира 81 · window_view · 9 полей')).toBeInTheDocument();
+    expect(await screen.findByText('Mobile CRM handoff: compact · 9 полей · audit hidden · feedback hidden')).toHaveClass('crm-mobile-density-readout');
+    const crmStack = screen.getByLabelText('Mobile CRM handoff stack');
+    expect(crmStack).toHaveClass('crm-handoff-stack', 'mobile-density', 'compact-copy', 'audit-hidden', 'feedback-hidden');
+    const crmCard = screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей').closest('.crm-export-action-card');
+    expect(crmCard).toHaveClass('mobile-density', 'compact-copy');
+    expect(screen.getByText(/Context\s+- ЖК: Estate3D Skyline\s+- Корпус: Корпус A/i)).toHaveClass('crm-export-action-text', 'copy-ready', 'mobile-scroll-safe');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · window_view · manager-ready' }));
+
+    expect(await screen.findByText('Mobile CRM handoff: compact · 9 полей · audit visible · feedback visible')).toHaveClass('crm-mobile-density-readout');
+    expect(screen.getByRole('note', { name: 'CRM copy audit trail' })).toHaveClass('crm-copy-audit-card', 'glass-card', 'mobile-density', 'audit-visible');
+  });
+
   it('shows lightweight analytics readouts for premium viewer interactions and lead failures', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     let rejectLead: (error: Error) => void = () => undefined;

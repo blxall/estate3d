@@ -16,6 +16,7 @@ import {
   buildGroupedLeadExportFields,
   buildCrmExportAction,
   buildCrmCopyIntentSummary,
+  buildMobileCrmHandoffState,
   buildMaterialTheme,
   buildResponsiveHudState,
   buildShareHandoffSummary,
@@ -623,6 +624,32 @@ describe('viewer scene adapter', () => {
       cardClass: 'crm-copy-audit-card glass-card error',
     });
     expect(buildCrmCopyIntentSummary({ status: 'copied', action: null })).toBeNull();
+  });
+
+  it('builds mobile CRM handoff density classes for compact sales demos', () => {
+    const action = {
+      label: 'CRM copy action: квартира 81 · window_view · 9 полей',
+      buttonLabel: 'Скопировать CRM block',
+      ariaLabel: 'Copy CRM export block: квартира 81 · window_view',
+      plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A\n\nShare\n- Copy-ready link: /developments/demo-premium/viewer?floor=floor_8&unit=unit_8_1&view=window_view&viewpoint=vp_living&window=window_city\n\nDigest\n- Digest note: квартира 81 · available · window_view · share ready · follow-up ready.\n- Digest готов для менеджера\n\nNext step\n- Предложить клиенту открыть ссылку и выбрать удобное время для звонка.',
+      cardClass: 'crm-export-action-card glass-card copy-action-ready',
+      textClass: 'crm-export-action-text copy-ready',
+      buttonClass: 'crm-export-action-button premium-outline',
+    };
+
+    expect(buildMobileCrmHandoffState({ viewportWidth: 390, action, hasAuditTrail: true, hasCopyFeedback: true })).toEqual({
+      mode: 'mobile',
+      label: 'Mobile CRM handoff: compact · 9 полей · audit visible · feedback visible',
+      stackClass: 'crm-handoff-stack mobile-density compact-copy audit-visible feedback-visible',
+      actionCardClass: 'crm-export-action-card glass-card copy-action-ready mobile-density compact-copy',
+      textClass: 'crm-export-action-text copy-ready mobile-scroll-safe',
+      auditClass: 'crm-copy-audit-card glass-card mobile-density audit-visible',
+    });
+    expect(buildMobileCrmHandoffState({ viewportWidth: 1180, action, hasAuditTrail: false, hasCopyFeedback: false })).toMatchObject({
+      mode: 'desktop',
+      label: 'Mobile CRM handoff: desktop · 9 полей · audit hidden · feedback hidden',
+    });
+    expect(buildMobileCrmHandoffState({ viewportWidth: 390, action: null, hasAuditTrail: false, hasCopyFeedback: false })).toBeNull();
   });
 
   it('builds premium lead success summaries with viewer context and follow-up copy', () => {

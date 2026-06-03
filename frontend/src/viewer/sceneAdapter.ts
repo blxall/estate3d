@@ -176,6 +176,15 @@ export type CrmCopyIntentSummary = {
   cardClass: string;
 };
 
+export type MobileCrmHandoffState = {
+  mode: 'mobile' | 'desktop';
+  label: string;
+  stackClass: string;
+  actionCardClass: string;
+  textClass: string;
+  auditClass: string;
+};
+
 export type LeadCtaStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export type LeadCtaState = {
@@ -834,6 +843,41 @@ export function buildCrmCopyIntentSummary({ status, action }: { status: 'copied'
     label: `CRM copy audit: fallback · ${unit} · ${viewerState} · ${fieldCount}`,
     managerNote: `CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for ${unit} · ${viewerState}.`,
     cardClass: 'crm-copy-audit-card glass-card error',
+  };
+}
+
+export function buildMobileCrmHandoffState({
+  viewportWidth,
+  action,
+  hasAuditTrail,
+  hasCopyFeedback,
+}: {
+  viewportWidth: number;
+  action: CrmExportAction | null;
+  hasAuditTrail: boolean;
+  hasCopyFeedback: boolean;
+}): MobileCrmHandoffState | null {
+  if (!action) {
+    return null;
+  }
+  const mode: MobileCrmHandoffState['mode'] = viewportWidth <= 640 ? 'mobile' : 'desktop';
+  const density = mode === 'mobile' ? 'compact' : 'desktop';
+  const labelParts = action.label.replace(/^CRM copy action: /, '').split(' · ');
+  const fieldCount = labelParts[2] ?? '0 полей';
+  const auditClass = hasAuditTrail ? 'audit-visible' : 'audit-hidden';
+  const feedbackClass = hasCopyFeedback ? 'feedback-visible' : 'feedback-hidden';
+  const stackBase = mode === 'mobile' ? 'crm-handoff-stack mobile-density compact-copy' : 'crm-handoff-stack desktop-density relaxed-copy';
+  const actionCardClass = mode === 'mobile' ? `${action.cardClass} mobile-density compact-copy` : `${action.cardClass} desktop-density`;
+  const textClass = mode === 'mobile' ? `${action.textClass} mobile-scroll-safe` : action.textClass;
+  const auditCardClass = mode === 'mobile' ? `crm-copy-audit-card glass-card mobile-density ${auditClass}` : `crm-copy-audit-card glass-card desktop-density ${auditClass}`;
+
+  return {
+    mode,
+    label: `Mobile CRM handoff: ${density} · ${fieldCount} · audit ${hasAuditTrail ? 'visible' : 'hidden'} · feedback ${hasCopyFeedback ? 'visible' : 'hidden'}`,
+    stackClass: `${stackBase} ${auditClass} ${feedbackClass}`,
+    actionCardClass,
+    textClass,
+    auditClass: auditCardClass,
   };
 }
 

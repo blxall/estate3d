@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { buildCrmCopyIntentSummary, buildCrmExportAction, buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, type BrokerNextStepScript, type CrmCopyIntentSummary, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
+import { buildCrmCopyIntentSummary, buildCrmExportAction, buildGroupedLeadExportFields, buildLeadCtaState, buildLeadExportPayload, buildLeadHandoffPersistenceState, buildMobileCrmHandoffState, type BrokerNextStepScript, type CrmCopyIntentSummary, type InteractionTrailSummary, type LeadContextSummary, type LeadCtaStatus, type LeadHandoffDigest, type LeadSuccessSummary, type ManagerFollowUpChecklist, type ShareHandoffSummary } from '../viewer/sceneAdapter';
 
 type Props = {
   leadMessage: string;
@@ -24,6 +24,12 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
   const leadExportPayload = buildLeadExportPayload({ leadContext, shareHandoff, digest: leadHandoffDigest, persistence: digestPersistence, managerFollowUp, brokerScript });
   const groupedLeadExportFields = buildGroupedLeadExportFields(leadExportPayload);
   const crmExportAction = buildCrmExportAction(groupedLeadExportFields);
+  const mobileCrmHandoff = buildMobileCrmHandoffState({
+    viewportWidth: typeof window === 'undefined' ? 1180 : window.innerWidth,
+    action: crmExportAction,
+    hasAuditTrail: Boolean(crmCopyIntent),
+    hasCopyFeedback: Boolean(crmCopyFeedback),
+  });
   const handleCrmCopy = async () => {
     if (!crmExportAction) {
       return;
@@ -122,18 +128,21 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
           ))}
         </div>
       )}
-      {crmExportAction && (
-        <div className={crmExportAction.cardClass}>
-          <p>{crmExportAction.label}</p>
-          <small className={crmExportAction.textClass}>{crmExportAction.plainText}</small>
-          <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel} onClick={handleCrmCopy}>{crmExportAction.buttonLabel}</button>
-          {crmCopyFeedback && <small role="status" aria-live="polite" aria-label="CRM copy status" className={crmCopyFeedback.className}>{crmCopyFeedback.message}</small>}
-          {crmCopyIntent && (
-            <div role="note" aria-label="CRM copy audit trail" className={crmCopyIntent.cardClass}>
-              <small className="crm-copy-audit-label">{crmCopyIntent.label}</small>
-              <small className="crm-copy-audit-note">{crmCopyIntent.managerNote}</small>
-            </div>
-          )}
+      {crmExportAction && mobileCrmHandoff && (
+        <div className={mobileCrmHandoff.stackClass} aria-label="Mobile CRM handoff stack">
+          <small className="crm-mobile-density-readout">{mobileCrmHandoff.label}</small>
+          <div className={mobileCrmHandoff.actionCardClass}>
+            <p>{crmExportAction.label}</p>
+            <small className={mobileCrmHandoff.textClass}>{crmExportAction.plainText}</small>
+            <button type="button" className={crmExportAction.buttonClass} aria-label={crmExportAction.ariaLabel} onClick={handleCrmCopy}>{crmExportAction.buttonLabel}</button>
+            {crmCopyFeedback && <small role="status" aria-live="polite" aria-label="CRM copy status" className={crmCopyFeedback.className}>{crmCopyFeedback.message}</small>}
+            {crmCopyIntent && (
+              <div role="note" aria-label="CRM copy audit trail" className={`${crmCopyIntent.cardClass} ${mobileCrmHandoff.mode === 'mobile' ? 'mobile-density' : 'desktop-density'} audit-visible`}>
+                <small className="crm-copy-audit-label">{crmCopyIntent.label}</small>
+                <small className="crm-copy-audit-note">{crmCopyIntent.managerNote}</small>
+              </div>
+            )}
+          </div>
         </div>
       )}
       <button type="button" className={leadCtaState.buttonClass} disabled={leadCtaState.buttonDisabled} onClick={onSubmit}>{leadCtaState.buttonLabel}</button>
