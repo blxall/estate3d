@@ -11,6 +11,13 @@ export type ViewerEngineConfig = {
   smokeChecklist: string[];
 };
 
+export const playCanvasSmokeFixture = {
+  publicSlug: 'playcanvas-smoke',
+  sceneUrl: '/playcanvas-smoke.glb',
+  routePath: '/tour/playcanvas-smoke?engine=playcanvas',
+  expectedLoadedStatus: 'PlayCanvas GLB сцена загружена',
+} as const;
+
 export const viewerEngineOptions: ViewerEngineConfig[] = [
   {
     id: 'r3f',

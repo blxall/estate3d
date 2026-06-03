@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-import { getViewerEngineConfig, resolveViewerEngineFromSearch, viewerEngineOptions } from '../viewerEngines';
+import { getViewerEngineConfig, playCanvasSmokeFixture, resolveViewerEngineFromSearch, viewerEngineOptions } from '../viewerEngines';
 
 describe('viewer engine adapter boundary', () => {
   it('keeps R3F as the production default when no query flag is present', () => {
@@ -37,5 +39,18 @@ describe('viewer engine adapter boundary', () => {
       'mobile-viewport-has-no-horizontal-overflow',
       'console-has-no-runtime-errors',
     ]);
+  });
+
+  it('documents the committed sample GLB used by browser smoke checks', () => {
+    expect(playCanvasSmokeFixture).toEqual({
+      publicSlug: 'playcanvas-smoke',
+      sceneUrl: '/playcanvas-smoke.glb',
+      routePath: '/tour/playcanvas-smoke?engine=playcanvas',
+      expectedLoadedStatus: 'PlayCanvas GLB сцена загружена',
+    });
+    const fixture = readFileSync(join(process.cwd(), 'public', playCanvasSmokeFixture.sceneUrl.replace(/^\//, '')));
+    expect(fixture.subarray(0, 4).toString('utf8')).toBe('glTF');
+    expect(fixture.readUInt32LE(4)).toBe(2);
+    expect(fixture.byteLength).toBeGreaterThan(200);
   });
 });
