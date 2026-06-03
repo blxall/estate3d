@@ -36,7 +36,18 @@ export function ViewerScene({
 
   return (
     <div className="viewer-scene">
-      <div className="state-pill">State: {viewerState}</div>
+      <div className="showroom-overlay" aria-label="Коммерческий сценарий просмотра">
+        <span className="showroom-step">ЖК → корпус → этаж → квартира</span>
+        <strong className="showroom-title">{selectedFloor ? selectedFloor.label : 'Общий вид комплекса'}</strong>
+        <span className="showroom-copy">
+          {selectedUnit
+            ? `Квартира ${selectedUnit.number}: планировка, прогулка и заявка менеджеру.`
+            : selectedFloor
+              ? 'Выберите квартиру на этаже, чтобы открыть план и точки просмотра.'
+              : 'Выберите подсвеченный этаж, чтобы перейти к квартирам и виду из окна.'}
+        </span>
+      </div>
+      <div className="state-pill technical-readout">State: {viewerState}</div>
       <div className="camera-path">{cameraMessage}</div>
       <Suspense fallback={<div className="r3f-scene-shell r3f-loading">Loading R3F scene…</div>}>
         <ThreeDevelopmentScene

@@ -94,6 +94,24 @@ describe('Premium development viewer route', () => {
     await waitFor(() => expect(screen.getAllByText(/Панорама из окна/i).length).toBeGreaterThan(0));
   });
 
+  it('renders a commercial premium showroom shell before exposing technical route/debug readouts', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(<App />);
+
+    expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
+    expect(screen.getByText('Живой выбор квартиры')).toHaveClass('hero-kpi-value');
+    expect(screen.getByText('16 этажей')).toHaveClass('hero-kpi-value');
+    expect(screen.getByText('Премиум-сцена продаж')).toHaveClass('hero-kpi-value');
+    expect(screen.getByText('Общий вид комплекса')).toHaveClass('showroom-title');
+    expect(screen.getByText('Выберите подсвеченный этаж, чтобы перейти к квартирам и виду из окна.')).toHaveClass('showroom-copy');
+    expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed');
+    await screen.findByText('Camera frame: overview');
+    expect(container.querySelector('.r3f-camera-readout')).toHaveClass('technical-readout', 'collapsed-diagnostics');
+  });
+
   it('keeps route/debug readouts in a dedicated full-width band before scene and HUD', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
@@ -105,7 +123,7 @@ describe('Premium development viewer route', () => {
     const stage = container.querySelector('.viewer-stage');
     const children = Array.from(stage?.children ?? []);
     expect(children.map((child) => (child as HTMLElement).className)).toEqual([
-      'viewer-stage-readouts',
+      'viewer-stage-readouts technical-readouts-collapsed',
       'viewer-scene',
       'viewer-hud desktop-panel',
     ]);

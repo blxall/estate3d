@@ -187,15 +187,31 @@ export function DevelopmentViewer({ development }: Props) {
 
   return (
     <main className={`development-viewer state-${viewerState}`}>
-      <section className="viewer-hero">
-        <p className="eyebrow">Premium Interactive Development Viewer</p>
-        <h1>{development.name}</h1>
-        <p className="viewer-tagline">{development.hero.tagline}</p>
-        <p>{development.hero.lead}</p>
+      <section className="viewer-hero commercial-hero">
+        <div className="hero-copy">
+          <p className="eyebrow">Premium Interactive Development Viewer</p>
+          <h1>{development.name}</h1>
+          <p className="viewer-tagline">{development.hero.tagline}</p>
+          <p>{development.hero.lead}</p>
+        </div>
+        <div className="hero-kpi-strip" aria-label="Коммерческие преимущества viewer">
+          <div className="hero-kpi-card">
+            <span className="hero-kpi-label">Формат</span>
+            <strong className="hero-kpi-value">Живой выбор квартиры</strong>
+          </div>
+          <div className="hero-kpi-card">
+            <span className="hero-kpi-label">Корпус</span>
+            <strong className="hero-kpi-value">{building.floors_count} этажей</strong>
+          </div>
+          <div className="hero-kpi-card">
+            <span className="hero-kpi-label">Сценарий</span>
+            <strong className="hero-kpi-value">Премиум-сцена продаж</strong>
+          </div>
+        </div>
       </section>
 
       <section className={responsiveStage.stageClass} aria-label="Интерактивная 3D сцена ЖК">
-        <div className="viewer-stage-readouts" aria-label="Premium viewer state and share readouts">
+        <div className="viewer-stage-readouts technical-readouts-collapsed" aria-label="Premium viewer state and share readouts">
           <p className="deep-link-readout">{deepLinkState.label}</p>
           <p className="share-link-readout">Share link: {shareLink}</p>
           <div className="analytics-readout" aria-label="Premium viewer analytics readout">

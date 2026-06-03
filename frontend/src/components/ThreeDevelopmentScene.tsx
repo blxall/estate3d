@@ -216,7 +216,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span>R3F-ready tower geometry</span>
         <small>{webGlAvailable ? 'WebGL canvas active' : 'Semantic fallback active'}</small>
       </div>
-      <div className="r3f-camera-readout" aria-live="polite">
+      <div className="r3f-camera-readout technical-readout collapsed-diagnostics" aria-live="polite">
         <span>Camera frame: {cameraPlan.frame}</span>
         <span>Camera target: {cameraPlan.target.join(',')}</span>
         <span>Camera position: {cameraPlan.position.join(',')}</span>
