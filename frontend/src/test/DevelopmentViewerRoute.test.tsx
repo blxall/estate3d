@@ -94,6 +94,24 @@ describe('Premium development viewer route', () => {
     await waitFor(() => expect(screen.getAllByText(/Панорама из окна/i).length).toBeGreaterThan(0));
   });
 
+  it('rebuilds the viewer as a full-bleed reference-style visual page instead of a recolored dashboard', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(<App />);
+
+    expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
+    expect(container.querySelector('.development-viewer')).toHaveClass('reference-full-bleed-site', 'visual-first-property-page');
+    expect(screen.getByRole('img', { name: 'Фотореалистичный 3D фон Estate3D Skyline' })).toHaveAttribute('src', '/demo/editorial-development-background.svg');
+    expect(container.querySelector('.reference-landing-screen')).toHaveClass('full-bleed-3d-background', 'reference-layout-copy');
+    expect(container.querySelector('.reference-visual-backdrop')).toHaveClass('source-backed-3d-image');
+    expect(container.querySelector('.reference-copy-panel')).toHaveClass('editorial-copy-overlay', 'image-led-caption-panel');
+    expect(container.querySelector('.reference-viewer-overlay')).toHaveClass('floating-viewer-interface', 'over-background-composition');
+    expect(screen.getByText('Interactive development image')).toHaveClass('reference-caption-kicker');
+    expect(screen.getByText('3D background first, viewer second')).toHaveClass('reference-composition-note');
+  });
+
   it('renders the selected Refero mix as a warm editorial atelier showroom shell', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });

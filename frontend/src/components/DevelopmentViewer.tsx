@@ -187,83 +187,92 @@ export function DevelopmentViewer({ development }: Props) {
   }
 
   return (
-    <main className={`${showroomDirection.pageClass} design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
-      <nav className="showroom-nav apple-linear-glass" aria-label="Estate3D showroom navigation">
-        <div className="showroom-brand">
-          <span className="showroom-brand-mark">Estate3D</span>
-          <span className="showroom-brand-subtitle">Remote property showroom</span>
+    <main className={`${showroomDirection.pageClass} reference-full-bleed-site visual-first-property-page design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
+      <section className="reference-landing-screen full-bleed-3d-background reference-layout-copy" aria-label="Estate3D reference-style visual landing">
+        <div className="reference-visual-backdrop source-backed-3d-image">
+          <img src="/demo/editorial-development-background.svg" alt="Фотореалистичный 3D фон Estate3D Skyline" />
         </div>
-        <div className="showroom-nav-links" aria-label="Premium viewer sections">
-          <span className="showroom-nav-pill">Live showroom</span>
-          <span>3D selection</span>
-          <span>Manager handoff</span>
-        </div>
-      </nav>
-      <section className={`${showroomDirection.heroClass} commercial-hero`}>
-        <div className="hero-copy">
-          <p className="eyebrow">Premium Interactive Development Viewer</p>
-          <p className="editorial-direction-label">{showroomDirection.headline}</p>
-          <p className="reference-mix-label">Incommonwith base · GIC HUD · Stykka discipline</p>
-          <h1>{development.name}</h1>
-          <p className="viewer-tagline">{development.hero.tagline}</p>
-          <p>{development.hero.lead}</p>
-        </div>
-        <div className="hero-kpi-strip" aria-label="Коммерческие преимущества viewer">
-          <div className="hero-kpi-card">
-            <span className="hero-kpi-label">Формат</span>
-            <strong className="hero-kpi-value">Живой выбор квартиры</strong>
-          </div>
-          <div className="hero-kpi-card">
-            <span className="hero-kpi-label">Корпус</span>
-            <strong className="hero-kpi-value">{building.floors_count} этажей</strong>
-          </div>
-          <div className="hero-kpi-card">
-            <span className="hero-kpi-label">Сценарий</span>
-            <strong className="hero-kpi-value">Премиум-сцена продаж</strong>
-          </div>
-        </div>
-      </section>
+        <div className="reference-ambient-layer" aria-hidden="true" />
 
-      <section className={`${responsiveStage.stageClass} scene-composition`} aria-label="Интерактивная 3D сцена ЖК">
-        <div className={showroomDirection.diagnosticClass} aria-label="Premium viewer state and share readouts">
-          <p className="deep-link-readout">{deepLinkState.label}</p>
-          <p className="share-link-readout">Share link: {shareLink}</p>
-          <div className="analytics-readout" aria-label="Premium viewer analytics readout">
-            {analyticsLabels.map((label) => <p key={label}>{label}</p>)}
+        <nav className="showroom-nav apple-linear-glass" aria-label="Estate3D showroom navigation">
+          <div className="showroom-brand">
+            <span className="showroom-brand-mark">Estate3D</span>
+            <span className="showroom-brand-subtitle">Remote property showroom</span>
           </div>
-        </div>
-        <ViewerScene
-          scene={scene}
-          viewerState={viewerState}
-          selectedFloor={selectedFloor}
-          selectedUnit={selectedUnit}
-          selectedViewpoint={selectedViewpoint}
-          activeWindow={activeWindow}
-          onChooseFloor={chooseFloor}
-          onChooseUnit={chooseUnit}
-          onEnterWalkMode={enterWalkMode}
-          onShowWindowView={showWindowView}
-        />
-        <ViewerHud
-          development={development}
-          building={building}
-          selectedFloor={selectedFloor}
-          selectedUnit={selectedUnit}
-          selectedViewpoint={selectedViewpoint}
-          activeWindow={activeWindow ?? firstWindow}
-          firstViewpoint={firstViewpoint}
-          viewerState={viewerState}
-          leadMessage={leadMessage}
-          leadStatus={leadStatus}
-          leadSuccess={leadSuccess}
-          interactionTrail={interactionTrail}
-          shareLink={shareLink}
-          onChooseUnit={chooseUnit}
-          onEnterWalkMode={enterWalkMode}
-          onShowWindowView={() => showWindowView()}
-          onSubmitLead={submitLead}
-          onCrmCopyIntent={handleCrmCopyIntent}
-        />
+          <div className="showroom-nav-links" aria-label="Premium viewer sections">
+            <span className="showroom-nav-pill">Live showroom</span>
+            <span>3D selection</span>
+            <span>Manager handoff</span>
+          </div>
+        </nav>
+
+        <section className={`${showroomDirection.heroClass} commercial-hero reference-copy-panel editorial-copy-overlay image-led-caption-panel`}>
+          <div className="hero-copy">
+            <p className="eyebrow reference-caption-kicker">Interactive development image</p>
+            <p className="editorial-direction-label">{showroomDirection.headline}</p>
+            <p className="reference-mix-label">Incommonwith base · GIC HUD · Stykka discipline</p>
+            <h1>{development.name}</h1>
+            <p className="viewer-tagline">{development.hero.tagline}</p>
+            <p>{development.hero.lead}</p>
+            <p className="reference-composition-note">3D background first, viewer second</p>
+          </div>
+          <div className="hero-kpi-strip" aria-label="Коммерческие преимущества viewer">
+            <div className="hero-kpi-card">
+              <span className="hero-kpi-label">Формат</span>
+              <strong className="hero-kpi-value">Живой выбор квартиры</strong>
+            </div>
+            <div className="hero-kpi-card">
+              <span className="hero-kpi-label">Корпус</span>
+              <strong className="hero-kpi-value">{building.floors_count} этажей</strong>
+            </div>
+            <div className="hero-kpi-card">
+              <span className="hero-kpi-label">Сценарий</span>
+              <strong className="hero-kpi-value">Премиум-сцена продаж</strong>
+            </div>
+          </div>
+        </section>
+
+        <section className={`${responsiveStage.stageClass} scene-composition reference-viewer-overlay floating-viewer-interface over-background-composition`} aria-label="Интерактивная 3D сцена ЖК">
+          <div className={showroomDirection.diagnosticClass} aria-label="Premium viewer state and share readouts">
+            <p className="deep-link-readout">{deepLinkState.label}</p>
+            <p className="share-link-readout">Share link: {shareLink}</p>
+            <div className="analytics-readout" aria-label="Premium viewer analytics readout">
+              {analyticsLabels.map((label) => <p key={label}>{label}</p>)}
+            </div>
+          </div>
+          <ViewerScene
+            scene={scene}
+            viewerState={viewerState}
+            selectedFloor={selectedFloor}
+            selectedUnit={selectedUnit}
+            selectedViewpoint={selectedViewpoint}
+            activeWindow={activeWindow}
+            onChooseFloor={chooseFloor}
+            onChooseUnit={chooseUnit}
+            onEnterWalkMode={enterWalkMode}
+            onShowWindowView={showWindowView}
+          />
+          <ViewerHud
+            development={development}
+            building={building}
+            selectedFloor={selectedFloor}
+            selectedUnit={selectedUnit}
+            selectedViewpoint={selectedViewpoint}
+            activeWindow={activeWindow ?? firstWindow}
+            firstViewpoint={firstViewpoint}
+            viewerState={viewerState}
+            leadMessage={leadMessage}
+            leadStatus={leadStatus}
+            leadSuccess={leadSuccess}
+            interactionTrail={interactionTrail}
+            shareLink={shareLink}
+            onChooseUnit={chooseUnit}
+            onEnterWalkMode={enterWalkMode}
+            onShowWindowView={() => showWindowView()}
+            onSubmitLead={submitLead}
+            onCrmCopyIntent={handleCrmCopyIntent}
+          />
+        </section>
       </section>
     </main>
   );
