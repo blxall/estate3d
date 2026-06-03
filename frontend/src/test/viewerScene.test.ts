@@ -361,7 +361,7 @@ describe('viewer scene adapter', () => {
     const unit = floor.units[0];
 
     expect(buildShareHandoffSummary({ selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city' })).toEqual({
-      label: 'Share handoff: 2 этаж · квартира 21 · window_view',
+      label: 'Ссылка на выбранную квартиру готова: 2 этаж · квартира 21 · window_view',
       copy: 'Ссылка для клиента: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city',
       ariaLabel: 'Copy share link: 2 этаж · квартира 21 · window_view',
       cardClass: 'share-handoff-card glass-card desktop-inline',
@@ -564,7 +564,7 @@ describe('viewer scene adapter', () => {
       },
     };
     const shareHandoff = {
-      label: 'Share handoff: 8 этаж · квартира 81 · window_view',
+      label: 'Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view',
       copy: 'Copy-ready link: /developments/demo-premium/viewer?floor=floor_8',
       ariaLabel: 'Скопировать ссылку для менеджера: 8 этаж · квартира 81 · window_view',
       cardClass: 'share-handoff-card glass-card copy-ready',

@@ -213,7 +213,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   }
 
   return (
-    <div className={presentation.shellClass} aria-label={`R3F scene slice for ${scene.building.name}`}>
+    <div className={`${presentation.shellClass} click-through-model-shell`} aria-label={`R3F scene slice for ${scene.building.name}`}>
       <div className="r3f-scene-meta">
         <span>R3F-ready tower geometry</span>
         <small>{webGlAvailable ? 'WebGL canvas active' : 'Semantic fallback active'}</small>
@@ -268,12 +268,12 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
           <div className="r3f-canvas-fallback">WebGL preview fallback</div>
         )}
       </div>
-      <div className="r3f-floor-hitboxes" aria-label="3D floor selection bridge">
+      <div className="r3f-floor-hitboxes tap-target-bridge browser-click-safe" aria-label="3D floor selection bridge">
         {scene.towerFloors.map((floor) => (
           <button
             key={floor.id}
             type="button"
-            className={`r3f-floor-hitbox ${selectedFloorId === floor.id ? 'active' : ''} ${hoveredFloorId === floor.id ? 'hovered' : ''} ${floor.hasUnits ? 'has-units' : ''}`}
+            className={`r3f-floor-hitbox tap-target-floor ${selectedFloorId === floor.id ? 'active' : ''} ${hoveredFloorId === floor.id ? 'hovered' : ''} ${floor.hasUnits ? 'has-units' : ''}`}
             onMouseEnter={() => setHoveredFloorId(floor.id)}
             onFocus={() => setHoveredFloorId(floor.id)}
             onMouseLeave={() => setHoveredFloorId(null)}

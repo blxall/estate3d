@@ -50,7 +50,7 @@ export function ViewerScene({
       </div>
       <div className="state-pill technical-readout">State: {viewerState}</div>
       <div className="camera-path">{cameraMessage}</div>
-      <Suspense fallback={<div className="r3f-scene-shell warm-model-shell r3f-loading">Loading R3F scene…</div>}>
+      <Suspense fallback={<div className="r3f-scene-shell warm-model-shell r3f-loading click-through-model-shell">Loading R3F scene…</div>}>
         <ThreeDevelopmentScene
           scene={scene}
           viewerState={viewerState}
@@ -65,7 +65,7 @@ export function ViewerScene({
           onShowWindowView={onShowWindowView}
         />
       </Suspense>
-      <div className="procedural-tower dom-fallback backup-controls" aria-label={`${scene.building.name} backup floor controls`}>
+      <div className="procedural-tower dom-fallback backup-controls mobile-touch-fallback browser-click-safe" aria-label="Backup floor controls for touch fallback">
         {scene.towerFloors.map((floor) => (
           <button
             key={floor.id}

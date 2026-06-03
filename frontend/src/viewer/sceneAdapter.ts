@@ -481,7 +481,7 @@ export function buildShareHandoffSummary({
   }
   const context = `${selectedFloor.label} · квартира ${selectedUnit.number} · ${viewerState}`;
   return {
-    label: `Share handoff: ${context}`,
+    label: `Ссылка на выбранную квартиру готова: ${context}`,
     copy: `Ссылка для клиента: ${shareLink}`,
     ariaLabel: `Copy share link: ${context}`,
     cardClass: 'share-handoff-card glass-card desktop-inline',

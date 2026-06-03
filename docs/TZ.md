@@ -163,7 +163,9 @@ Estate3D должен выглядеть как современный premium r
 3. При переносе референса запрещено ограничиваться recolor/gamma pass. Если референс построен на full-bleed 3D/visual background, editorial overlay и floating UI, Estate3D должен повторять именно структуру страницы, а уже потом адаптировать контент и интерактивность.
 4. Customer-facing surface не должен показывать debug/readout strings (`Deep link`, raw `viewerState`, `R3F-ready`, camera diagnostics, mesh labels). Такие данные можно сохранять семантически в DOM для тестов/a11y, но визуально они должны быть скрыты или заменены на sales/customer-facing copy.
 5. После каждого визуального slice обязательны desktop/mobile screenshots и честный visual audit: hierarchy, contrast, clipping, clutter, reference match, mobile fit, отсутствие technical leakage.
-6. Основная текущая direction после Refero-разбора: warm editorial real-estate showroom. База — Incommonwith; механика floating/frosted HUD — General Intelligence Company; дисциплина hairline/minimal UI — Stykka. Следующие итерации должны усиливать не только shell, но и качество 3D/hero visual source.
+6. Mobile-first viewer должен показывать интерактивную модель/visual area до длинной editorial copy, сохранять реальные browser/touch hitboxes для выбора этажа/квартиры и не перекрывать primary R3F/3D selection декоративными fallback layers.
+7. Raw URLs, English/internal labels (`Share handoff`, `Copy-ready`, raw `viewerState`) не должны быть видны customer-facing пользователю. Если данные нужны для тестов, менеджерского handoff или a11y, они должны быть визуально демотированы/скрыты и заменены sales/customer-facing copy.
+8. Основная текущая direction после Refero-разбора: warm editorial real-estate showroom. База — Incommonwith; механика floating/frosted HUD — General Intelligence Company; дисциплина hairline/minimal UI — Stykka. Следующие итерации должны усиливать не только shell, но и качество 3D/hero visual source.
 
 ### Целевой пользовательский сценарий
 

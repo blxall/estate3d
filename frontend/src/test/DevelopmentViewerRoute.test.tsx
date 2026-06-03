@@ -112,6 +112,25 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('3D background first, viewer second')).toHaveClass('reference-composition-note');
   });
 
+  it('marks the reference shell as mobile-visual-priority and pointer-safe for browser hitbox polish', async () => {
+    Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true });
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(<App />);
+
+    expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
+    expect(container.querySelector('.reference-landing-screen')).toHaveClass('mobile-visual-priority', 'hitbox-safe-reference-shell');
+    expect(container.querySelector('.reference-copy-panel')).toHaveClass('mobile-editorial-compact', 'below-visual-on-mobile');
+    expect(container.querySelector('.reference-viewer-overlay')).toHaveClass('mobile-model-first', 'tap-safe-overlay');
+    expect(container.querySelector('.r3f-scene-shell')).toHaveClass('click-through-model-shell');
+    expect(await screen.findByRole('button', { name: '3D floor mesh: 8 этаж' })).toHaveClass('tap-target-floor');
+    expect(await screen.findByLabelText('3D floor selection bridge')).toHaveClass('tap-target-bridge', 'browser-click-safe');
+    expect(screen.getByLabelText('Backup floor controls for touch fallback')).toHaveClass('mobile-touch-fallback', 'browser-click-safe');
+    Object.defineProperty(window, 'innerWidth', { value: 1440, configurable: true });
+  });
+
   it('renders the selected Refero mix as a warm editorial atelier showroom shell', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
@@ -250,7 +269,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText(/Клиент смотрел квартира 81 в режиме window_view/)).toHaveClass('lead-handoff-digest-recap');
     expect(screen.getByText('Digest note: квартира 81 · available · window_view · share ready · follow-up ready.', { selector: '.lead-handoff-digest-note' })).toHaveClass('lead-handoff-digest-note');
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
-    const shareHandoff = screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
+    const shareHandoff = screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
     expect(shareHandoff).toHaveClass('glass-card', 'desktop-inline');
     expect(screen.getByText(/^Ссылка для клиента:/i, { selector: '.share-handoff-copy' })).toHaveClass('share-handoff-copy', 'copy-ready');
     expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · window_view' })).toHaveClass('share-copy-button', 'premium-outline');
@@ -446,7 +465,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Отправляем заявку менеджеру…')).toHaveClass('lead-feedback', 'sending');
     expect(screen.getByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
     expect(screen.getByText('Interaction trail: select_floor → select_unit → enter_walk_mode → open_window_view')).toBeInTheDocument();
-    expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: sending · sales-room context locked')).toBeInTheDocument();
     expect(screen.getByText('Digest закреплен при отправке', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
 
@@ -456,7 +475,7 @@ describe('Premium development viewer route', () => {
     expect(retryButton).not.toBeDisabled();
     expect(retryButton).toHaveClass('lead-submit-button', 'retry');
     expect(screen.getByText('Не удалось отправить заявку. Попробуйте еще раз.')).toHaveClass('lead-feedback', 'error-card');
-    expect(screen.getByText('Share handoff: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: error · retry keeps sales-room context')).toBeInTheDocument();
     expect(screen.getByText('Digest сохранен для повтора', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
     expect(screen.getByText('CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы')).toBeInTheDocument();

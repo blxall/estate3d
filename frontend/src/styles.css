@@ -3062,6 +3062,7 @@ button {
   z-index: -3;
   overflow: hidden;
   background: #ead5c4;
+  pointer-events: none;
 }
 
 .reference-visual-backdrop.source-backed-3d-image img {
@@ -3498,4 +3499,219 @@ button {
 .reference-viewer-overlay .r3f-room-hitbox,
 .reference-viewer-overlay .r3f-window-hotspot {
   pointer-events: auto;
+}
+/* v3.37 mobile reference composition + browser-click hitbox polish */
+.reference-landing-screen.mobile-visual-priority.hitbox-safe-reference-shell {
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.reference-viewer-overlay.tap-safe-overlay,
+.reference-viewer-overlay.tap-safe-overlay .viewer-scene,
+.reference-viewer-overlay.tap-safe-overlay .viewer-hud {
+  position: relative;
+}
+
+.reference-viewer-overlay.tap-safe-overlay {
+  pointer-events: auto;
+}
+
+.reference-viewer-overlay.tap-safe-overlay .viewer-scene {
+  pointer-events: auto;
+}
+
+.reference-viewer-overlay.tap-safe-overlay .viewer-hud,
+.reference-viewer-overlay.tap-safe-overlay .viewer-hud *,
+.reference-viewer-overlay.tap-safe-overlay .r3f-floor-hitboxes,
+.reference-viewer-overlay.tap-safe-overlay .r3f-unit-hitboxes,
+.reference-viewer-overlay.tap-safe-overlay .r3f-room-hitboxes,
+.reference-viewer-overlay.tap-safe-overlay .r3f-window-hotspots,
+.reference-viewer-overlay.tap-safe-overlay .procedural-tower,
+.reference-viewer-overlay.tap-safe-overlay .procedural-tower * {
+  pointer-events: auto;
+}
+
+.reference-viewer-overlay .click-through-model-shell {
+  pointer-events: none;
+}
+
+.design-audit-clean .share-handoff-copy.copy-ready {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.reference-viewer-overlay .tap-target-bridge.browser-click-safe {
+  pointer-events: auto;
+  z-index: 1000;
+}
+
+.reference-viewer-overlay .tap-target-floor,
+.reference-viewer-overlay .r3f-unit-hitbox,
+.reference-viewer-overlay .r3f-room-hitbox,
+.reference-viewer-overlay .r3f-window-hotspot,
+.reference-viewer-overlay .mobile-touch-fallback.browser-click-safe button {
+  position: relative;
+  z-index: 1001;
+  pointer-events: auto;
+  min-width: 44px;
+  min-height: 24px;
+  touch-action: manipulation;
+}
+
+.reference-viewer-overlay .mobile-touch-fallback.browser-click-safe {
+  z-index: 38;
+}
+
+@media (max-width: 720px) {
+  .reference-landing-screen.mobile-visual-priority.hitbox-safe-reference-shell {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible;
+    padding: 10px;
+  }
+
+  .reference-landing-screen.mobile-visual-priority .showroom-nav {
+    order: 1;
+    flex: 0 0 auto;
+  }
+
+  .reference-viewer-overlay.mobile-model-first.tap-safe-overlay {
+    order: 2;
+    margin-top: 0;
+    min-height: 58svh;
+    padding: 8px;
+    background: rgba(255, 250, 242, 0.34);
+    backdrop-filter: blur(18px) saturate(1.08);
+  }
+
+  .reference-copy-panel.mobile-editorial-compact.below-visual-on-mobile {
+    order: 3;
+    margin: 0;
+    padding: 16px;
+    background: rgba(250, 246, 238, 0.82);
+  }
+
+  .reference-copy-panel.mobile-editorial-compact h1 {
+    font-size: clamp(2.55rem, 12vw, 4.4rem);
+    line-height: 0.9;
+    max-width: 8.8ch;
+    margin-bottom: 0.18em;
+  }
+
+  .reference-copy-panel.mobile-editorial-compact .editorial-direction-label,
+  .reference-copy-panel.mobile-editorial-compact .reference-mix-label,
+  .reference-copy-panel.mobile-editorial-compact .viewer-tagline,
+  .reference-copy-panel.mobile-editorial-compact .hero-copy > p:not(.eyebrow):not(.reference-composition-note) {
+    font-size: 0.9rem;
+    line-height: 1.38;
+  }
+
+  .reference-copy-panel.mobile-editorial-compact .reference-caption-kicker,
+  .reference-copy-panel.mobile-editorial-compact .reference-composition-note {
+    padding: 6px 9px;
+    font-size: 0.62rem;
+    margin-bottom: 8px;
+  }
+
+  .reference-copy-panel.mobile-editorial-compact .hero-kpi-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+
+  .reference-copy-panel.mobile-editorial-compact .hero-kpi-card {
+    border-bottom: 0;
+    border-right: 1px solid rgba(74, 10, 5, 0.12);
+    padding: 8px 6px 0 0;
+  }
+
+  .reference-copy-panel.mobile-editorial-compact .hero-kpi-label {
+    font-size: 0.56rem;
+  }
+
+  .reference-copy-panel.mobile-editorial-compact .hero-kpi-value {
+    font-size: 0.72rem;
+    line-height: 1.14;
+  }
+
+  .reference-viewer-overlay.mobile-model-first .viewer-scene {
+    min-height: 52svh;
+  }
+
+  .reference-viewer-overlay.mobile-model-first .viewer-hud {
+    max-height: 45svh;
+    overflow: auto;
+  }
+
+  .reference-full-bleed-site .reference-viewer-overlay.mobile-model-first .r3f-scene-shell {
+    height: min(52svh, 390px);
+    margin: 8px auto;
+  }
+
+  .reference-viewer-overlay .tap-target-bridge.browser-click-safe {
+    position: fixed;
+    top: 315px;
+    left: 42px;
+    right: auto;
+    bottom: auto;
+    width: 64px;
+    height: 260px;
+    transform: none;
+    z-index: 2147483000;
+    gap: 3px;
+  }
+
+  .reference-viewer-overlay .r3f-unit-hitboxes,
+  .reference-viewer-overlay .r3f-room-hitboxes,
+  .reference-viewer-overlay .r3f-window-hotspots {
+    position: fixed;
+    left: 24px;
+    right: auto;
+    bottom: auto;
+    top: 420px;
+    width: 210px;
+    min-height: 96px;
+    transform: none;
+    z-index: 2147483001;
+  }
+
+  .state-development_overview .reference-viewer-overlay .r3f-unit-hitboxes,
+  .state-development_overview .reference-viewer-overlay .r3f-room-hitboxes,
+  .state-development_overview .reference-viewer-overlay .r3f-window-hotspots,
+  .state-floor_focus .reference-viewer-overlay .r3f-room-hitboxes,
+  .state-floor_focus .reference-viewer-overlay .r3f-window-hotspots {
+    display: none;
+  }
+
+  .reference-viewer-overlay .r3f-room-hitboxes,
+  .reference-viewer-overlay .r3f-window-hotspots {
+    top: 474px;
+  }
+
+  .reference-viewer-overlay .tap-target-floor {
+    min-height: 12px;
+  }
+
+  .reference-viewer-overlay .mobile-touch-fallback.browser-click-safe {
+    opacity: 0.01;
+    pointer-events: none !important;
+  }
+
+  .reference-viewer-overlay .mobile-touch-fallback.browser-click-safe * {
+    pointer-events: none !important;
+  }
+
+  .reference-viewer-overlay .viewer-scene:focus-within .mobile-touch-fallback.browser-click-safe {
+    opacity: 0.2;
+  }
 }

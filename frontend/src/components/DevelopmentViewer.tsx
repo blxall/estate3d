@@ -188,7 +188,7 @@ export function DevelopmentViewer({ development }: Props) {
 
   return (
     <main className={`${showroomDirection.pageClass} reference-full-bleed-site visual-first-property-page design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
-      <section className="reference-landing-screen full-bleed-3d-background reference-layout-copy" aria-label="Estate3D reference-style visual landing">
+      <section className="reference-landing-screen full-bleed-3d-background reference-layout-copy mobile-visual-priority hitbox-safe-reference-shell" aria-label="Estate3D reference-style visual landing">
         <div className="reference-visual-backdrop source-backed-3d-image">
           <img src="/demo/editorial-development-hero.jpg" alt="Фотореалистичный 3D фон Estate3D Skyline" />
         </div>
@@ -206,7 +206,7 @@ export function DevelopmentViewer({ development }: Props) {
           </div>
         </nav>
 
-        <section className={`${showroomDirection.heroClass} commercial-hero reference-copy-panel editorial-copy-overlay image-led-caption-panel`}>
+        <section className={`${showroomDirection.heroClass} commercial-hero reference-copy-panel editorial-copy-overlay image-led-caption-panel mobile-editorial-compact below-visual-on-mobile`}>
           <div className="hero-copy">
             <p className="eyebrow reference-caption-kicker">Interactive development image</p>
             <p className="editorial-direction-label">{showroomDirection.headline}</p>
@@ -232,7 +232,7 @@ export function DevelopmentViewer({ development }: Props) {
           </div>
         </section>
 
-        <section className={`${responsiveStage.stageClass} scene-composition reference-viewer-overlay floating-viewer-interface over-background-composition`} aria-label="Интерактивная 3D сцена ЖК">
+        <section className={`${responsiveStage.stageClass} scene-composition reference-viewer-overlay floating-viewer-interface over-background-composition mobile-model-first tap-safe-overlay`} aria-label="Интерактивная 3D сцена ЖК">
           <div className={showroomDirection.diagnosticClass} aria-label="Premium viewer state and share readouts">
             <p className="deep-link-readout">{deepLinkState.label}</p>
             <p className="share-link-readout">Share link: {shareLink}</p>
