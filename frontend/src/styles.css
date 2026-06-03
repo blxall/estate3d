@@ -1739,3 +1739,199 @@ button {
 .state-unit_top_down .state-pill.technical-readout::after { content: "Apartment plan"; }
 .state-walk_mode .state-pill.technical-readout::after { content: "Walkthrough"; }
 .state-window_view .state-pill.technical-readout::after { content: "Window view"; }
+/* No-black showroom pass: replace harsh black scene/HUD with warm gallery surfaces. */
+.viewer-scene.warm-gallery-card,
+.viewer-hud.warm-sales-hud {
+  border: 1px solid rgba(126, 96, 51, 0.14);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.72), transparent 28%),
+    linear-gradient(145deg, rgba(255, 252, 246, 0.96), rgba(239, 230, 214, 0.9));
+  color: #17130e;
+  box-shadow: rgba(92, 64, 30, 0.14) 0 34px 90px -44px, rgba(50, 50, 93, 0.1) 0 20px 46px -34px, inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.viewer-scene.warm-gallery-card {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.86), transparent 22%),
+    radial-gradient(circle at 52% 52%, rgba(184, 137, 60, 0.2), transparent 38%),
+    linear-gradient(180deg, #fffdf8 0%, #efe6d6 100%);
+}
+
+.viewer-scene.warm-gallery-card::before {
+  background: radial-gradient(circle, rgba(184, 137, 60, 0.18), transparent 60%);
+  filter: blur(12px);
+}
+
+.r3f-scene-shell.warm-model-shell {
+  border-color: rgba(126, 96, 51, 0.16);
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255, 255, 255, 0.8), transparent 24%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(239, 230, 214, 0.64)),
+    #f4ecdf;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), rgba(92, 64, 30, 0.16) 0 34px 90px -44px;
+}
+
+.showroom-overlay {
+  border-color: rgba(126, 96, 51, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: rgba(92, 64, 30, 0.12) 0 24px 70px -38px;
+}
+
+.showroom-title,
+.r3f-scene-meta::before,
+.room-card strong,
+.window-view-card h3,
+.unit-plan h3,
+.viewer-hud.warm-sales-hud h2,
+.viewer-hud.warm-sales-hud h3 {
+  color: #17130e;
+}
+
+.showroom-copy,
+.viewer-hud.warm-sales-hud p,
+.viewer-hud.warm-sales-hud small,
+.r3f-scene-meta::after {
+  color: #65594a;
+}
+
+.showroom-step,
+.viewer-hud.warm-sales-hud .eyebrow {
+  color: #9a6a25;
+}
+
+.state-pill.technical-readout,
+.r3f-camera-readout.diagnostic-chip,
+.camera-path {
+  border-color: rgba(126, 96, 51, 0.14);
+  background: rgba(255, 255, 255, 0.58);
+  color: rgba(23, 19, 14, 0.64);
+}
+
+.state-pill.technical-readout::after {
+  color: rgba(23, 19, 14, 0.68);
+}
+
+.procedural-tower.dom-fallback,
+.r3f-building-shell {
+  filter: saturate(0.92) contrast(0.94);
+}
+
+.r3f-building-shell {
+  border-color: rgba(126, 96, 51, 0.16);
+  background:
+    linear-gradient(90deg, rgba(126, 96, 51, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(126, 96, 51, 0.08) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.18);
+  box-shadow: 20px 26px 0 rgba(126, 96, 51, 0.06), inset 0 0 60px rgba(184, 137, 60, 0.08);
+}
+
+.viewer-hud.warm-sales-hud {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(245, 238, 226, 0.88)),
+    #f7efe3;
+}
+
+.viewer-hud.warm-sales-hud .responsive-hud-readout::after,
+.unit-plan,
+.window-view-card,
+.room-card,
+.lead-card,
+.viewer-empty-state,
+.lead-context,
+.interaction-trail-card.glass-card,
+.manager-follow-up-card.glass-card,
+.broker-script-card.glass-card,
+.lead-handoff-digest-card.glass-card,
+.share-handoff-card.glass-card,
+.lead-export-fields-card.crm-field-groups,
+.crm-export-action-card.copy-action-ready {
+  border-color: rgba(126, 96, 51, 0.14);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), rgba(92, 64, 30, 0.08) 0 18px 46px -34px;
+}
+
+.unit-list button,
+.window-button,
+.walk-button,
+.lead-submit-button,
+.lead-card .share-copy-button.premium-outline,
+.lead-card .crm-export-action-button.premium-outline {
+  border-color: rgba(126, 96, 51, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  color: #17130e;
+}
+
+.unit-list button.active,
+.walk-button,
+.window-button,
+.lead-submit-button {
+  border-color: rgba(154, 106, 37, 0.28);
+  background: linear-gradient(135deg, #d9b56e, #fff0c9);
+  color: #17130e;
+}
+
+.interaction-trail-card p,
+.manager-follow-up-card p,
+.broker-script-card p,
+.lead-handoff-digest-card p,
+.share-handoff-card p,
+.lead-export-field-title,
+.crm-export-action-card p,
+.lead-card .share-copy-button.premium-outline,
+.lead-card .crm-export-action-button.premium-outline {
+  color: #7a541d;
+}
+
+.interaction-trail-card small,
+.manager-follow-up-card ul,
+.manager-follow-up-copy,
+.broker-script-opener,
+.broker-script-next-step,
+.lead-handoff-digest-recap,
+.lead-handoff-digest-note,
+.share-handoff-copy.copy-ready,
+.lead-export-field-row,
+.crm-export-action-text.copy-ready,
+.lead-context small,
+.responsive-hud-readout,
+.unit-list small {
+  color: #5f5345;
+}
+
+/* Replace remaining pure-black brand accents with deep espresso so the theme stays warm. */
+.showroom-brand-mark,
+.viewer-hero h1,
+.showroom-title,
+.viewer-hud.warm-sales-hud h2,
+.viewer-hud.warm-sales-hud h3,
+.hero-kpi-value {
+  color: #21180f;
+}
+
+.showroom-nav-pill {
+  background: linear-gradient(135deg, #7a541d, #c49a54);
+  color: #fff7ea;
+  box-shadow: rgba(122, 84, 29, 0.24) 0 14px 34px -22px;
+}
+
+.r3f-label,
+.r3f-scene-meta span,
+.r3f-scene-meta small,
+.r3f-camera-readout {
+  color: #3b2c1c;
+}
+/* The selectable floor bridge is visible over WebGL; keep it champagne/sage instead of black slabs. */
+.premium-real-estate-showroom .r3f-floor-hitbox {
+  border: 1px solid rgba(126, 96, 51, 0.16);
+  background: linear-gradient(90deg, rgba(239, 224, 196, 0.72), rgba(210, 196, 170, 0.64));
+  box-shadow: 8px 7px 0 rgba(126, 96, 51, 0.08);
+}
+
+.premium-real-estate-showroom .r3f-floor-hitbox.has-units,
+.premium-real-estate-showroom .r3f-floor-hitbox.active,
+.premium-real-estate-showroom .r3f-floor-hitbox.hovered,
+.premium-real-estate-showroom .r3f-floor-hitbox:hover {
+  border-color: rgba(154, 106, 37, 0.26);
+  background: linear-gradient(90deg, rgba(217, 181, 110, 0.72), rgba(199, 216, 209, 0.72));
+  box-shadow: 8px 7px 0 rgba(126, 96, 51, 0.1);
+}

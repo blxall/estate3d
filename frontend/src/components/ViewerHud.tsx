@@ -68,7 +68,7 @@ export function ViewerHud({
   const leadHandoffDigest = buildLeadHandoffDigest({ leadContext, interactionTrail, managerFollowUp, brokerScript, shareHandoff, selectedUnit });
 
   return (
-    <aside className={`${responsiveHud.hudClass} sales-hud`}>
+    <aside className={`${responsiveHud.hudClass} sales-hud warm-sales-hud`}>
       <p className="responsive-hud-readout">{responsiveHud.label}</p>
       <p className="eyebrow">{building.name}</p>
       <h2>{selectedFloor ? selectedFloor.label : 'Выберите этаж'}</h2>

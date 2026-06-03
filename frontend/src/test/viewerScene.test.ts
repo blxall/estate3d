@@ -183,37 +183,37 @@ describe('viewer scene adapter', () => {
     });
   });
 
-  it('maps premium R3F material themes for floor, unit, room, and window states', () => {
+  it('maps warm no-black R3F material themes for floor, unit, room, and window states', () => {
     expect(buildMaterialTheme({ kind: 'floor', active: true, hasUnits: true })).toEqual({
-      color: '#f6d77b',
-      opacity: 0.98,
-      emissive: '#7c5f1b',
-      metalness: 0.42,
-      roughness: 0.38,
-      label: 'Material floor: active premium-gold',
+      color: '#d9b56e',
+      opacity: 0.96,
+      emissive: '#8a611f',
+      metalness: 0.18,
+      roughness: 0.46,
+      label: 'Material floor: active warm-gold',
     });
     expect(buildMaterialTheme({ kind: 'floor', hovered: true, hasUnits: true })).toMatchObject({
-      color: '#7dd3fc',
-      opacity: 0.9,
-      label: 'Material floor: hover sky-highlight',
+      color: '#c7d8d1',
+      opacity: 0.88,
+      label: 'Material floor: hover sage-highlight',
     });
     expect(buildMaterialTheme({ kind: 'floor', hasUnits: false })).toMatchObject({
-      color: '#24344d',
-      opacity: 0.42,
-      label: 'Material floor: empty muted-shell',
+      color: '#d8cbb7',
+      opacity: 0.56,
+      label: 'Material floor: empty warm-stone',
     });
     expect(buildMaterialTheme({ kind: 'unit', status: 'reserved' })).toMatchObject({
-      color: '#fb923c',
-      opacity: 0.74,
+      color: '#d89b5f',
+      opacity: 0.76,
       label: 'Material unit: reserved warm-reserve',
     });
     expect(buildMaterialTheme({ kind: 'unit', status: 'sold' })).toMatchObject({
-      color: '#64748b',
-      opacity: 0.34,
-      label: 'Material unit: sold muted-unavailable',
+      color: '#b8ad9d',
+      opacity: 0.44,
+      label: 'Material unit: sold warm-muted',
     });
-    expect(buildMaterialTheme({ kind: 'room' })).toMatchObject({ color: '#a78bfa', opacity: 0.82, label: 'Material room: walkthrough violet' });
-    expect(buildMaterialTheme({ kind: 'window-hotspot' })).toMatchObject({ color: '#f97316', opacity: 0.92, label: 'Material window-hotspot: sunset view-hotspot' });
+    expect(buildMaterialTheme({ kind: 'room' })).toMatchObject({ color: '#c9b79c', opacity: 0.78, label: 'Material room: walkthrough warm-stone' });
+    expect(buildMaterialTheme({ kind: 'window-hotspot' })).toMatchObject({ color: '#d9824b', opacity: 0.88, label: 'Material window-hotspot: sunset warm-view' });
   });
 
   it('describes premium empty and unavailable states for sparse floor/unit data', () => {

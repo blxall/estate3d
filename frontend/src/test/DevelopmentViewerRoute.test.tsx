@@ -112,8 +112,9 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Общий вид комплекса')).toHaveClass('showroom-title');
     expect(screen.getByText('Выберите подсвеченный этаж, чтобы перейти к квартирам и виду из окна.')).toHaveClass('showroom-copy');
     expect(container.querySelector('.viewer-stage')).toHaveClass('viewer-stage', 'scene-composition');
-    expect(container.querySelector('.viewer-scene')).toHaveClass('viewer-scene', 'immersive-model-card');
-    expect(container.querySelector('.viewer-hud')).toHaveClass('sales-hud');
+    expect(container.querySelector('.viewer-scene')).toHaveClass('viewer-scene', 'immersive-model-card', 'warm-gallery-card');
+    expect(container.querySelector('.viewer-hud')).toHaveClass('sales-hud', 'warm-sales-hud');
+    expect(container.querySelector('.r3f-scene-shell')).toHaveClass('warm-model-shell');
     expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed', 'diagnostics-minimized');
     await screen.findByText('Camera frame: overview');
     expect(container.querySelector('.r3f-camera-readout')).toHaveClass('technical-readout', 'collapsed-diagnostics', 'diagnostic-chip');
@@ -131,8 +132,8 @@ describe('Premium development viewer route', () => {
     const children = Array.from(stage?.children ?? []);
     expect(children.map((child) => (child as HTMLElement).className)).toEqual([
       'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized',
-      'viewer-scene immersive-model-card',
-      'viewer-hud desktop-panel sales-hud',
+      'viewer-scene immersive-model-card warm-gallery-card',
+      'viewer-hud desktop-panel sales-hud warm-sales-hud',
     ]);
     expect(container.querySelector('.viewer-stage-readouts .deep-link-readout')).toHaveTextContent('Deep link: overview fallback');
     expect(container.querySelector('.viewer-stage-readouts .share-link-readout')).toHaveTextContent('Share link: /developments/demo-premium/viewer?view=development_overview');
@@ -276,7 +277,7 @@ describe('Premium development viewer route', () => {
     fireEvent.click(meshFloor);
 
     expect(await screen.findByText('Selected mesh: 8 этаж')).toBeInTheDocument();
-    expect(await screen.findByText('Material theme: floor active premium-gold · #f6d77b · opacity 0.98')).toBeInTheDocument();
+    expect(await screen.findByText('Material theme: floor active warm-gold · #d9b56e · opacity 0.96')).toBeInTheDocument();
     expect(await screen.findByText('Scene availability: units 1 · viewpoints 0 · windows 0')).toBeInTheDocument();
     expect(await screen.findByText('Camera frame: floor_8')).toBeInTheDocument();
     expect(await screen.findByText('Camera target: 0,2.6,0')).toBeInTheDocument();

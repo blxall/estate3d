@@ -35,7 +35,7 @@ export function ViewerScene({
   const cameraMessage = cameraMessageForState({ viewerState, selectedFloor, selectedUnit, selectedViewpoint, activeWindow });
 
   return (
-    <div className="viewer-scene immersive-model-card">
+    <div className="viewer-scene immersive-model-card warm-gallery-card">
       <div className="showroom-overlay" aria-label="Коммерческий сценарий просмотра">
         <span className="showroom-step">ЖК → корпус → этаж → квартира</span>
         <strong className="showroom-title">{selectedFloor ? selectedFloor.label : 'Общий вид комплекса'}</strong>
@@ -49,7 +49,7 @@ export function ViewerScene({
       </div>
       <div className="state-pill technical-readout">State: {viewerState}</div>
       <div className="camera-path">{cameraMessage}</div>
-      <Suspense fallback={<div className="r3f-scene-shell r3f-loading">Loading R3F scene…</div>}>
+      <Suspense fallback={<div className="r3f-scene-shell warm-model-shell r3f-loading">Loading R3F scene…</div>}>
         <ThreeDevelopmentScene
           scene={scene}
           viewerState={viewerState}

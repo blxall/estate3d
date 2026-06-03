@@ -74,7 +74,7 @@ function TowerMeshes({ scene, selectedFloorId, hoveredFloorId, onChooseFloor, on
     <group rotation={[0.08, -0.42, 0]} position={[0, -2.4, 0]}>
       <mesh position={[0, 1.62, 0]}>
         <boxGeometry args={[3.0, 3.2, 1.34]} />
-        <meshStandardMaterial {...buildMaterialTheme({ kind: 'tower-shell' })} transparent />
+        <meshBasicMaterial color={buildMaterialTheme({ kind: 'tower-shell' }).color} opacity={buildMaterialTheme({ kind: 'tower-shell' }).opacity} transparent />
       </mesh>
       {scene.towerFloors.map((floor, index) => {
         const y = scene.towerFloors.length - index;
@@ -94,13 +94,13 @@ function TowerMeshes({ scene, selectedFloorId, hoveredFloorId, onChooseFloor, on
             onPointerOut={() => onHoverFloor(null)}
           >
             <boxGeometry args={[width, 0.12, 1.1]} />
-            <meshStandardMaterial {...material} transparent />
+            <meshBasicMaterial color={material.color} opacity={material.opacity} transparent />
           </mesh>
         );
       })}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[3.2, 0.18, 1.5]} />
-        <meshStandardMaterial color="#111827" />
+        <meshBasicMaterial color="#cdbfaa" />
       </mesh>
     </group>
   );
@@ -115,7 +115,7 @@ function UnitMeshes({ footprints, selectedUnitId, onChooseUnitById }: UnitMeshes
         return (
           <mesh key={unit.id} position={unit.center} onClick={() => onChooseUnitById(unit.id)}>
             <boxGeometry args={unit.size} />
-            <meshStandardMaterial {...material} transparent />
+            <meshBasicMaterial color={material.color} opacity={material.opacity} transparent />
           </mesh>
         );
       })}
@@ -131,7 +131,7 @@ function RoomMeshes({ footprints, onChooseRoomById }: RoomMeshesProps) {
         return (
           <mesh key={room.id} position={room.center} onClick={() => onChooseRoomById(room.id)}>
             <boxGeometry args={room.size} />
-            <meshStandardMaterial {...material} transparent />
+            <meshBasicMaterial color={material.color} opacity={material.opacity} transparent />
           </mesh>
         );
       })}
@@ -147,7 +147,7 @@ function WindowHotspotMeshes({ hotspots, onChooseWindowById }: WindowHotspotMesh
         return (
           <mesh key={hotspot.id} position={hotspot.center} onClick={() => onChooseWindowById(hotspot.id)}>
             <boxGeometry args={hotspot.size} />
-            <meshStandardMaterial {...material} transparent />
+            <meshBasicMaterial color={material.color} opacity={material.opacity} transparent />
           </mesh>
         );
       })}
@@ -211,7 +211,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   }
 
   return (
-    <div className="r3f-scene-shell" aria-label={`R3F scene slice for ${scene.building.name}`}>
+    <div className="r3f-scene-shell warm-model-shell" aria-label={`R3F scene slice for ${scene.building.name}`}>
       <div className="r3f-scene-meta">
         <span>R3F-ready tower geometry</span>
         <small>{webGlAvailable ? 'WebGL canvas active' : 'Semantic fallback active'}</small>
