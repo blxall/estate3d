@@ -9,12 +9,21 @@ export type ViewerEngineConfig = {
   validationStatus: ViewerEngineValidationStatus;
   riskNotes: string[];
   smokeChecklist: string[];
+  rollout?: {
+    status: 'default-with-guardrails';
+    fallbackQuery: string;
+    fallbackLabel: string;
+    lazyChunkBudgetKbGzip: number;
+    acceptedBuildWarnings: string[];
+    nextMitigation: string;
+  };
 };
 
 export const playCanvasSmokeFixture = {
   publicSlug: 'playcanvas-smoke',
   sceneUrl: '/playcanvas-smoke.glb',
-  routePath: '/tour/playcanvas-smoke?engine=playcanvas',
+  routePath: '/tour/playcanvas-smoke',
+  fallbackRoutePath: '/tour/playcanvas-smoke?engine=r3f',
   expectedLoadedStatus: 'PlayCanvas GLB сцена загружена',
 } as const;
 
@@ -42,6 +51,14 @@ export const viewerEngineOptions: ViewerEngineConfig[] = [
       'mobile-viewport-has-no-horizontal-overflow',
       'console-has-no-runtime-errors',
     ],
+    rollout: {
+      status: 'default-with-guardrails',
+      fallbackQuery: '?engine=r3f',
+      fallbackLabel: 'Fallback renderer: add ?engine=r3f if PlayCanvas fails on this device',
+      lazyChunkBudgetKbGzip: 500,
+      acceptedBuildWarnings: ['playcanvas-lazy-chunk-over-700kb', 'vite-node-worker-threads-externalized-for-gsplat-workers'],
+      nextMitigation: 'Investigate PlayCanvas import/bundle splitting before premium ЖК migration',
+    },
   },
 ];
 

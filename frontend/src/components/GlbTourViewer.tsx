@@ -45,6 +45,15 @@ export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEn
         </Suspense>
       </div>
       <p className="viewer-engine-readout">{engineConfig.readout}</p>
+      {engineConfig.rollout ? (
+        <aside className="viewer-engine-diagnostics viewer-engine-rollout" role="note" aria-label="PlayCanvas rollout guardrails">
+          <strong>PlayCanvas rollout guardrails</strong>
+          <p>{engineConfig.rollout.fallbackLabel}</p>
+          <p>lazy chunk budget: {engineConfig.rollout.lazyChunkBudgetKbGzip} KB gzip</p>
+          <p>accepted warnings: {engineConfig.rollout.acceptedBuildWarnings.join(', ')}</p>
+          <p>{engineConfig.rollout.nextMitigation}</p>
+        </aside>
+      ) : null}
       {engineConfig.validationStatus === 'spike' ? (
         <aside className="viewer-engine-diagnostics" role="note" aria-label="PlayCanvas spike validation">
           <strong>PlayCanvas spike validation</strong>

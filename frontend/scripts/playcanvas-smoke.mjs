@@ -4,6 +4,7 @@ import { createServer } from 'vite';
 const publicSlug = 'playcanvas-smoke';
 const sceneUrl = '/playcanvas-smoke.glb';
 const routePath = `/tour/${publicSlug}`;
+const fallbackRoutePath = `/tour/${publicSlug}?engine=r3f`;
 const expectedLoadedStatus = 'PlayCanvas GLB сцена загружена';
 
 function publicTourPayload(baseUrl) {
@@ -106,6 +107,16 @@ async function main() {
     if (layout.rootWidth <= 0 || layout.rootHeight <= 0 || layout.canvasWidth <= 0 || layout.canvasHeight <= 0) {
       throw new Error(`viewer/canvas size invalid after resize: ${JSON.stringify(layout)}`);
     }
+
+    await page.goto(`${baseUrl}${fallbackRoutePath}`, { waitUntil: 'networkidle' });
+    await page.getByRole('region', { name: /3d viewer/i }).waitFor();
+    const fallbackEngine = await page.getByRole('region', { name: /3d viewer/i }).getAttribute('data-viewer-engine');
+    if (fallbackEngine !== 'r3f') {
+      throw new Error(`expected R3F fallback engine, got ${fallbackEngine ?? 'missing'}`);
+    }
+    await page.getByText('GLB scene · Orbit controls').waitFor();
+    await page.getByText('Renderer: Three.js/R3F · explicit fallback · GLB-first').waitFor();
+
     if (errors.length > 0) {
       throw new Error(`browser runtime errors: ${errors.join(' | ')}`);
     }
@@ -115,8 +126,10 @@ async function main() {
         {
           ok: true,
           url: `${baseUrl}${routePath}`,
+          fallbackUrl: `${baseUrl}${fallbackRoutePath}`,
           sceneUrl: `${baseUrl}${sceneUrl}`,
           status: expectedLoadedStatus,
+          fallbackEngine,
           layout,
           errors,
         },

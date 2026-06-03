@@ -15,6 +15,12 @@ describe('GlbTourViewer', () => {
     expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
     expect(screen.getByText('Шоурум')).toBeInTheDocument();
     expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
+    expect(screen.getByRole('note', { name: /playcanvas rollout guardrails/i })).toHaveTextContent(
+      'Fallback renderer: add ?engine=r3f if PlayCanvas fails on this device',
+    );
+    expect(
+      screen.getByText('accepted warnings: playcanvas-lazy-chunk-over-700kb, vite-node-worker-threads-externalized-for-gsplat-workers'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
     expect(screen.getByRole('button', { name: /fullscreen/i })).toBeInTheDocument();
     expect(screen.getByText('/storage/properties/prop_1/scene.glb')).toBeInTheDocument();

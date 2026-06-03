@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { getViewerEngineConfig, playCanvasSmokeFixture, resolveViewerEngineFromSearch, viewerEngineOptions } from '../viewerEngines';
+import {
+  getViewerEngineConfig,
+  playCanvasSmokeFixture,
+  resolveViewerEngineFromSearch,
+  viewerEngineOptions,
+} from '../viewerEngines';
 
 describe('viewer engine adapter boundary', () => {
   it('uses PlayCanvas as the public/uploaded GLB default while preserving the R3F fallback query flag', () => {
@@ -45,11 +50,23 @@ describe('viewer engine adapter boundary', () => {
     ]);
   });
 
+  it('documents PlayCanvas rollout guardrails for default GLB tours', () => {
+    expect(getViewerEngineConfig('playcanvas').rollout).toEqual({
+      status: 'default-with-guardrails',
+      fallbackQuery: '?engine=r3f',
+      fallbackLabel: 'Fallback renderer: add ?engine=r3f if PlayCanvas fails on this device',
+      lazyChunkBudgetKbGzip: 500,
+      acceptedBuildWarnings: ['playcanvas-lazy-chunk-over-700kb', 'vite-node-worker-threads-externalized-for-gsplat-workers'],
+      nextMitigation: 'Investigate PlayCanvas import/bundle splitting before premium ЖК migration',
+    });
+  });
+
   it('documents the committed sample GLB used by browser smoke checks', () => {
     expect(playCanvasSmokeFixture).toEqual({
       publicSlug: 'playcanvas-smoke',
       sceneUrl: '/playcanvas-smoke.glb',
-      routePath: '/tour/playcanvas-smoke?engine=playcanvas',
+      routePath: '/tour/playcanvas-smoke',
+      fallbackRoutePath: '/tour/playcanvas-smoke?engine=r3f',
       expectedLoadedStatus: 'PlayCanvas GLB сцена загружена',
     });
     const fixture = readFileSync(join(process.cwd(), 'public', playCanvasSmokeFixture.sceneUrl.replace(/^\//, '')));
