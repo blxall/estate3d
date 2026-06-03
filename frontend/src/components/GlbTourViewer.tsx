@@ -12,12 +12,14 @@ type Props = {
   sceneUrl: string;
   title: string;
   engine?: ViewerEngine;
+  fallbackUrl?: string;
 };
 
-export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEngine() }: Props) {
+export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEngine(), fallbackUrl }: Props) {
   const canvasRootRef = useRef<HTMLDivElement | null>(null);
   const engineConfig = getViewerEngineConfig(engine);
   const SceneComponent = engine === 'playcanvas' ? PlayCanvasGlbScene : ThreeGlbScene;
+  const showFallbackLink = engine === 'playcanvas' && Boolean(fallbackUrl);
 
   function requestFullscreen() {
     void canvasRootRef.current?.requestFullscreen?.();
@@ -39,6 +41,14 @@ export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEn
           </button>
         </div>
       </div>
+      {showFallbackLink ? (
+        <p className="viewer-fallback-switch">
+          Trouble loading?{' '}
+          <a href={fallbackUrl} aria-label="Open fallback renderer">
+            Open fallback renderer with R3F
+          </a>
+        </p>
+      ) : null}
       <div className="viewer-canvas" data-testid="viewer-canvas-root" ref={canvasRootRef}>
         <Suspense fallback={<p className="viewer-status">Загружаем 3D viewer...</p>}>
           <SceneComponent sceneUrl={sceneUrl} />

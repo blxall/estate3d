@@ -43,6 +43,10 @@ function currentViewerEngine(): ViewerEngine {
   return resolveViewerEngineFromSearch(window.location.search);
 }
 
+function fallbackRendererUrl(slug: string): string {
+  return `/tour/${encodeURIComponent(slug)}?engine=r3f`;
+}
+
 function readStoredToken(): string | null {
   if (typeof window.localStorage?.getItem !== 'function') {
     return null;
@@ -200,7 +204,14 @@ export function App() {
     if (!publicTour) {
       return <main className="layout">Загружаем тур...</main>;
     }
-    return <GlbTourViewer engine={viewerEngine} sceneUrl={publicTour.viewer_config.scene_url} title={publicTour.property.title} />;
+    return (
+      <GlbTourViewer
+        engine={viewerEngine}
+        fallbackUrl={fallbackRendererUrl(tourSlug)}
+        sceneUrl={publicTour.viewer_config.scene_url}
+        title={publicTour.property.title}
+      />
+    );
   }
 
   if (propertyId) {

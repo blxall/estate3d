@@ -74,6 +74,12 @@ async function main() {
     }
     await page.getByText('GLB scene · PlayCanvas runtime').waitFor();
     await page.getByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first').waitFor();
+    const fallbackLink = page.getByRole('link', { name: /open fallback renderer/i });
+    await fallbackLink.waitFor();
+    const fallbackLinkHref = await fallbackLink.getAttribute('href');
+    if (fallbackLinkHref !== fallbackRoutePath) {
+      throw new Error(`expected fallback link ${fallbackRoutePath}, got ${fallbackLinkHref ?? 'missing'}`);
+    }
     await page.getByText(sceneUrl).waitFor();
     await page.getByText(expectedLoadedStatus).waitFor({ timeout: 10_000 });
 
@@ -127,6 +133,7 @@ async function main() {
           ok: true,
           url: `${baseUrl}${routePath}`,
           fallbackUrl: `${baseUrl}${fallbackRoutePath}`,
+          fallbackLinkHref,
           sceneUrl: `${baseUrl}${sceneUrl}`,
           status: expectedLoadedStatus,
           fallbackEngine,

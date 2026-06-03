@@ -10,7 +10,7 @@ afterEach(() => {
 
 describe('GlbTourViewer', () => {
   it('renders viewer shell controls with PlayCanvas as the GLB default', () => {
-    render(<GlbTourViewer sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
+    render(<GlbTourViewer fallbackUrl="/tour/api-slug?engine=r3f" sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
 
     expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
     expect(screen.getByText('Шоурум')).toBeInTheDocument();
@@ -22,6 +22,13 @@ describe('GlbTourViewer', () => {
       screen.getByText('accepted warnings: playcanvas-lazy-chunk-over-700kb, vite-node-worker-threads-externalized-for-gsplat-workers'),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
+    expect(screen.getByRole('link', { name: /open fallback renderer/i })).toHaveAttribute(
+      'href',
+      '/tour/api-slug?engine=r3f',
+    );
+    expect(screen.getByText(/trouble loading\?/i)).toHaveTextContent(
+      'Trouble loading? Open fallback renderer with R3F',
+    );
     expect(screen.getByRole('button', { name: /fullscreen/i })).toBeInTheDocument();
     expect(screen.getByText('/storage/properties/prop_1/scene.glb')).toBeInTheDocument();
   });
@@ -40,12 +47,13 @@ describe('GlbTourViewer', () => {
   });
 
   it('can opt into the R3F fallback without changing the public tour shell', async () => {
-    render(<GlbTourViewer engine="r3f" sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
+    render(<GlbTourViewer engine="r3f" fallbackUrl="/tour/api-slug?engine=r3f" sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
 
     expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'r3f');
     expect(screen.getByText('GLB scene · Orbit controls')).toBeInTheDocument();
     expect(await screen.findByText('Renderer: Three.js/R3F · explicit fallback · GLB-first')).toBeInTheDocument();
     expect(screen.queryByRole('note', { name: /playcanvas spike validation/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /open fallback renderer/i })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
   });
 });

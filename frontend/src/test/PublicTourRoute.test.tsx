@@ -43,6 +43,10 @@ describe('public tour route', () => {
     expect(await screen.findByText('Публичный API тур')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
     expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /open fallback renderer/i })).toHaveAttribute(
+      'href',
+      '/tour/api-slug?engine=r3f',
+    );
     expect(screen.getByText('/storage/properties/prop_1/scene.glb')).toBeInTheDocument();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/tour/api-slug'));
   });
@@ -78,6 +82,7 @@ describe('public tour route', () => {
     expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'r3f');
     expect(screen.getByText('GLB scene · Orbit controls')).toBeInTheDocument();
     expect(await screen.findByText('Renderer: Three.js/R3F · explicit fallback · GLB-first')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /open fallback renderer/i })).not.toBeInTheDocument();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/tour/api-slug'));
   });
 });
