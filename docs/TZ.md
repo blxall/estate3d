@@ -152,6 +152,19 @@ MVP не обещает инженерную CAD/БТИ-точность. MVP о
 
 Estate3D должен развиваться не просто как сайт с 3D-туром, а как premium real estate visualization platform: интерактивная 3D-продажная платформа для ЖК, корпусов, этажей, квартир и видов из окон.
 
+### Дизайн-направление и качество визуала
+
+Estate3D должен выглядеть как современный premium real-estate / architectural showroom, а не как debug/admin dashboard. Визуальная разработка должна опираться на качественные актуальные референсы и дизайн-системные правила, а не на поверхностную смену цветов.
+
+Обязательные ориентиры:
+
+1. `DESIGN.md` / дизайн-токены — использовать как будущий источник дизайн-системы проекта: цвета, типографика, spacing, radius, elevation, компоненты, do/don'ts и WCAG-контраст должны быть описаны явно, чтобы frontend-агенты и разработчики не импровизировали каждый раз заново.
+2. `styles.refero.design` — использовать как постоянный банк актуальных визуальных направлений. Перед крупными UI/visual milestone нужно смотреть подходящие Refero-style страницы и разбирать не только палитру, но и структуру: hero composition, image/model usage, overlay logic, typography rhythm, density, interaction affordances, mobile behavior.
+3. При переносе референса запрещено ограничиваться recolor/gamma pass. Если референс построен на full-bleed 3D/visual background, editorial overlay и floating UI, Estate3D должен повторять именно структуру страницы, а уже потом адаптировать контент и интерактивность.
+4. Customer-facing surface не должен показывать debug/readout strings (`Deep link`, raw `viewerState`, `R3F-ready`, camera diagnostics, mesh labels). Такие данные можно сохранять семантически в DOM для тестов/a11y, но визуально они должны быть скрыты или заменены на sales/customer-facing copy.
+5. После каждого визуального slice обязательны desktop/mobile screenshots и честный visual audit: hierarchy, contrast, clipping, clutter, reference match, mobile fit, отсутствие technical leakage.
+6. Основная текущая direction после Refero-разбора: warm editorial real-estate showroom. База — Incommonwith; механика floating/frosted HUD — General Intelligence Company; дисциплина hairline/minimal UI — Stykka. Следующие итерации должны усиливать не только shell, но и качество 3D/hero visual source.
+
 ### Целевой пользовательский сценарий
 
 1. Покупатель открывает публичную страницу ЖК.

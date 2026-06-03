@@ -103,7 +103,7 @@ describe('Premium development viewer route', () => {
 
     expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
     expect(container.querySelector('.development-viewer')).toHaveClass('reference-full-bleed-site', 'visual-first-property-page');
-    expect(screen.getByRole('img', { name: 'Фотореалистичный 3D фон Estate3D Skyline' })).toHaveAttribute('src', '/demo/editorial-development-background.svg');
+    expect(screen.getByRole('img', { name: 'Фотореалистичный 3D фон Estate3D Skyline' })).toHaveAttribute('src', '/demo/editorial-development-hero.jpg');
     expect(container.querySelector('.reference-landing-screen')).toHaveClass('full-bleed-3d-background', 'reference-layout-copy');
     expect(container.querySelector('.reference-visual-backdrop')).toHaveClass('source-backed-3d-image');
     expect(container.querySelector('.reference-copy-panel')).toHaveClass('editorial-copy-overlay', 'image-led-caption-panel');

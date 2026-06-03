@@ -190,7 +190,7 @@ export function DevelopmentViewer({ development }: Props) {
     <main className={`${showroomDirection.pageClass} reference-full-bleed-site visual-first-property-page design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
       <section className="reference-landing-screen full-bleed-3d-background reference-layout-copy" aria-label="Estate3D reference-style visual landing">
         <div className="reference-visual-backdrop source-backed-3d-image">
-          <img src="/demo/editorial-development-background.svg" alt="Фотореалистичный 3D фон Estate3D Skyline" />
+          <img src="/demo/editorial-development-hero.jpg" alt="Фотореалистичный 3D фон Estate3D Skyline" />
         </div>
         <div className="reference-ambient-layer" aria-hidden="true" />
 
