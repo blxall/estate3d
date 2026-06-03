@@ -114,8 +114,10 @@ async function main() {
       throw new Error(`viewer/canvas size invalid after resize: ${JSON.stringify(layout)}`);
     }
 
-    await page.goto(`${baseUrl}${fallbackRoutePath}`, { waitUntil: 'networkidle' });
+    await fallbackLink.click();
+    await page.waitForURL(`${baseUrl}${fallbackRoutePath}`);
     await page.getByRole('region', { name: /3d viewer/i }).waitFor();
+    const fallbackNavigationUrl = page.url();
     const fallbackEngine = await page.getByRole('region', { name: /3d viewer/i }).getAttribute('data-viewer-engine');
     if (fallbackEngine !== 'r3f') {
       throw new Error(`expected R3F fallback engine, got ${fallbackEngine ?? 'missing'}`);
@@ -134,6 +136,7 @@ async function main() {
           url: `${baseUrl}${routePath}`,
           fallbackUrl: `${baseUrl}${fallbackRoutePath}`,
           fallbackLinkHref,
+          fallbackNavigationUrl,
           sceneUrl: `${baseUrl}${sceneUrl}`,
           status: expectedLoadedStatus,
           fallbackEngine,

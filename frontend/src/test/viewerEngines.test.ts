@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
+  buildFallbackRendererUrl,
   getViewerEngineConfig,
   playCanvasSmokeFixture,
   resolveViewerEngineFromSearch,
@@ -29,6 +30,14 @@ describe('viewer engine adapter boundary', () => {
       publicTourDefault: false,
       validationStatus: 'production',
     });
+  });
+
+  it('builds resilient fallback renderer URLs by replacing malformed engine queries and preserving campaign params', () => {
+    expect(buildFallbackRendererUrl('api-slug', '')).toBe('/tour/api-slug?engine=r3f');
+    expect(buildFallbackRendererUrl('api slug', '?engine=bad&utm=broker')).toBe('/tour/api%20slug?utm=broker&engine=r3f');
+    expect(buildFallbackRendererUrl('api-slug', '?utm=broker&engine=playcanvas&view=mobile')).toBe(
+      '/tour/api-slug?utm=broker&view=mobile&engine=r3f',
+    );
   });
 
   it('documents renderer capabilities and validation risks separately from CTA/domain logic', () => {

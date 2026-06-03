@@ -85,4 +85,40 @@ describe('public tour route', () => {
     expect(screen.queryByRole('link', { name: /open fallback renderer/i })).not.toBeInTheDocument();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/tour/api-slug'));
   });
+
+  it('falls back to PlayCanvas for malformed engine queries while keeping a clean R3F fallback switch', async () => {
+    window.history.pushState({}, '', '/tour/api-slug?engine=bad&utm=broker');
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        property: {
+          id: 'prop_1',
+          title: 'Публичный API тур',
+          property_type: 'apartment',
+          status: 'ready',
+          public_slug: 'api-slug',
+          is_public: true,
+        },
+        tour: {
+          id: 'tour_1',
+          property_id: 'prop_1',
+          tour_type: 'glb_model',
+          scene_url: '/storage/properties/prop_1/scene.glb',
+          public_url: '/tour/api-slug',
+        },
+        viewer_config: { tour_type: 'glb_model', scene_url: '/storage/properties/prop_1/scene.glb' },
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+
+    expect(await screen.findByText('Публичный API тур')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
+    expect(screen.getByRole('link', { name: /open fallback renderer/i })).toHaveAttribute(
+      'href',
+      '/tour/api-slug?utm=broker&engine=r3f',
+    );
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/tour/api-slug'));
+  });
 });

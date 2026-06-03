@@ -7,7 +7,7 @@ import { GlbTourViewer } from './components/GlbTourViewer';
 import { PropertyDashboard } from './components/PropertyDashboard';
 import { PropertyDetailPage } from './components/PropertyDetailPage';
 import type { AuthPayload, AuthResponse, DevelopmentViewerPayload, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
-import { resolveViewerEngineFromSearch } from './viewerEngines';
+import { buildFallbackRendererUrl, resolveViewerEngineFromSearch } from './viewerEngines';
 import type { ViewerEngine } from './viewerEngines';
 
 const demoProperties: PropertySummary[] = [
@@ -41,10 +41,6 @@ function currentDevelopmentViewerSlug(): string | null {
 
 function currentViewerEngine(): ViewerEngine {
   return resolveViewerEngineFromSearch(window.location.search);
-}
-
-function fallbackRendererUrl(slug: string): string {
-  return `/tour/${encodeURIComponent(slug)}?engine=r3f`;
 }
 
 function readStoredToken(): string | null {
@@ -207,7 +203,7 @@ export function App() {
     return (
       <GlbTourViewer
         engine={viewerEngine}
-        fallbackUrl={fallbackRendererUrl(tourSlug)}
+        fallbackUrl={buildFallbackRendererUrl(tourSlug, window.location.search)}
         sceneUrl={publicTour.viewer_config.scene_url}
         title={publicTour.property.title}
       />

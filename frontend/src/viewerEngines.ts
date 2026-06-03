@@ -80,3 +80,10 @@ export function resolveViewerEngineFromSearch(search: string): ViewerEngine {
   }
   return getDefaultPublicTourEngine();
 }
+
+export function buildFallbackRendererUrl(slug: string, search: string): string {
+  const params = new URLSearchParams(search);
+  params.delete('engine');
+  params.append('engine', 'r3f');
+  return `/tour/${encodeURIComponent(slug)}?${params.toString()}`;
+}
