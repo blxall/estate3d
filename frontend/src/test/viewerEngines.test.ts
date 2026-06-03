@@ -5,21 +5,25 @@ import { join } from 'node:path';
 import { getViewerEngineConfig, playCanvasSmokeFixture, resolveViewerEngineFromSearch, viewerEngineOptions } from '../viewerEngines';
 
 describe('viewer engine adapter boundary', () => {
-  it('keeps R3F as the production default when no query flag is present', () => {
-    expect(resolveViewerEngineFromSearch('')).toBe('r3f');
-    expect(resolveViewerEngineFromSearch('?foo=bar')).toBe('r3f');
-    expect(getViewerEngineConfig('r3f')).toMatchObject({
-      id: 'r3f',
-      label: 'Orbit controls',
-      publicTourDefault: true,
-    });
-  });
-
-  it('enables PlayCanvas only through the explicit public tour query flag', () => {
+  it('uses PlayCanvas as the public/uploaded GLB default while preserving the R3F fallback query flag', () => {
+    expect(resolveViewerEngineFromSearch('')).toBe('playcanvas');
+    expect(resolveViewerEngineFromSearch('?foo=bar')).toBe('playcanvas');
     expect(resolveViewerEngineFromSearch('?engine=playcanvas')).toBe('playcanvas');
     expect(resolveViewerEngineFromSearch('?engine=PLAYCANVAS')).toBe('playcanvas');
     expect(resolveViewerEngineFromSearch('?engine=r3f')).toBe('r3f');
-    expect(resolveViewerEngineFromSearch('?engine=unknown')).toBe('r3f');
+    expect(resolveViewerEngineFromSearch('?engine=unknown')).toBe('playcanvas');
+    expect(getViewerEngineConfig('playcanvas')).toMatchObject({
+      id: 'playcanvas',
+      label: 'PlayCanvas runtime',
+      publicTourDefault: true,
+      validationStatus: 'production',
+    });
+    expect(getViewerEngineConfig('r3f')).toMatchObject({
+      id: 'r3f',
+      label: 'Orbit controls',
+      publicTourDefault: false,
+      validationStatus: 'production',
+    });
   });
 
   it('documents renderer capabilities and validation risks separately from CTA/domain logic', () => {
@@ -28,8 +32,8 @@ describe('viewer engine adapter boundary', () => {
       id: 'playcanvas',
       label: 'PlayCanvas runtime',
       readout: 'Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first',
-      publicTourDefault: false,
-      validationStatus: 'spike',
+      publicTourDefault: true,
+      validationStatus: 'production',
     });
     expect(getViewerEngineConfig('playcanvas').riskNotes).toContain('large-lazy-chunk');
     expect(getViewerEngineConfig('playcanvas').smokeChecklist).toEqual([

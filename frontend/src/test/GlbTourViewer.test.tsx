@@ -9,12 +9,12 @@ afterEach(() => {
 });
 
 describe('GlbTourViewer', () => {
-  it('renders viewer shell controls while the heavy Three.js scene is lazy-loaded', () => {
+  it('renders viewer shell controls with PlayCanvas as the GLB default', () => {
     render(<GlbTourViewer sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
 
-    expect(screen.getByRole('region', { name: /3d viewer/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
     expect(screen.getByText('Шоурум')).toBeInTheDocument();
-    expect(screen.getByText(/orbit controls/i)).toBeInTheDocument();
+    expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
     expect(screen.getByRole('button', { name: /fullscreen/i })).toBeInTheDocument();
     expect(screen.getByText('/storage/properties/prop_1/scene.glb')).toBeInTheDocument();
@@ -33,15 +33,13 @@ describe('GlbTourViewer', () => {
     expect(requestFullscreen).toHaveBeenCalledOnce();
   });
 
-  it('can opt into the PlayCanvas runtime without changing the public tour shell', async () => {
-    render(<GlbTourViewer engine="playcanvas" sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
+  it('can opt into the R3F fallback without changing the public tour shell', async () => {
+    render(<GlbTourViewer engine="r3f" sceneUrl="/storage/properties/prop_1/scene.glb" title="Шоурум" />);
 
-    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
-    expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
-    expect(await screen.findByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first')).toBeInTheDocument();
-    expect(screen.getByRole('note', { name: /playcanvas spike validation/i })).toBeInTheDocument();
-    expect(screen.getByText('real-glb-loads-or-fallback-is-visible')).toBeInTheDocument();
-    expect(screen.getByText('large-lazy-chunk')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'r3f');
+    expect(screen.getByText('GLB scene · Orbit controls')).toBeInTheDocument();
+    expect(await screen.findByText('Renderer: Three.js/R3F · explicit fallback · GLB-first')).toBeInTheDocument();
+    expect(screen.queryByRole('note', { name: /playcanvas spike validation/i })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
   });
 });

@@ -41,13 +41,14 @@ describe('public tour route', () => {
     render(<App />);
 
     expect(await screen.findByText('Публичный API тур')).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: /3d viewer/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
+    expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
     expect(screen.getByText('/storage/properties/prop_1/scene.glb')).toBeInTheDocument();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/tour/api-slug'));
   });
 
-  it('enables a PlayCanvas public tour spike with a query flag', async () => {
-    window.history.pushState({}, '', '/tour/api-slug?engine=playcanvas');
+  it('keeps R3F available as an explicit public tour fallback query flag', async () => {
+    window.history.pushState({}, '', '/tour/api-slug?engine=r3f');
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -74,9 +75,9 @@ describe('public tour route', () => {
     render(<App />);
 
     expect(await screen.findByText('Публичный API тур')).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
-    expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
-    expect(await screen.findByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'r3f');
+    expect(screen.getByText('GLB scene · Orbit controls')).toBeInTheDocument();
+    expect(await screen.findByText('Renderer: Three.js/R3F · explicit fallback · GLB-first')).toBeInTheDocument();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/tour/api-slug'));
   });
 });

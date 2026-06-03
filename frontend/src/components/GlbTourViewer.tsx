@@ -1,6 +1,6 @@
 import { lazy, Suspense, useRef } from 'react';
 
-import { getViewerEngineConfig } from '../viewerEngines';
+import { getDefaultPublicTourEngine, getViewerEngineConfig } from '../viewerEngines';
 import type { ViewerEngine } from '../viewerEngines';
 
 const ThreeGlbScene = lazy(() => import('./ThreeGlbScene').then((module) => ({ default: module.ThreeGlbScene })));
@@ -14,7 +14,7 @@ type Props = {
   engine?: ViewerEngine;
 };
 
-export function GlbTourViewer({ sceneUrl, title, engine = 'r3f' }: Props) {
+export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEngine() }: Props) {
   const canvasRootRef = useRef<HTMLDivElement | null>(null);
   const engineConfig = getViewerEngineConfig(engine);
   const SceneComponent = engine === 'playcanvas' ? PlayCanvasGlbScene : ThreeGlbScene;

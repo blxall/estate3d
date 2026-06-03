@@ -3,7 +3,7 @@ import { createServer } from 'vite';
 
 const publicSlug = 'playcanvas-smoke';
 const sceneUrl = '/playcanvas-smoke.glb';
-const routePath = `/tour/${publicSlug}?engine=playcanvas`;
+const routePath = `/tour/${publicSlug}`;
 const expectedLoadedStatus = 'PlayCanvas GLB сцена загружена';
 
 function publicTourPayload(baseUrl) {
@@ -67,9 +67,12 @@ async function main() {
   try {
     await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'networkidle' });
     await page.getByRole('region', { name: /3d viewer/i }).waitFor();
+    const selectedEngine = await page.getByRole('region', { name: /3d viewer/i }).getAttribute('data-viewer-engine');
+    if (selectedEngine !== 'playcanvas') {
+      throw new Error(`expected PlayCanvas default engine, got ${selectedEngine ?? 'missing'}`);
+    }
     await page.getByText('GLB scene · PlayCanvas runtime').waitFor();
     await page.getByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first').waitFor();
-    await page.getByRole('note', { name: /playcanvas spike validation/i }).waitFor();
     await page.getByText(sceneUrl).waitFor();
     await page.getByText(expectedLoadedStatus).waitFor({ timeout: 10_000 });
 
