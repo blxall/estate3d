@@ -1,0 +1,41 @@
+import { describe, expect, it } from 'vitest';
+
+import { getViewerEngineConfig, resolveViewerEngineFromSearch, viewerEngineOptions } from '../viewerEngines';
+
+describe('viewer engine adapter boundary', () => {
+  it('keeps R3F as the production default when no query flag is present', () => {
+    expect(resolveViewerEngineFromSearch('')).toBe('r3f');
+    expect(resolveViewerEngineFromSearch('?foo=bar')).toBe('r3f');
+    expect(getViewerEngineConfig('r3f')).toMatchObject({
+      id: 'r3f',
+      label: 'Orbit controls',
+      publicTourDefault: true,
+    });
+  });
+
+  it('enables PlayCanvas only through the explicit public tour query flag', () => {
+    expect(resolveViewerEngineFromSearch('?engine=playcanvas')).toBe('playcanvas');
+    expect(resolveViewerEngineFromSearch('?engine=PLAYCANVAS')).toBe('playcanvas');
+    expect(resolveViewerEngineFromSearch('?engine=r3f')).toBe('r3f');
+    expect(resolveViewerEngineFromSearch('?engine=unknown')).toBe('r3f');
+  });
+
+  it('documents renderer capabilities and validation risks separately from CTA/domain logic', () => {
+    expect(viewerEngineOptions).toHaveLength(2);
+    expect(getViewerEngineConfig('playcanvas')).toMatchObject({
+      id: 'playcanvas',
+      label: 'PlayCanvas runtime',
+      readout: 'Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first',
+      publicTourDefault: false,
+      validationStatus: 'spike',
+    });
+    expect(getViewerEngineConfig('playcanvas').riskNotes).toContain('large-lazy-chunk');
+    expect(getViewerEngineConfig('playcanvas').smokeChecklist).toEqual([
+      'real-glb-loads-or-fallback-is-visible',
+      'resize-keeps-canvas-usable',
+      'fullscreen-targets-viewer-root',
+      'mobile-viewport-has-no-horizontal-overflow',
+      'console-has-no-runtime-errors',
+    ]);
+  });
+});

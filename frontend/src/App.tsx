@@ -7,6 +7,8 @@ import { GlbTourViewer } from './components/GlbTourViewer';
 import { PropertyDashboard } from './components/PropertyDashboard';
 import { PropertyDetailPage } from './components/PropertyDetailPage';
 import type { AuthPayload, AuthResponse, DevelopmentViewerPayload, PropertyAnalytics, PropertyCreatePayload, PropertySummary, PublicTourPayload, TourSummary, UploadedMedia, UserAccount } from './types';
+import { resolveViewerEngineFromSearch } from './viewerEngines';
+import type { ViewerEngine } from './viewerEngines';
 
 const demoProperties: PropertySummary[] = [
   {
@@ -37,8 +39,8 @@ function currentDevelopmentViewerSlug(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-function currentViewerEngine(): 'r3f' | 'playcanvas' {
-  return new URLSearchParams(window.location.search).get('engine') === 'playcanvas' ? 'playcanvas' : 'r3f';
+function currentViewerEngine(): ViewerEngine {
+  return resolveViewerEngineFromSearch(window.location.search);
 }
 
 function readStoredToken(): string | null {

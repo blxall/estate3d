@@ -1,11 +1,12 @@
 import { lazy, Suspense, useRef } from 'react';
 
+import { getViewerEngineConfig } from '../viewerEngines';
+import type { ViewerEngine } from '../viewerEngines';
+
 const ThreeGlbScene = lazy(() => import('./ThreeGlbScene').then((module) => ({ default: module.ThreeGlbScene })));
 const PlayCanvasGlbScene = lazy(() =>
   import('./PlayCanvasGlbScene').then((module) => ({ default: module.PlayCanvasGlbScene })),
 );
-
-type ViewerEngine = 'r3f' | 'playcanvas';
 
 type Props = {
   sceneUrl: string;
@@ -15,7 +16,7 @@ type Props = {
 
 export function GlbTourViewer({ sceneUrl, title, engine = 'r3f' }: Props) {
   const canvasRootRef = useRef<HTMLDivElement | null>(null);
-  const engineLabel = engine === 'playcanvas' ? 'PlayCanvas runtime' : 'Orbit controls';
+  const engineConfig = getViewerEngineConfig(engine);
   const SceneComponent = engine === 'playcanvas' ? PlayCanvasGlbScene : ThreeGlbScene;
 
   function requestFullscreen() {
@@ -27,7 +28,7 @@ export function GlbTourViewer({ sceneUrl, title, engine = 'r3f' }: Props) {
       <div className="viewer-header">
         <div>
           <h2>{title}</h2>
-          <span>GLB scene · {engineLabel}</span>
+          <span>GLB scene · {engineConfig.label}</span>
         </div>
         <div className="viewer-actions">
           <a href={sceneUrl} target="_blank" rel="noreferrer">
@@ -43,6 +44,28 @@ export function GlbTourViewer({ sceneUrl, title, engine = 'r3f' }: Props) {
           <SceneComponent sceneUrl={sceneUrl} />
         </Suspense>
       </div>
+      <p className="viewer-engine-readout">{engineConfig.readout}</p>
+      {engineConfig.validationStatus === 'spike' ? (
+        <aside className="viewer-engine-diagnostics" role="note" aria-label="PlayCanvas spike validation">
+          <strong>PlayCanvas spike validation</strong>
+          <div>
+            <span>Smoke checklist</span>
+            <ul>
+              {engineConfig.smokeChecklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <span>Risk notes</span>
+            <ul>
+              {engineConfig.riskNotes.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      ) : null}
       <p className="scene-url">{sceneUrl}</p>
     </section>
   );

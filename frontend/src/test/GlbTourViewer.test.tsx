@@ -39,6 +39,9 @@ describe('GlbTourViewer', () => {
     expect(screen.getByRole('region', { name: /3d viewer/i })).toHaveAttribute('data-viewer-engine', 'playcanvas');
     expect(screen.getByText('GLB scene · PlayCanvas runtime')).toBeInTheDocument();
     expect(await screen.findByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first')).toBeInTheDocument();
+    expect(screen.getByRole('note', { name: /playcanvas spike validation/i })).toBeInTheDocument();
+    expect(screen.getByText('real-glb-loads-or-fallback-is-visible')).toBeInTheDocument();
+    expect(screen.getByText('large-lazy-chunk')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /открыть glb/i })).toHaveAttribute('href', '/storage/properties/prop_1/scene.glb');
   });
 });

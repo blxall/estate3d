@@ -108,7 +108,6 @@ export function PlayCanvasGlbScene({ sceneUrl }: Props) {
     <>
       <div className="viewer-canvas-inner playcanvas-canvas-inner" ref={mountRef} />
       <p className="viewer-status">{status}</p>
-      <p className="viewer-engine-readout">Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first</p>
     </>
   );
 }
