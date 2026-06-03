@@ -7,11 +7,9 @@ type Props = {
 export function WalkModePanel({ viewpoint }: Props) {
   return (
     <div className="walk-mode-card">
-      <p className="eyebrow">Walk mode</p>
-      <h3>Walk mode: {viewpoint.label}</h3>
-      <p>
-        Камера: {viewpoint.position.x}, {viewpoint.position.y}, {viewpoint.position.z} → target {viewpoint.target.x}, {viewpoint.target.y}, {viewpoint.target.z}
-      </p>
+      <p className="eyebrow">Прогулка по квартире</p>
+      <h3>{viewpoint.label}</h3>
+      <p>Открыт обзор комнаты. Можно продолжить к виду из окна или передать этот контекст менеджеру.</p>
     </div>
   );
 }
