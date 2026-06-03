@@ -68,7 +68,7 @@ export function ViewerHud({
   const leadHandoffDigest = buildLeadHandoffDigest({ leadContext, interactionTrail, managerFollowUp, brokerScript, shareHandoff, selectedUnit });
 
   return (
-    <aside className={`${responsiveHud.hudClass} sales-hud warm-sales-hud`}>
+    <aside className={`${responsiveHud.hudClass} sales-hud warm-sales-hud curated-sales-panel`}>
       <p className="responsive-hud-readout">{responsiveHud.label}</p>
       <p className="eyebrow">{building.name}</p>
       <h2>{selectedFloor ? selectedFloor.label : 'Выберите этаж'}</h2>
@@ -86,7 +86,7 @@ export function ViewerHud({
         <div className="unit-list">
           {unitCards.map(({ unit, card }) => (
             <button key={unit.id} type="button" onClick={() => onChooseUnit(unit)} className={selectedUnit?.id === unit.id ? 'active' : ''} aria-label={card.ariaLabel}>
-              <span>Unit card: {card.title} · {card.subtitle} · {card.statusBadge}</span>
+              <span data-customer-label={`${card.title} · ${card.subtitle}`}>Unit card: {card.title} · {card.subtitle} · {card.statusBadge}</span>
               <small className={`unit-status ${card.statusTone}`}>{card.statusBadge}</small>
               <small>{card.availabilityCopy}</small>
               {card.selectedLabel && <strong>{card.selectedLabel}</strong>}

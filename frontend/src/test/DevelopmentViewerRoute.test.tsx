@@ -102,7 +102,7 @@ describe('Premium development viewer route', () => {
     const { container } = render(<App />);
 
     expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
-    expect(container.querySelector('.development-viewer')).toHaveClass('design-system-modern', 'premium-real-estate-showroom');
+    expect(container.querySelector('.development-viewer')).toHaveClass('design-system-modern', 'premium-real-estate-showroom', 'design-audit-clean');
     expect(screen.getByRole('navigation', { name: 'Estate3D showroom navigation' })).toHaveClass('showroom-nav', 'apple-linear-glass');
     expect(screen.getByText('Estate3D')).toHaveClass('showroom-brand-mark');
     expect(screen.getByText('Live showroom')).toHaveClass('showroom-nav-pill');
@@ -112,10 +112,10 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Общий вид комплекса')).toHaveClass('showroom-title');
     expect(screen.getByText('Выберите подсвеченный этаж, чтобы перейти к квартирам и виду из окна.')).toHaveClass('showroom-copy');
     expect(container.querySelector('.viewer-stage')).toHaveClass('viewer-stage', 'scene-composition');
-    expect(container.querySelector('.viewer-scene')).toHaveClass('viewer-scene', 'immersive-model-card', 'warm-gallery-card');
-    expect(container.querySelector('.viewer-hud')).toHaveClass('sales-hud', 'warm-sales-hud');
+    expect(container.querySelector('.viewer-scene')).toHaveClass('viewer-scene', 'immersive-model-card', 'warm-gallery-card', 'showroom-stage-balanced');
+    expect(container.querySelector('.viewer-hud')).toHaveClass('sales-hud', 'warm-sales-hud', 'curated-sales-panel');
     expect(container.querySelector('.r3f-scene-shell')).toHaveClass('warm-model-shell');
-    expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed', 'diagnostics-minimized');
+    expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed', 'diagnostics-minimized', 'visually-demoted-readouts');
     await screen.findByText('Camera frame: overview');
     expect(container.querySelector('.r3f-camera-readout')).toHaveClass('technical-readout', 'collapsed-diagnostics', 'diagnostic-chip');
   });
@@ -131,9 +131,9 @@ describe('Premium development viewer route', () => {
     const stage = container.querySelector('.viewer-stage');
     const children = Array.from(stage?.children ?? []);
     expect(children.map((child) => (child as HTMLElement).className)).toEqual([
-      'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized',
-      'viewer-scene immersive-model-card warm-gallery-card',
-      'viewer-hud desktop-panel sales-hud warm-sales-hud',
+      'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts',
+      'viewer-scene immersive-model-card warm-gallery-card showroom-stage-balanced',
+      'viewer-hud desktop-panel sales-hud warm-sales-hud curated-sales-panel',
     ]);
     expect(container.querySelector('.viewer-stage-readouts .deep-link-readout')).toHaveTextContent('Deep link: overview fallback');
     expect(container.querySelector('.viewer-stage-readouts .share-link-readout')).toHaveTextContent('Share link: /developments/demo-premium/viewer?view=development_overview');

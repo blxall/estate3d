@@ -186,7 +186,7 @@ export function DevelopmentViewer({ development }: Props) {
   }
 
   return (
-    <main className={`development-viewer design-system-modern premium-real-estate-showroom state-${viewerState}`}>
+    <main className={`development-viewer design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
       <nav className="showroom-nav apple-linear-glass" aria-label="Estate3D showroom navigation">
         <div className="showroom-brand">
           <span className="showroom-brand-mark">Estate3D</span>
@@ -222,7 +222,7 @@ export function DevelopmentViewer({ development }: Props) {
       </section>
 
       <section className={`${responsiveStage.stageClass} scene-composition`} aria-label="Интерактивная 3D сцена ЖК">
-        <div className="viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized" aria-label="Premium viewer state and share readouts">
+        <div className="viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts" aria-label="Premium viewer state and share readouts">
           <p className="deep-link-readout">{deepLinkState.label}</p>
           <p className="share-link-readout">Share link: {shareLink}</p>
           <div className="analytics-readout" aria-label="Premium viewer analytics readout">

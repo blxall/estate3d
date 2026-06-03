@@ -35,7 +35,7 @@ export function ViewerScene({
   const cameraMessage = cameraMessageForState({ viewerState, selectedFloor, selectedUnit, selectedViewpoint, activeWindow });
 
   return (
-    <div className="viewer-scene immersive-model-card warm-gallery-card">
+    <div className="viewer-scene immersive-model-card warm-gallery-card showroom-stage-balanced">
       <div className="showroom-overlay" aria-label="Коммерческий сценарий просмотра">
         <span className="showroom-step">ЖК → корпус → этаж → квартира</span>
         <strong className="showroom-title">{selectedFloor ? selectedFloor.label : 'Общий вид комплекса'}</strong>
