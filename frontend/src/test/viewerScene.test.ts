@@ -16,6 +16,7 @@ import {
   buildGroupedLeadExportFields,
   buildCrmExportAction,
   buildCrmCopyIntentSummary,
+  buildEditorialShowroomDirection,
   buildMobileCrmHandoffState,
   buildMaterialTheme,
   buildResponsiveHudState,
@@ -215,6 +216,32 @@ describe('viewer scene adapter', () => {
     });
     expect(buildMaterialTheme({ kind: 'room' })).toMatchObject({ color: '#c9b79c', opacity: 0.78, label: 'Material room: walkthrough warm-stone' });
     expect(buildMaterialTheme({ kind: 'window-hotspot' })).toMatchObject({ color: '#d9824b', opacity: 0.88, label: 'Material window-hotspot: sunset warm-view' });
+  });
+
+  it('describes selected reference mix as a warm editorial real-estate showroom direction', () => {
+    expect(buildEditorialShowroomDirection()).toEqual({
+      directionName: 'Warm editorial real-estate showroom',
+      pageClass: 'development-viewer editorial-atelier-showroom incommonwith-direction frosted-hud-discipline scandi-hairline-discipline',
+      heroClass: 'viewer-hero editorial-hero cream-paper-hero oxblood-ink-hero',
+      sceneClass: 'viewer-scene immersive-model-card editorial-model-stage frosted-atmosphere-stage',
+      hudClass: 'viewer-hud desktop-panel sales-hud editorial-sales-panel linen-glass-hud',
+      diagnosticClass: 'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts editorial-diagnostics-band',
+      palette: {
+        paper: '#fafaf9',
+        ink: '#4a0a05',
+        linen: '#f8f7f1',
+        clay: '#a2827f',
+        glass: 'rgba(248, 247, 241, 0.74)',
+      },
+      references: [
+        'Incommonwith: cream paper + oxblood editorial atelier',
+        'General Intelligence Company: frosted floating HUD cards',
+        'Stykka: invisible UI, hairline borders, object-first restraint',
+      ],
+      headline: 'Warm editorial real-estate showroom',
+      stageLabel: 'Большая архитектурная сцена с лёгким редакционным HUD',
+      forbid: ['cold SaaS blue as primary accent', 'pure black admin slabs', 'visible debug-first labels'],
+    });
   });
 
   it('describes a premium 3D presentation layer with customer-facing labels instead of raw debug copy', () => {

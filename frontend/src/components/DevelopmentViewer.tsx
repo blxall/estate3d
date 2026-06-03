@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { submitDevelopmentLead } from '../api';
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewerPayload, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
-import { buildBrokerNextStepScript, buildLeadContextSummary, buildInteractionTrailSummary, buildLeadExportPayload, buildLeadHandoffDigest, buildLeadHandoffPersistenceState, buildLeadSuccessSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type CrmCopyIntentSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
+import { buildBrokerNextStepScript, buildEditorialShowroomDirection, buildLeadContextSummary, buildInteractionTrailSummary, buildLeadExportPayload, buildLeadHandoffDigest, buildLeadHandoffPersistenceState, buildLeadSuccessSummary, buildManagerFollowUpChecklist, buildResponsiveHudState, buildShareHandoffSummary, buildViewerAnalyticsEvent, buildViewerDeepLinkSearch, buildViewerDeepLinkState, buildViewerScene, type CrmCopyIntentSummary, type LeadCtaStatus, type LeadSuccessSummary, type ViewerAnalyticsAction, type ViewerState } from '../viewer/sceneAdapter';
 import { ViewerHud } from './ViewerHud';
 import { ViewerScene } from './ViewerScene';
 
@@ -39,6 +39,7 @@ export function DevelopmentViewer({ development }: Props) {
     hasSelectedUnit: Boolean(selectedUnit),
     hasLeadContext: Boolean(selectedUnit),
   });
+  const showroomDirection = useMemo(() => buildEditorialShowroomDirection(), []);
   const shareLink = `${typeof window === 'undefined' ? '/developments/demo-premium/viewer' : window.location.pathname}${buildViewerDeepLinkSearch({
     selectedFloor,
     selectedUnit,
@@ -186,7 +187,7 @@ export function DevelopmentViewer({ development }: Props) {
   }
 
   return (
-    <main className={`development-viewer design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
+    <main className={`${showroomDirection.pageClass} design-system-modern premium-real-estate-showroom design-audit-clean state-${viewerState}`}>
       <nav className="showroom-nav apple-linear-glass" aria-label="Estate3D showroom navigation">
         <div className="showroom-brand">
           <span className="showroom-brand-mark">Estate3D</span>
@@ -198,9 +199,11 @@ export function DevelopmentViewer({ development }: Props) {
           <span>Manager handoff</span>
         </div>
       </nav>
-      <section className="viewer-hero commercial-hero">
+      <section className={`${showroomDirection.heroClass} commercial-hero`}>
         <div className="hero-copy">
           <p className="eyebrow">Premium Interactive Development Viewer</p>
+          <p className="editorial-direction-label">{showroomDirection.headline}</p>
+          <p className="reference-mix-label">Incommonwith base · GIC HUD · Stykka discipline</p>
           <h1>{development.name}</h1>
           <p className="viewer-tagline">{development.hero.tagline}</p>
           <p>{development.hero.lead}</p>
@@ -222,7 +225,7 @@ export function DevelopmentViewer({ development }: Props) {
       </section>
 
       <section className={`${responsiveStage.stageClass} scene-composition`} aria-label="Интерактивная 3D сцена ЖК">
-        <div className="viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts" aria-label="Premium viewer state and share readouts">
+        <div className={showroomDirection.diagnosticClass} aria-label="Premium viewer state and share readouts">
           <p className="deep-link-readout">{deepLinkState.label}</p>
           <p className="share-link-readout">Share link: {shareLink}</p>
           <div className="analytics-readout" aria-label="Premium viewer analytics readout">

@@ -2853,3 +2853,185 @@ button {
     bottom: 18px;
   }
 }
+/* v3.34 Refero-selected warm editorial showroom direction */
+.development-viewer.editorial-atelier-showroom {
+  --showroom-bg: #fafaf9;
+  --showroom-ink: #4a0a05;
+  --showroom-muted: #7f625e;
+  --showroom-line: rgba(74, 10, 5, 0.16);
+  --showroom-card: rgba(248, 247, 241, 0.78);
+  --showroom-night: #2d1512;
+  --showroom-night-2: #4a0a05;
+  --showroom-gold: #a2827f;
+  --showroom-gold-soft: #f8f7f1;
+  --showroom-blue: #a2827f;
+  --showroom-shadow: rgba(74, 10, 5, 0.12) 0 28px 90px -44px;
+  background:
+    radial-gradient(circle at 12% -10%, rgba(162, 130, 127, 0.2), transparent 34%),
+    radial-gradient(circle at 82% 8%, rgba(188, 182, 166, 0.24), transparent 31%),
+    linear-gradient(180deg, #fafaf9 0%, #f8f7f1 49%, #eee9dd 100%);
+  color: #4a0a05;
+}
+
+.editorial-atelier-showroom .showroom-nav {
+  border-color: rgba(74, 10, 5, 0.14);
+  background: rgba(250, 250, 249, 0.72);
+  box-shadow: none;
+}
+
+.editorial-atelier-showroom .showroom-brand-mark,
+.editorial-atelier-showroom .hero-kpi-value,
+.editorial-atelier-showroom .viewer-hero h1 {
+  color: #4a0a05;
+}
+
+.editorial-atelier-showroom .showroom-nav-pill,
+.editorial-atelier-showroom button:not(.tower-floor):not(.r3f-floor-hitbox):not(.r3f-unit-hitbox):not(.r3f-room-hitbox):not(.r3f-window-hotspot) {
+  border: 1px solid rgba(74, 10, 5, 0.28);
+  background: #4a0a05;
+  color: #fafaf9 !important;
+  box-shadow: none;
+}
+
+.editorial-hero.cream-paper-hero {
+  border-color: rgba(74, 10, 5, 0.13);
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, rgba(250, 250, 249, 0.98), rgba(248, 247, 241, 0.78)),
+    radial-gradient(circle at 86% 30%, rgba(162, 130, 127, 0.14), transparent 34%);
+  box-shadow: none;
+}
+
+.editorial-direction-label,
+.reference-mix-label,
+.stage-direction-label {
+  margin: 0;
+  color: #4a0a05;
+  font-size: 0.72rem;
+  font-weight: 720;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.reference-mix-label {
+  color: #a2827f;
+  letter-spacing: 0.08em;
+}
+
+.editorial-model-stage.frosted-atmosphere-stage {
+  border: 1px solid rgba(74, 10, 5, 0.16);
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 48% 35%, rgba(250, 250, 249, 0.18), transparent 28%),
+    linear-gradient(180deg, #5b211b 0%, #351511 52%, #210f0d 100%);
+  box-shadow: none;
+}
+
+.editorial-model-stage .showroom-overlay,
+.linen-glass-hud,
+.editorial-atelier-showroom .glass-card,
+.editorial-atelier-showroom .hero-kpi-card {
+  border: 1px solid rgba(74, 10, 5, 0.14);
+  background: rgba(248, 247, 241, 0.74);
+  color: #4a0a05;
+  box-shadow: none;
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+.editorial-model-stage .showroom-title,
+.editorial-model-stage .showroom-step,
+.editorial-model-stage .showroom-copy,
+.editorial-model-stage .stage-direction-label {
+  color: #4a0a05;
+}
+
+.editorial-sales-panel.linen-glass-hud {
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(250, 250, 249, 0.86), rgba(248, 247, 241, 0.78)),
+    radial-gradient(circle at 100% 0%, rgba(162, 130, 127, 0.14), transparent 38%);
+}
+
+.editorial-sales-panel h2,
+.editorial-sales-panel h3,
+.editorial-sales-panel .eyebrow {
+  color: #4a0a05;
+}
+
+.editorial-diagnostics-band .deep-link-readout,
+.editorial-diagnostics-band .share-link-readout {
+  border-color: rgba(74, 10, 5, 0.16);
+  background: rgba(248, 247, 241, 0.72);
+  color: rgba(74, 10, 5, 0.72);
+}
+
+.editorial-model-stage .r3f-scene-shell {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(250, 250, 249, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(94, 39, 30, 0.92), rgba(36, 16, 14, 0.98));
+}
+
+.editorial-model-stage .r3f-customer-readout,
+.editorial-model-stage .r3f-presentation-labels span {
+  border-color: rgba(250, 250, 249, 0.24);
+  background: rgba(248, 247, 241, 0.78);
+  color: #4a0a05;
+  box-shadow: none;
+}
+
+@media (max-width: 760px) {
+  .editorial-hero.cream-paper-hero,
+  .editorial-model-stage.frosted-atmosphere-stage,
+  .editorial-sales-panel.linen-glass-hud {
+    border-radius: 0;
+  }
+
+  .editorial-direction-label,
+  .reference-mix-label,
+  .stage-direction-label {
+    font-size: 0.64rem;
+    letter-spacing: 0.09em;
+  }
+}
+
+/* v3.34 readability correction after screenshot audit */
+.editorial-atelier-showroom .editorial-sales-panel .unit-list button {
+  border: 1px solid rgba(74, 10, 5, 0.16);
+  background: rgba(250, 250, 249, 0.82) !important;
+  color: #4a0a05 !important;
+  box-shadow: none;
+}
+
+.editorial-atelier-showroom .editorial-sales-panel .unit-list button.active {
+  border-color: rgba(74, 10, 5, 0.32);
+  background: linear-gradient(135deg, rgba(248, 247, 241, 0.98), rgba(232, 222, 209, 0.88)) !important;
+}
+
+.editorial-atelier-showroom .editorial-sales-panel .unit-list button span,
+.editorial-atelier-showroom .editorial-sales-panel .unit-list button strong {
+  color: #4a0a05 !important;
+}
+
+.editorial-atelier-showroom .editorial-sales-panel .unit-list small {
+  color: #7f625e !important;
+}
+
+.editorial-atelier-showroom .editorial-sales-panel .unit-status {
+  color: #8d5f1f !important;
+}
+
+/* v3.34 remove customer-facing technical scene strings */
+.editorial-atelier-showroom .r3f-scene-meta::before {
+  content: "Архитектурная модель";
+  color: #4a0a05;
+}
+
+.editorial-atelier-showroom .r3f-scene-meta > span,
+.editorial-atelier-showroom .r3f-scene-meta > small {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

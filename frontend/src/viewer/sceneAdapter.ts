@@ -78,6 +78,26 @@ export type ScenePresentationState = {
   debugVisibleByDefault: boolean;
 };
 
+export type EditorialShowroomDirection = {
+  directionName: string;
+  pageClass: string;
+  heroClass: string;
+  sceneClass: string;
+  hudClass: string;
+  diagnosticClass: string;
+  palette: {
+    paper: string;
+    ink: string;
+    linen: string;
+    clay: string;
+    glass: string;
+  };
+  references: string[];
+  headline: string;
+  stageLabel: string;
+  forbid: string[];
+};
+
 export type AvailabilityState = {
   state: 'overview' | 'empty-floor' | 'floor-ready' | 'unit-ready' | 'no-walkthrough-media' | 'unavailable-unit';
   unitCount: number;
@@ -1078,6 +1098,32 @@ export function buildViewerScene(development: DevelopmentViewerPayload): ViewerS
   };
 }
 
+
+export function buildEditorialShowroomDirection(): EditorialShowroomDirection {
+  return {
+    directionName: 'Warm editorial real-estate showroom',
+    pageClass: 'development-viewer editorial-atelier-showroom incommonwith-direction frosted-hud-discipline scandi-hairline-discipline',
+    heroClass: 'viewer-hero editorial-hero cream-paper-hero oxblood-ink-hero',
+    sceneClass: 'viewer-scene immersive-model-card editorial-model-stage frosted-atmosphere-stage',
+    hudClass: 'viewer-hud desktop-panel sales-hud editorial-sales-panel linen-glass-hud',
+    diagnosticClass: 'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts editorial-diagnostics-band',
+    palette: {
+      paper: '#fafaf9',
+      ink: '#4a0a05',
+      linen: '#f8f7f1',
+      clay: '#a2827f',
+      glass: 'rgba(248, 247, 241, 0.74)',
+    },
+    references: [
+      'Incommonwith: cream paper + oxblood editorial atelier',
+      'General Intelligence Company: frosted floating HUD cards',
+      'Stykka: invisible UI, hairline borders, object-first restraint',
+    ],
+    headline: 'Warm editorial real-estate showroom',
+    stageLabel: 'Большая архитектурная сцена с лёгким редакционным HUD',
+    forbid: ['cold SaaS blue as primary accent', 'pure black admin slabs', 'visible debug-first labels'],
+  };
+}
 
 export function buildScenePresentationState({
   scene,

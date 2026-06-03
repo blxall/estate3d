@@ -94,6 +94,30 @@ describe('Premium development viewer route', () => {
     await waitFor(() => expect(screen.getAllByText(/Панорама из окна/i).length).toBeGreaterThan(0));
   });
 
+  it('renders the selected Refero mix as a warm editorial atelier showroom shell', async () => {
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(<App />);
+
+    expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
+    expect(container.querySelector('.development-viewer')).toHaveClass(
+      'editorial-atelier-showroom',
+      'incommonwith-direction',
+      'frosted-hud-discipline',
+      'scandi-hairline-discipline',
+    );
+    expect(container.querySelector('.viewer-hero')).toHaveClass('editorial-hero', 'cream-paper-hero', 'oxblood-ink-hero');
+    expect(screen.getByText('Warm editorial real-estate showroom')).toHaveClass('editorial-direction-label');
+    expect(screen.getByText('Incommonwith base · GIC HUD · Stykka discipline')).toHaveClass('reference-mix-label');
+    expect(container.querySelector('.viewer-scene')).toHaveClass('editorial-model-stage', 'frosted-atmosphere-stage');
+    expect(container.querySelector('.viewer-hud')).toHaveClass('editorial-sales-panel', 'linen-glass-hud');
+    expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('editorial-diagnostics-band');
+    expect(screen.getByText('Большая архитектурная сцена с лёгким редакционным HUD')).toHaveClass('stage-direction-label');
+    expect(container.querySelector('.development-viewer')).not.toHaveClass('cold-saas-blue-primary', 'admin-black-slab');
+  });
+
   it('renders a commercial premium showroom shell before exposing technical route/debug readouts', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
@@ -135,9 +159,9 @@ describe('Premium development viewer route', () => {
     const stage = container.querySelector('.viewer-stage');
     const children = Array.from(stage?.children ?? []);
     expect(children.map((child) => (child as HTMLElement).className)).toEqual([
-      'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts',
-      'viewer-scene immersive-model-card warm-gallery-card showroom-stage-balanced',
-      'viewer-hud desktop-panel sales-hud warm-sales-hud curated-sales-panel',
+      'viewer-stage-readouts technical-readouts-collapsed diagnostics-minimized visually-demoted-readouts editorial-diagnostics-band',
+      'viewer-scene immersive-model-card warm-gallery-card showroom-stage-balanced editorial-model-stage frosted-atmosphere-stage',
+      'viewer-hud desktop-panel sales-hud warm-sales-hud curated-sales-panel editorial-sales-panel linen-glass-hud',
     ]);
     expect(container.querySelector('.viewer-stage-readouts .deep-link-readout')).toHaveTextContent('Deep link: overview fallback');
     expect(container.querySelector('.viewer-stage-readouts .share-link-readout')).toHaveTextContent('Share link: /developments/demo-premium/viewer?view=development_overview');
