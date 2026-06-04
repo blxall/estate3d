@@ -76,6 +76,7 @@ export type ScenePresentationState = {
   unitTransitionLabel: string;
   customerReadout: string;
   debugVisibleByDefault: boolean;
+  depthLayerLabel: string;
 };
 
 export type EditorialShowroomDirection = {
@@ -1163,13 +1164,14 @@ export function buildScenePresentationState({
   ].filter(Boolean).join(' · ');
 
   return {
-    shellClass: `r3f-scene-shell warm-model-shell high-fidelity-showroom-model${floorClass}${unitClass}`,
-    skylineClass: `r3f-skyline-massing premium-massing${skylineFloorClass}${skylineUnitClass}`,
+    shellClass: `r3f-scene-shell warm-model-shell high-fidelity-showroom-model source-backed-architectural-model${floorClass}${unitClass}`,
+    skylineClass: `r3f-skyline-massing premium-massing source-backed-depth${skylineFloorClass}${skylineUnitClass}`,
     selectedFloorLabel,
     selectedUnitLabel,
     unitTransitionLabel,
     customerReadout,
     debugVisibleByDefault: false,
+    depthLayerLabel: 'Source-backed architectural depth · 3 massing layers · 16 facade bays · 4 foreground planes',
   };
 }
 

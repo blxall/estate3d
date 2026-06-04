@@ -586,7 +586,7 @@ def _demo_development_viewer() -> DevelopmentViewerResponse:
         hero={
             "tagline": "ЖК → корпус → этаж → квартира → окно",
             "headline": "Интерактивный выбор квартиры в 3D",
-            "lead": "Демо-сцена для premium viewer: плавный подлет к корпусу, выбор этажа, top-down квартира и виды из окон.",
+            "lead": "Демо-сцена для премиального выбора квартиры: плавный подлет к корпусу, выбор этажа, планировка квартиры и виды из окон.",
         },
         viewer_config={
             "default_state": "development_overview",

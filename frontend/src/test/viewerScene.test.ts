@@ -251,15 +251,17 @@ describe('viewer scene adapter', () => {
     const presentation = buildScenePresentationState({ scene, selectedFloor: floor, selectedUnit: unit });
 
     expect(presentation).toEqual({
-      shellClass: 'r3f-scene-shell warm-model-shell high-fidelity-showroom-model floor-emphasis unit-emphasis',
-      skylineClass: 'r3f-skyline-massing premium-massing selected-floor-emphasis selected-unit-emphasis',
+      shellClass: 'r3f-scene-shell warm-model-shell high-fidelity-showroom-model source-backed-architectural-model floor-emphasis unit-emphasis',
+      skylineClass: 'r3f-skyline-massing premium-massing source-backed-depth selected-floor-emphasis selected-unit-emphasis',
       selectedFloorLabel: 'Выбран 2 этаж',
       selectedUnitLabel: 'Квартира 21 · 61 м² · от 20 млн ₽',
       unitTransitionLabel: 'Плавный переход к квартире 21',
       customerReadout: 'Корпус A · 2 этаж · квартира 21 · 1 вид из окна',
       debugVisibleByDefault: false,
+      depthLayerLabel: 'Source-backed architectural depth · 3 massing layers · 16 facade bays · 4 foreground planes',
     });
     expect(presentation.customerReadout).not.toMatch(/R3F|debug|mesh|footprint/i);
+    expect(presentation.depthLayerLabel).not.toMatch(/debug|raw|mesh/i);
   });
 
   it('describes premium empty and unavailable states for sparse floor/unit data', () => {

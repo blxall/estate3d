@@ -12,7 +12,7 @@ const demoPayload = {
   hero: {
     tagline: 'ЖК → корпус → этаж → квартира → окно',
     headline: 'Интерактивный выбор квартиры в 3D',
-    lead: 'Демо-сцена для premium viewer',
+    lead: 'Демо-сцена для премиального выбора квартиры',
   },
   viewer_config: { default_state: 'development_overview', accent_color: '#d7b56d' },
   buildings: [
@@ -108,8 +108,8 @@ describe('Premium development viewer route', () => {
     expect(container.querySelector('.reference-visual-backdrop')).toHaveClass('source-backed-3d-image');
     expect(container.querySelector('.reference-copy-panel')).toHaveClass('editorial-copy-overlay', 'image-led-caption-panel');
     expect(container.querySelector('.reference-viewer-overlay')).toHaveClass('floating-viewer-interface', 'over-background-composition');
-    expect(screen.getByText('Interactive development image')).toHaveClass('reference-caption-kicker');
-    expect(screen.getByText('3D background first, viewer second')).toHaveClass('reference-composition-note');
+    expect(screen.getByText('Интерактивный образ комплекса')).toHaveClass('reference-caption-kicker');
+    expect(screen.getByText('Сначала образ дома — затем выбор квартиры')).toHaveClass('reference-composition-note');
   });
 
   it('marks the reference shell as mobile-visual-priority and pointer-safe for browser hitbox polish', async () => {
@@ -193,8 +193,12 @@ describe('Premium development viewer route', () => {
     expect(container.querySelector('.viewer-stage')).toHaveClass('viewer-stage', 'scene-composition');
     expect(container.querySelector('.viewer-scene')).toHaveClass('viewer-scene', 'immersive-model-card', 'warm-gallery-card', 'showroom-stage-balanced');
     expect(container.querySelector('.viewer-hud')).toHaveClass('sales-hud', 'warm-sales-hud', 'curated-sales-panel');
-    expect(container.querySelector('.r3f-scene-shell')).toHaveClass('warm-model-shell', 'high-fidelity-showroom-model');
-    expect(container.querySelector('.r3f-skyline-massing')).toHaveClass('premium-massing');
+    await screen.findByLabelText('Source-backed architectural model depth');
+    expect(container.querySelector('.r3f-scene-shell')).toHaveClass('warm-model-shell', 'high-fidelity-showroom-model', 'source-backed-architectural-model');
+    expect(container.querySelector('.r3f-skyline-massing')).toHaveClass('premium-massing', 'source-backed-depth');
+    expect(screen.getByLabelText('Source-backed architectural model depth')).toHaveClass('architectural-depth-layer', 'source-backed-model-depth');
+    expect(container.querySelectorAll('.facade-bay')).toHaveLength(16);
+    expect(container.querySelectorAll('.architectural-foreground-plane')).toHaveLength(4);
     expect(screen.getByText('Корпус A', { selector: '.r3f-customer-readout' })).toHaveClass('r3f-customer-readout');
     expect(screen.getByText('Общий вид комплекса', { selector: '.r3f-floor-emphasis-label' })).toBeInTheDocument();
     expect(screen.getByText('Плавный выбор этажа')).toHaveClass('r3f-transition-label');

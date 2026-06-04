@@ -208,13 +208,13 @@ export function DevelopmentViewer({ development }: Props) {
 
         <section className={`${showroomDirection.heroClass} commercial-hero reference-copy-panel editorial-copy-overlay image-led-caption-panel mobile-editorial-compact below-visual-on-mobile`}>
           <div className="hero-copy">
-            <p className="eyebrow reference-caption-kicker">Interactive development image</p>
+            <p className="eyebrow reference-caption-kicker">Интерактивный образ комплекса</p>
             <p className="editorial-direction-label">{showroomDirection.headline}</p>
             <p className="reference-mix-label">Incommonwith base · GIC HUD · Stykka discipline</p>
             <h1>{development.name}</h1>
             <p className="viewer-tagline">{development.hero.tagline}</p>
             <p>{development.hero.lead}</p>
-            <p className="reference-composition-note">3D background first, viewer second</p>
+            <p className="reference-composition-note">Сначала образ дома — затем выбор квартиры</p>
           </div>
           <div className="hero-kpi-strip" aria-label="Коммерческие преимущества viewer">
             <div className="hero-kpi-card">

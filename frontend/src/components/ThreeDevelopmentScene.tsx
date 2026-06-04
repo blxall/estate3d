@@ -230,6 +230,21 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span className="massing-floor-selected" />
         <span className="massing-unit-selected" />
       </div>
+      <div className="architectural-depth-layer source-backed-model-depth" aria-label="Source-backed architectural model depth">
+        <span className="depth-massing-plane depth-massing-plane-back" />
+        <span className="depth-massing-plane depth-massing-plane-mid" />
+        <span className="depth-massing-plane depth-massing-plane-front" />
+        <div className="facade-bay-grid" aria-hidden="true">
+          {Array.from({ length: 16 }, (_, index) => (
+            <span key={`facade-bay-${index}`} className="facade-bay" />
+          ))}
+        </div>
+        <span className="architectural-foreground-plane foreground-plane-1" />
+        <span className="architectural-foreground-plane foreground-plane-2" />
+        <span className="architectural-foreground-plane foreground-plane-3" />
+        <span className="architectural-foreground-plane foreground-plane-4" />
+      </div>
+      <div className="source-backed-depth-readout" aria-hidden="true">{presentation.depthLayerLabel}</div>
       <div className="r3f-camera-readout technical-readout collapsed-diagnostics diagnostic-chip" aria-live="polite">
         <span>Camera frame: {cameraPlan.frame}</span>
         <span>Camera target: {cameraPlan.target.join(',')}</span>
