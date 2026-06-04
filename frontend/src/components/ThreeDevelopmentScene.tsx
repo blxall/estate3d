@@ -1,6 +1,7 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useState } from 'react';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { Suspense, useMemo, useState } from 'react';
 import { Vector3 } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import type { DevelopmentFloor, DevelopmentUnit, DevelopmentViewpoint, DevelopmentWindowView } from '../types';
 import {
@@ -11,6 +12,7 @@ import {
   buildRoomFootprints,
   buildScenePresentationState,
   buildShowroomAssetReadiness,
+  buildShowroomRuntimeState,
   buildUnitFootprints,
   buildViewpointAnchors,
   buildWindowHotspots,
@@ -157,6 +159,15 @@ function WindowHotspotMeshes({ hotspots, onChooseWindowById }: WindowHotspotMesh
   );
 }
 
+function SourceBackedGltfModel({ assetUrl }: { assetUrl: string }) {
+  const gltf = useLoader(GLTFLoader, assetUrl);
+  return (
+    <group rotation={[0.08, -0.42, 0]} position={[0, -1.8, -0.28]} scale={[0.9, 0.9, 0.9]}>
+      <primitive object={gltf.scene} />
+    </group>
+  );
+}
+
 function CameraController({ control }: { control: ReturnType<typeof buildCameraControlState> }) {
   const { camera } = useThree();
   const targetPosition = useMemo(() => new Vector3(...control.position), [control.key, control.position]);
@@ -192,6 +203,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   });
   const presentation = buildScenePresentationState({ scene, selectedFloor, selectedUnit });
   const assetReadiness = buildShowroomAssetReadiness(scene);
+  const runtimeState = buildShowroomRuntimeState(scene);
 
   function chooseUnitById(unitId: string) {
     const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
@@ -251,6 +263,15 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span className="showroom-asset-title">{assetReadiness.label}</span>
         <span className="showroom-asset-detail">{assetReadiness.detail}</span>
       </div>
+      <div className={runtimeState.slotClass} aria-label="Интерактивный runtime исходной 3D модели">
+        <span className="showroom-runtime-title">{runtimeState.customerLabel}</span>
+        <span className="showroom-runtime-status">{runtimeState.statusLabel}</span>
+      </div>
+      <div
+        className={`source-backed-gltf-stage ${runtimeState.enabled ? 'runtime-asset-loaded' : 'runtime-procedural-only'}`}
+        data-asset-url={runtimeState.assetUrl}
+        aria-hidden="true"
+      />
       <div className="r3f-camera-readout technical-readout collapsed-diagnostics diagnostic-chip" aria-live="polite">
         <span>Camera frame: {cameraPlan.frame}</span>
         <span>Camera target: {cameraPlan.target.join(',')}</span>
@@ -274,6 +295,11 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
             <CameraController control={cameraControl} />
             <ambientLight intensity={0.8} />
             <directionalLight position={[4, 5, 4]} intensity={1.5} />
+            {runtimeState.enabled ? (
+              <Suspense fallback={null}>
+                <SourceBackedGltfModel assetUrl={runtimeState.assetUrl} />
+              </Suspense>
+            ) : null}
             <TowerMeshes
               scene={scene}
               selectedFloorId={selectedFloorId}

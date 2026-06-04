@@ -3008,6 +3008,53 @@ button {
   letter-spacing: 0.01em;
 }
 
+.design-audit-clean .showroom-runtime-slot {
+  position: absolute;
+  z-index: 8;
+  left: 18px;
+  right: auto;
+  bottom: 18px;
+  max-width: min(280px, calc(100% - 36px));
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(74,10,5,0.1);
+  border-radius: 18px;
+  background: rgba(255,248,236,0.74);
+  color: #3a2b1a;
+  box-shadow: rgba(92,64,30,0.08) 0 16px 44px -28px;
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+.design-audit-clean .showroom-runtime-title {
+  font-size: 0.71rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.design-audit-clean .showroom-runtime-status {
+  color: rgba(58,43,26,0.62);
+  font-size: 0.66rem;
+  font-weight: 760;
+}
+
+.design-audit-clean .source-backed-gltf-stage {
+  position: absolute;
+  inset: 22% 17% 18% 17%;
+  z-index: 2;
+  border-radius: 34px;
+  pointer-events: none;
+  opacity: 0.42;
+}
+
+.design-audit-clean .source-backed-gltf-stage.runtime-asset-loaded {
+  background:
+    radial-gradient(circle at 52% 35%, rgba(184,138,71,0.22), transparent 36%),
+    linear-gradient(140deg, rgba(74,10,5,0.08), rgba(125,144,121,0.13));
+  outline: 1px solid rgba(184,138,71,0.16);
+}
+
 @media (max-width: 620px) {
   .design-audit-clean .r3f-customer-readout {
     top: 12px;
@@ -3042,6 +3089,19 @@ button {
     right: 12px;
     max-width: none;
     padding: 9px 11px;
+  }
+
+  .design-audit-clean .showroom-runtime-slot {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-width: none;
+    padding: 8px 10px;
+  }
+
+  .design-audit-clean .source-backed-gltf-stage {
+    inset: 28% 13% 23% 13%;
+    border-radius: 24px;
   }
 
   .design-audit-clean .showroom-asset-title,

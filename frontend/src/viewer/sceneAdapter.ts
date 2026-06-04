@@ -89,6 +89,18 @@ export type ShowroomAssetReadiness = {
   debugCopyVisible: boolean;
 };
 
+export type ShowroomRuntimeState = {
+  enabled: boolean;
+  renderer: 'r3f-gltf' | 'procedural-fallback';
+  assetUrl: string;
+  previewUrl: string;
+  label: string;
+  customerLabel: string;
+  statusLabel: string;
+  slotClass: string;
+  debugVisibleByDefault: boolean;
+};
+
 export type EditorialShowroomDirection = {
   directionName: string;
   pageClass: string;
@@ -1187,6 +1199,40 @@ export function buildShowroomAssetReadiness(scene: ViewerScene): ShowroomAssetRe
     previewUrl,
     cardClass: 'showroom-asset-card procedural-asset-preview customer-facing-asset-note',
     debugCopyVisible: false,
+  };
+}
+
+export function buildShowroomRuntimeState(scene: ViewerScene): ShowroomRuntimeState {
+  const model = scene.building.model;
+  const sourceUrl = modelString(model, 'source_url');
+  const previewUrl = modelString(model, 'preview_url');
+  const sourceType = modelString(model, 'source_type') || 'glb_model';
+  const isGlb = sourceUrl.toLowerCase().endsWith('.glb') || sourceType === 'glb_model';
+
+  if (sourceUrl && isGlb) {
+    return {
+      enabled: true,
+      renderer: 'r3f-gltf',
+      assetUrl: sourceUrl,
+      previewUrl,
+      label: 'Runtime сцены: GLB-модель загружается в интерактивный 3D-viewer',
+      customerLabel: 'Интерактивная модель комплекса подключена к сцене',
+      statusLabel: 'Готово к просмотру · GLB · source-backed',
+      slotClass: 'showroom-runtime-slot source-backed-runtime-ready r3f-gltf-runtime customer-facing-runtime-note',
+      debugVisibleByDefault: false,
+    };
+  }
+
+  return {
+    enabled: false,
+    renderer: 'procedural-fallback',
+    assetUrl: '',
+    previewUrl,
+    label: 'Runtime сцены: интерактивный макет без внешней 3D-модели',
+    customerLabel: 'Интерактивный макет комплекса готов для демо-показа',
+    statusLabel: 'Демо-макет · без внешнего GLB',
+    slotClass: 'showroom-runtime-slot procedural-runtime-preview customer-facing-runtime-note',
+    debugVisibleByDefault: false,
   };
 }
 

@@ -27,6 +27,7 @@ import {
   buildRoomFootprints,
   buildScenePresentationState,
   buildShowroomAssetReadiness,
+  buildShowroomRuntimeState,
   buildUnitCard,
   buildUnitFootprints,
   buildViewpointAnchors,
@@ -779,6 +780,52 @@ describe('viewer scene adapter', () => {
         size: [2, 0.06, 2],
       },
     ]);
+  });
+
+  it('promotes source-backed GLB metadata into a customer-safe showroom runtime state', () => {
+    const scene = buildViewerScene({
+      ...payload,
+      buildings: [
+        {
+          ...payload.buildings[0],
+          model: {
+            kind: 'source_backed_architectural_scene',
+            source_url: '/demo/source/estate3d-skyline-massing.glb',
+            preview_url: '/demo/source/estate3d-skyline-massing.jpg',
+            source_type: 'glb_model',
+            source_quality: 'artist_approved',
+          },
+        },
+      ],
+    });
+
+    expect(buildShowroomRuntimeState(scene)).toEqual({
+      enabled: true,
+      renderer: 'r3f-gltf',
+      assetUrl: '/demo/source/estate3d-skyline-massing.glb',
+      previewUrl: '/demo/source/estate3d-skyline-massing.jpg',
+      label: 'Runtime сцены: GLB-модель загружается в интерактивный 3D-viewer',
+      customerLabel: 'Интерактивная модель комплекса подключена к сцене',
+      statusLabel: 'Готово к просмотру · GLB · source-backed',
+      slotClass: 'showroom-runtime-slot source-backed-runtime-ready r3f-gltf-runtime customer-facing-runtime-note',
+      debugVisibleByDefault: false,
+    });
+  });
+
+  it('keeps procedural scenes in a safe non-runtime showroom state', () => {
+    const scene = buildViewerScene(payload);
+
+    expect(buildShowroomRuntimeState(scene)).toEqual({
+      enabled: false,
+      renderer: 'procedural-fallback',
+      assetUrl: '',
+      previewUrl: '',
+      label: 'Runtime сцены: интерактивный макет без внешней 3D-модели',
+      customerLabel: 'Интерактивный макет комплекса готов для демо-показа',
+      statusLabel: 'Демо-макет · без внешнего GLB',
+      slotClass: 'showroom-runtime-slot procedural-runtime-preview customer-facing-runtime-note',
+      debugVisibleByDefault: false,
+    });
   });
 
   it('builds room footprint primitives for the selected apartment', () => {

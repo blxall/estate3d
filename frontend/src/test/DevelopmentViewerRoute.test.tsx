@@ -214,6 +214,12 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Основа сцены: подготовленная 3D-модель комплекса')).toHaveClass('showroom-asset-title');
     expect(screen.getByText('GLB · artist-approved · 16 фасадных модулей · 4 плана окружения')).toHaveClass('showroom-asset-detail');
     expect(container.querySelector('.showroom-asset-card')).toHaveClass('source-backed-asset-ready', 'customer-facing-asset-note');
+    expect(screen.getByLabelText('Интерактивный runtime исходной 3D модели')).toHaveClass('source-backed-runtime-ready', 'r3f-gltf-runtime', 'customer-facing-runtime-note');
+    expect(screen.getByText('Интерактивная модель комплекса подключена к сцене')).toHaveClass('showroom-runtime-title');
+    expect(screen.getByText('Готово к просмотру · GLB · source-backed')).toHaveClass('showroom-runtime-status');
+    expect(container.querySelector('.source-backed-gltf-stage')).toHaveClass('runtime-asset-loaded');
+    expect(container.querySelector('.source-backed-gltf-stage')).toHaveAttribute('data-asset-url', '/demo/source/estate3d-skyline-massing.glb');
+    expect(screen.queryByText('/demo/source/estate3d-skyline-massing.glb')).not.toBeInTheDocument();
     expect(screen.getByText('Общий вид комплекса', { selector: '.r3f-floor-emphasis-label' })).toBeInTheDocument();
     expect(screen.getByText('Плавный выбор этажа')).toHaveClass('r3f-transition-label');
     expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed', 'diagnostics-minimized', 'visually-demoted-readouts');
