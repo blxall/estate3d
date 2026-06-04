@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import * as pc from 'playcanvas';
+
+import {
+  Color,
+  createEstate3dGlbApplication,
+  Entity,
+  FILLMODE_FILL_WINDOW,
+  RESOLUTION_AUTO,
+  type Estate3dGlbApplication,
+  Vec3,
+} from '../playcanvas/createEstate3dGlbApplication';
 
 type Props = {
   sceneUrl: string;
@@ -7,7 +16,7 @@ type Props = {
 
 export function PlayCanvasGlbScene({ sceneUrl }: Props) {
   const mountRef = useRef<HTMLDivElement | null>(null);
-  const appRef = useRef<pc.Application | null>(null);
+  const appRef = useRef<Estate3dGlbApplication | null>(null);
   const [status, setStatus] = useState('Готовим интерактивный 3D-просмотр...');
 
   useEffect(() => {
@@ -28,9 +37,9 @@ export function PlayCanvasGlbScene({ sceneUrl }: Props) {
     canvas.style.touchAction = 'none';
     mount.appendChild(canvas);
 
-    let app: pc.Application;
+    let app: Estate3dGlbApplication;
     try {
-      app = new pc.Application(canvas, {
+      app = createEstate3dGlbApplication(canvas, {
         graphicsDeviceOptions: {
           antialias: true,
         },
@@ -42,13 +51,13 @@ export function PlayCanvasGlbScene({ sceneUrl }: Props) {
     }
 
     appRef.current = app;
-    app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
-    app.setCanvasResolution(pc.RESOLUTION_AUTO);
+    app.setCanvasFillMode(FILLMODE_FILL_WINDOW);
+    app.setCanvasResolution(RESOLUTION_AUTO);
     app.start();
 
-    const camera = new pc.Entity('Estate3D PlayCanvas camera');
+    const camera = new Entity('Estate3D PlayCanvas camera');
     camera.addComponent('camera', {
-      clearColor: new pc.Color(0.05, 0.09, 0.16),
+      clearColor: new Color(0.05, 0.09, 0.16),
       farClip: 1000,
       fov: 60,
       nearClip: 0.01,
@@ -56,7 +65,7 @@ export function PlayCanvasGlbScene({ sceneUrl }: Props) {
     let yaw = 34;
     let pitch = 24;
     let radius = 5;
-    const target = new pc.Vec3(0, 0.8, 0);
+    const target = new Vec3(0, 0.8, 0);
     const applyCameraOrbit = () => {
       const yawRad = (yaw * Math.PI) / 180;
       const pitchRad = (pitch * Math.PI) / 180;
@@ -69,16 +78,16 @@ export function PlayCanvasGlbScene({ sceneUrl }: Props) {
     applyCameraOrbit();
     app.root.addChild(camera);
 
-    const light = new pc.Entity('Estate3D PlayCanvas light');
+    const light = new Entity('Estate3D PlayCanvas light');
     light.addComponent('light', {
-      color: new pc.Color(1, 1, 1),
+      color: new Color(1, 1, 1),
       intensity: 1.4,
       type: 'directional',
     });
     light.setEulerAngles(45, 45, 0);
     app.root.addChild(light);
 
-    const fallback = new pc.Entity('Estate3D fallback cube');
+    const fallback = new Entity('Estate3D fallback cube');
     fallback.addComponent('render', {
       type: 'box',
     });
@@ -92,7 +101,7 @@ export function PlayCanvasGlbScene({ sceneUrl }: Props) {
         return;
       }
 
-      const resource = asset.resource as { instantiateRenderEntity?: () => pc.Entity };
+      const resource = asset.resource as { instantiateRenderEntity?: () => Entity };
       const entity = resource.instantiateRenderEntity?.();
       if (!entity) {
         setStatus('Модель загружена частично — показываем резервный предпросмотр');

@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 
-const ACCEPTED_WARNING_KEYS = ['playcanvas-lazy-chunk-over-700kb', 'vite-node-worker-threads-externalized-for-gsplat-workers'];
+const CHUNK_WARNING_KEY = 'playcanvas-lazy-chunk-over-700kb';
+const NODE_WORKER_WARNING_KEY = 'vite-node-worker-threads-externalized-for-gsplat-workers';
 const GZIP_GUARDRAIL_KB = 500;
 const CHUNK_WARNING_LIMIT_KB = 700;
 
@@ -14,6 +15,9 @@ export function parsePlayCanvasBuildRisk(output) {
   const nodeWorkerThreadsExternalizedCount = (output.match(/node:worker_threads/g) ?? []).length;
   const chunkWarning = output.includes('Some chunks are larger than 700 kB after minification');
   const split = playCanvasChunks.splitStrategy === 'manual-playcanvas-vendor-chunk';
+  const acceptedWarningKeys = [chunkWarning ? CHUNK_WARNING_KEY : null, nodeWorkerThreadsExternalizedCount > 0 ? NODE_WORKER_WARNING_KEY : null].filter(Boolean);
+  const eliminatedWarningKeys = nodeWorkerThreadsExternalizedCount === 0 ? [NODE_WORKER_WARNING_KEY] : [];
+  const glbOnlyFactory = split && nodeWorkerThreadsExternalizedCount === 0;
 
   return {
     playCanvasChunk,
@@ -21,12 +25,17 @@ export function parsePlayCanvasBuildRisk(output) {
     warnings: {
       chunkWarning,
       nodeWorkerThreadsExternalizedCount,
-      acceptedWarningKeys: ACCEPTED_WARNING_KEYS,
+      acceptedWarningKeys,
+      eliminatedWarningKeys,
     },
-    mitigationDecision: split
+    mitigationDecision: glbOnlyFactory
+      ? 'glb-only-app-factory-accepted-for-public-tours'
+      : split
       ? 'manual-vendor-split-accepted-for-cacheable-glb-runtime'
       : 'guarded-default-accepted-for-glb-only-public-tours',
-    nextMitigation: split
+    nextMitigation: glbOnlyFactory
+      ? 'Keep the GLB-only AppBase factory; do not reintroduce full Application imports before premium ЖК migration.'
+      : split
       ? 'Keep PlayCanvas vendor isolated; investigate package-level gsplat worker imports before premium ЖК migration.'
       : 'Keep PlayCanvas lazy-loaded; investigate package-level gsplat worker imports before premium ЖК migration.',
   };

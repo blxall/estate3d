@@ -18,6 +18,12 @@ dist/assets/playcanvas-vendor-COV5RfEb.js    1,913.18 kB │ gzip: 480.20 kB
 (!) Some chunks are larger than 700 kB after minification.
 `;
 
+const glbOnlyBuildOutput = `vite v8.0.14 building client environment for production...
+dist/assets/PlayCanvasGlbScene-BWr8mV65.js       3.80 kB │ gzip:   1.87 kB
+dist/assets/playcanvas-vendor-hBHQO1H9.js      979.48 kB │ gzip: 257.04 kB
+(!) Some chunks are larger than 700 kB after minification.
+`;
+
 describe('PlayCanvas build risk parser', () => {
   it('turns Vite build output into deterministic rollout budget metadata', () => {
     expect(parsePlayCanvasBuildRisk(sampleBuildOutput)).toEqual({
@@ -44,6 +50,7 @@ describe('PlayCanvas build risk parser', () => {
         chunkWarning: true,
         nodeWorkerThreadsExternalizedCount: 2,
         acceptedWarningKeys: ['playcanvas-lazy-chunk-over-700kb', 'vite-node-worker-threads-externalized-for-gsplat-workers'],
+        eliminatedWarningKeys: [],
       },
       mitigationDecision: 'guarded-default-accepted-for-glb-only-public-tours',
       nextMitigation: 'Keep PlayCanvas lazy-loaded; investigate package-level gsplat worker imports before premium ЖК migration.',
@@ -78,6 +85,43 @@ describe('PlayCanvas build risk parser', () => {
       },
       mitigationDecision: 'manual-vendor-split-accepted-for-cacheable-glb-runtime',
       nextMitigation: 'Keep PlayCanvas vendor isolated; investigate package-level gsplat worker imports before premium ЖК migration.',
+    });
+  });
+
+  it('marks gsplat worker externalization as eliminated when the GLB-only app factory avoids those imports', () => {
+    expect(parsePlayCanvasBuildRisk(glbOnlyBuildOutput)).toMatchObject({
+      playCanvasChunk: {
+        file: 'dist/assets/playcanvas-vendor-hBHQO1H9.js',
+        sizeKb: 979.48,
+        gzipKb: 257.04,
+        overChunkWarningLimit: true,
+        withinGzipGuardrail: true,
+      },
+      playCanvasChunks: {
+        sceneChunk: {
+          file: 'dist/assets/PlayCanvasGlbScene-BWr8mV65.js',
+          sizeKb: 3.8,
+          gzipKb: 1.87,
+          overChunkWarningLimit: false,
+        },
+        vendorChunk: {
+          file: 'dist/assets/playcanvas-vendor-hBHQO1H9.js',
+          sizeKb: 979.48,
+          gzipKb: 257.04,
+          overChunkWarningLimit: true,
+        },
+        totalGzipKb: 258.91,
+        splitStrategy: 'manual-playcanvas-vendor-chunk',
+        withinGzipGuardrail: true,
+      },
+      warnings: {
+        chunkWarning: true,
+        nodeWorkerThreadsExternalizedCount: 0,
+        acceptedWarningKeys: ['playcanvas-lazy-chunk-over-700kb'],
+        eliminatedWarningKeys: ['vite-node-worker-threads-externalized-for-gsplat-workers'],
+      },
+      mitigationDecision: 'glb-only-app-factory-accepted-for-public-tours',
+      nextMitigation: 'Keep the GLB-only AppBase factory; do not reintroduce full Application imports before premium ЖК migration.',
     });
   });
 });
