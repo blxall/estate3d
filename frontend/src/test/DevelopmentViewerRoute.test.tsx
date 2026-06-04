@@ -20,7 +20,18 @@ const demoPayload = {
       id: 'building_a',
       name: 'Корпус A',
       floors_count: 16,
-      model: { kind: 'procedural_tower', width: 18, depth: 12, floor_height: 3.25 },
+      model: {
+        kind: 'source_backed_architectural_scene',
+        width: 18,
+        depth: 12,
+        floor_height: 3.25,
+        source_url: '/demo/source/estate3d-skyline-massing.glb',
+        preview_url: '/demo/editorial-development-hero.jpg',
+        source_type: 'glb_model',
+        source_quality: 'artist_approved',
+        facade_bays: 16,
+        foreground_planes: 4,
+      },
       floors: Array.from({ length: 16 }, (_, index) => ({
         id: `floor_${index + 1}`,
         level: index + 1,
@@ -200,6 +211,9 @@ describe('Premium development viewer route', () => {
     expect(container.querySelectorAll('.facade-bay')).toHaveLength(16);
     expect(container.querySelectorAll('.architectural-foreground-plane')).toHaveLength(4);
     expect(screen.getByText('Корпус A', { selector: '.r3f-customer-readout' })).toHaveClass('r3f-customer-readout');
+    expect(screen.getByText('Основа сцены: подготовленная 3D-модель комплекса')).toHaveClass('showroom-asset-title');
+    expect(screen.getByText('GLB · artist-approved · 16 фасадных модулей · 4 плана окружения')).toHaveClass('showroom-asset-detail');
+    expect(container.querySelector('.showroom-asset-card')).toHaveClass('source-backed-asset-ready', 'customer-facing-asset-note');
     expect(screen.getByText('Общий вид комплекса', { selector: '.r3f-floor-emphasis-label' })).toBeInTheDocument();
     expect(screen.getByText('Плавный выбор этажа')).toHaveClass('r3f-transition-label');
     expect(container.querySelector('.viewer-stage-readouts')).toHaveClass('viewer-stage-readouts', 'technical-readouts-collapsed', 'diagnostics-minimized', 'visually-demoted-readouts');

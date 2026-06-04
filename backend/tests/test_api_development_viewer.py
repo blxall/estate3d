@@ -18,6 +18,18 @@ def test_demo_development_viewer_returns_spatial_hierarchy():
     building = payload["buildings"][0]
     assert building["id"] == "building_a"
     assert building["floors_count"] >= 12
+    assert building["model"] == {
+        "kind": "source_backed_architectural_scene",
+        "width": 18,
+        "depth": 12,
+        "floor_height": 3.25,
+        "source_url": "/demo/source/estate3d-skyline-massing.glb",
+        "preview_url": "/demo/editorial-development-hero.jpg",
+        "source_type": "glb_model",
+        "source_quality": "artist_approved",
+        "facade_bays": 16,
+        "foreground_planes": 4,
+    }
     assert len(building["floors"]) >= 12
 
     eighth_floor = next(floor for floor in building["floors"] if floor["level"] == 8)

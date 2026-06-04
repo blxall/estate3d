@@ -26,6 +26,7 @@ import {
   buildViewerDeepLinkState,
   buildRoomFootprints,
   buildScenePresentationState,
+  buildShowroomAssetReadiness,
   buildUnitCard,
   buildUnitFootprints,
   buildViewpointAnchors,
@@ -262,6 +263,36 @@ describe('viewer scene adapter', () => {
     });
     expect(presentation.customerReadout).not.toMatch(/R3F|debug|mesh|footprint/i);
     expect(presentation.depthLayerLabel).not.toMatch(/debug|raw|mesh/i);
+  });
+
+  it('builds customer-facing source asset readiness for the showroom model without exposing renderer/debug jargon', () => {
+    const scene = buildViewerScene({
+      ...payload,
+      buildings: [
+        {
+          ...payload.buildings[0],
+          model: {
+            kind: 'source_backed_architectural_scene',
+            source_url: '/demo/source/estate3d-skyline-massing.glb',
+            preview_url: '/demo/editorial-development-hero.jpg',
+            source_type: 'glb_model',
+            source_quality: 'artist_approved',
+            facade_bays: 16,
+            foreground_planes: 4,
+          },
+        },
+      ],
+    });
+
+    expect(buildShowroomAssetReadiness(scene)).toEqual({
+      mode: 'source-backed',
+      label: 'Основа сцены: подготовленная 3D-модель комплекса',
+      detail: 'GLB · artist-approved · 16 фасадных модулей · 4 плана окружения',
+      assetUrl: '/demo/source/estate3d-skyline-massing.glb',
+      previewUrl: '/demo/editorial-development-hero.jpg',
+      cardClass: 'showroom-asset-card source-backed-asset-ready customer-facing-asset-note',
+      debugCopyVisible: false,
+    });
   });
 
   it('describes premium empty and unavailable states for sparse floor/unit data', () => {

@@ -79,6 +79,16 @@ export type ScenePresentationState = {
   depthLayerLabel: string;
 };
 
+export type ShowroomAssetReadiness = {
+  mode: 'procedural' | 'source-backed';
+  label: string;
+  detail: string;
+  assetUrl: string;
+  previewUrl: string;
+  cardClass: string;
+  debugCopyVisible: boolean;
+};
+
 export type EditorialShowroomDirection = {
   directionName: string;
   pageClass: string;
@@ -1135,6 +1145,48 @@ export function buildEditorialShowroomDirection(): EditorialShowroomDirection {
     headline: 'Warm editorial real-estate showroom',
     stageLabel: 'Большая архитектурная сцена с лёгким редакционным HUD',
     forbid: ['cold SaaS blue as primary accent', 'pure black admin slabs', 'visible debug-first labels'],
+  };
+}
+
+function modelString(model: Record<string, unknown>, key: string): string {
+  const value = model[key];
+  return typeof value === 'string' ? value : '';
+}
+
+function modelNumber(model: Record<string, unknown>, key: string, fallback: number): number {
+  const value = model[key];
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+export function buildShowroomAssetReadiness(scene: ViewerScene): ShowroomAssetReadiness {
+  const model = scene.building.model;
+  const sourceUrl = modelString(model, 'source_url');
+  const previewUrl = modelString(model, 'preview_url');
+  const sourceType = modelString(model, 'source_type') || 'procedural';
+  const sourceQuality = modelString(model, 'source_quality') || 'demo';
+  const facadeBays = modelNumber(model, 'facade_bays', 16);
+  const foregroundPlanes = modelNumber(model, 'foreground_planes', 4);
+
+  if (sourceUrl) {
+    return {
+      mode: 'source-backed',
+      label: 'Основа сцены: подготовленная 3D-модель комплекса',
+      detail: `${sourceType.replace('_model', '').toUpperCase()} · ${sourceQuality.replace('_', '-')} · ${facadeBays} фасадных модулей · ${foregroundPlanes} плана окружения`,
+      assetUrl: sourceUrl,
+      previewUrl,
+      cardClass: 'showroom-asset-card source-backed-asset-ready customer-facing-asset-note',
+      debugCopyVisible: false,
+    };
+  }
+
+  return {
+    mode: 'procedural',
+    label: 'Основа сцены: интерактивный макет комплекса',
+    detail: `${scene.towerFloors.length} этажей · фасадная сетка · окружение для демо-показа`,
+    assetUrl: '',
+    previewUrl,
+    cardClass: 'showroom-asset-card procedural-asset-preview customer-facing-asset-note',
+    debugCopyVisible: false,
   };
 }
 

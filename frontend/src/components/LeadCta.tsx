@@ -84,7 +84,7 @@ export function LeadCta({ leadMessage, leadStatus, leadContext, leadSuccess, int
         <div className={managerFollowUp.cardClass}>
           <p>{managerFollowUp.label}</p>
           <ul>
-            {managerFollowUp.items.map((item) => <li key={item}>{item}</li>)}
+            {managerFollowUp.items.map((item) => <li key={item} className={item.includes('/developments/') ? 'manager-follow-up-raw-link' : undefined}>{item}</li>)}
           </ul>
           <small className="manager-follow-up-copy">{managerFollowUp.copy}</small>
         </div>

@@ -10,6 +10,7 @@ import {
   buildMaterialTheme,
   buildRoomFootprints,
   buildScenePresentationState,
+  buildShowroomAssetReadiness,
   buildUnitFootprints,
   buildViewpointAnchors,
   buildWindowHotspots,
@@ -190,6 +191,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
     hasUnits: Boolean(selectedFloor?.units.length),
   });
   const presentation = buildScenePresentationState({ scene, selectedFloor, selectedUnit });
+  const assetReadiness = buildShowroomAssetReadiness(scene);
 
   function chooseUnitById(unitId: string) {
     const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
@@ -245,6 +247,10 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
         <span className="architectural-foreground-plane foreground-plane-4" />
       </div>
       <div className="source-backed-depth-readout" aria-hidden="true">{presentation.depthLayerLabel}</div>
+      <div className={assetReadiness.cardClass} aria-label="Готовность исходной 3D модели">
+        <span className="showroom-asset-title">{assetReadiness.label}</span>
+        <span className="showroom-asset-detail">{assetReadiness.detail}</span>
+      </div>
       <div className="r3f-camera-readout technical-readout collapsed-diagnostics diagnostic-chip" aria-live="polite">
         <span>Camera frame: {cameraPlan.frame}</span>
         <span>Camera target: {cameraPlan.target.join(',')}</span>

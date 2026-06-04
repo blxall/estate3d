@@ -2945,6 +2945,69 @@ button {
   box-shadow: rgba(92,64,30,0.2) 0 30px 74px -36px, 0 0 0 1px rgba(164,119,51,0.08);
 }
 
+
+
+.design-audit-clean .viewer-stage-readouts .deep-link-readout,
+.design-audit-clean .viewer-stage-readouts .share-link-readout,
+.design-audit-clean .r3f-camera-readout,
+.design-audit-clean .r3f-unit-footprints,
+.design-audit-clean .r3f-room-footprints,
+.design-audit-clean .r3f-viewpoint-anchors,
+.design-audit-clean .r3f-window-hotspot-readout {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.design-audit-clean .showroom-asset-card {
+  position: absolute;
+  z-index: 9;
+  left: 18px;
+  top: 62px;
+  max-width: min(330px, calc(100% - 36px));
+  display: grid;
+  gap: 4px;
+  padding: 11px 13px;
+  border: 1px solid rgba(84,62,38,0.12);
+  border-radius: 18px;
+  background: rgba(255,253,248,0.72);
+  color: #3a2b1a;
+  box-shadow: rgba(92,64,30,0.1) 0 16px 44px -30px;
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+.design-audit-clean .source-backed-asset-ready::before {
+  content: '';
+  position: absolute;
+  inset: 9px auto 9px 8px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(184,138,71,0.96), rgba(125,144,121,0.86));
+}
+
+.design-audit-clean .showroom-asset-title {
+  padding-left: 8px;
+  color: #3a2b1a;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.design-audit-clean .showroom-asset-detail {
+  padding-left: 8px;
+  color: rgba(58,43,26,0.68);
+  font-size: 0.68rem;
+  font-weight: 760;
+  letter-spacing: 0.01em;
+}
+
 @media (max-width: 620px) {
   .design-audit-clean .r3f-customer-readout {
     top: 12px;
@@ -2952,6 +3015,38 @@ button {
     right: 12px;
     max-width: none;
     text-align: center;
+  }
+
+  
+.design-audit-clean .viewer-stage-readouts .deep-link-readout,
+.design-audit-clean .viewer-stage-readouts .share-link-readout,
+.design-audit-clean .r3f-camera-readout,
+.design-audit-clean .r3f-unit-footprints,
+.design-audit-clean .r3f-room-footprints,
+.design-audit-clean .r3f-viewpoint-anchors,
+.design-audit-clean .r3f-window-hotspot-readout {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.design-audit-clean .showroom-asset-card {
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    padding: 9px 11px;
+  }
+
+  .design-audit-clean .showroom-asset-title,
+  .design-audit-clean .showroom-asset-detail {
+    font-size: 0.64rem;
   }
 
   .design-audit-clean .r3f-skyline-massing {
@@ -4005,4 +4100,29 @@ button {
   .reference-viewer-overlay .viewer-scene:focus-within .mobile-touch-fallback.browser-click-safe {
     opacity: 0.2;
   }
+}
+
+
+/* v3.40 customer-facing asset readiness: keep diagnostics semantic-only in showroom screenshots */
+.design-audit-clean .viewer-stage-readouts .deep-link-readout,
+.design-audit-clean .viewer-stage-readouts .share-link-readout,
+.design-audit-clean .r3f-camera-readout,
+.design-audit-clean .r3f-unit-footprints,
+.design-audit-clean .r3f-room-footprints,
+.design-audit-clean .r3f-viewpoint-anchors,
+.design-audit-clean .r3f-window-hotspot-readout,
+.design-audit-clean .share-handoff-copy.copy-ready {
+  display: none !important;
+}
+
+.design-audit-clean .broker-script-next-step,
+.design-audit-clean .lead-handoff-digest-recap,
+.design-audit-clean .lead-export-payload-copy,
+.design-audit-clean .lead-export-field-row,
+.design-audit-clean .crm-export-action-text.copy-ready {
+  display: none !important;
+}
+
+.design-audit-clean .manager-follow-up-raw-link {
+  display: none !important;
 }
