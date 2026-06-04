@@ -5,32 +5,55 @@ const GZIP_GUARDRAIL_KB = 500;
 const CHUNK_WARNING_LIMIT_KB = 700;
 
 export function parsePlayCanvasBuildRisk(output) {
-  const playCanvasChunk = parsePlayCanvasChunk(output);
+  const playCanvasChunks = parsePlayCanvasChunks(output);
+  const playCanvasChunk = playCanvasChunks.vendorChunk
+    ? { ...playCanvasChunks.vendorChunk, withinGzipGuardrail: playCanvasChunks.withinGzipGuardrail }
+    : playCanvasChunks.sceneChunk
+      ? { ...playCanvasChunks.sceneChunk, withinGzipGuardrail: playCanvasChunks.withinGzipGuardrail }
+      : null;
   const nodeWorkerThreadsExternalizedCount = (output.match(/node:worker_threads/g) ?? []).length;
   const chunkWarning = output.includes('Some chunks are larger than 700 kB after minification');
+  const split = playCanvasChunks.splitStrategy === 'manual-playcanvas-vendor-chunk';
 
   return {
     playCanvasChunk,
+    playCanvasChunks,
     warnings: {
       chunkWarning,
       nodeWorkerThreadsExternalizedCount,
       acceptedWarningKeys: ACCEPTED_WARNING_KEYS,
     },
-    mitigationDecision: 'guarded-default-accepted-for-glb-only-public-tours',
-    nextMitigation: 'Keep PlayCanvas lazy-loaded; investigate package-level gsplat worker imports before premium ЖК migration.',
+    mitigationDecision: split
+      ? 'manual-vendor-split-accepted-for-cacheable-glb-runtime'
+      : 'guarded-default-accepted-for-glb-only-public-tours',
+    nextMitigation: split
+      ? 'Keep PlayCanvas vendor isolated; investigate package-level gsplat worker imports before premium ЖК migration.'
+      : 'Keep PlayCanvas lazy-loaded; investigate package-level gsplat worker imports before premium ЖК migration.',
   };
 }
 
-function parsePlayCanvasChunk(output) {
-  const line = output
-    .split('\n')
-    .find((candidate) => /dist\/assets\/PlayCanvasGlbScene-.*\.js\s+/.test(candidate));
+function parsePlayCanvasChunks(output) {
+  const sceneChunk = parseChunkLine(output, /dist\/assets\/PlayCanvasGlbScene-.*\.js\s+/);
+  const vendorChunk = parseChunkLine(output, /dist\/assets\/playcanvas-vendor-.*\.js\s+/);
+  const totalGzipKb = Number([sceneChunk, vendorChunk].filter(Boolean).reduce((sum, chunk) => sum + chunk.gzipKb, 0).toFixed(2));
+
+  return {
+    sceneChunk,
+    vendorChunk,
+    totalGzipKb,
+    splitStrategy: vendorChunk ? 'manual-playcanvas-vendor-chunk' : 'unsplit-scene-chunk',
+    withinGzipGuardrail: totalGzipKb > 0 && totalGzipKb <= GZIP_GUARDRAIL_KB,
+  };
+}
+
+function parseChunkLine(output, pattern) {
+  const line = output.split('\n').find((candidate) => pattern.test(candidate));
 
   if (!line) {
     return null;
   }
 
-  const match = line.match(/(dist\/assets\/PlayCanvasGlbScene-[^\s]+\.js)\s+([\d,.]+)\s+kB\s+│\s+gzip:\s+([\d,.]+)\s+kB/);
+  const match = line.match(/(dist\/assets\/(?:PlayCanvasGlbScene|playcanvas-vendor)-[^\s]+\.js)\s+([\d,.]+)\s+kB\s+│\s+gzip:\s+([\d,.]+)\s+kB/);
   if (!match) {
     return null;
   }
@@ -43,7 +66,6 @@ function parsePlayCanvasChunk(output) {
     sizeKb,
     gzipKb,
     overChunkWarningLimit: sizeKb > CHUNK_WARNING_LIMIT_KB,
-    withinGzipGuardrail: gzipKb <= GZIP_GUARDRAIL_KB,
   };
 }
 
@@ -83,8 +105,8 @@ async function main() {
   if (!risk.playCanvasChunk) {
     throw new Error('PlayCanvas chunk was not found in Vite build output');
   }
-  if (!risk.playCanvasChunk.withinGzipGuardrail) {
-    throw new Error(`PlayCanvas gzip chunk exceeds ${GZIP_GUARDRAIL_KB} KB guardrail: ${risk.playCanvasChunk.gzipKb} KB`);
+  if (!risk.playCanvasChunks.withinGzipGuardrail) {
+    throw new Error(`PlayCanvas combined gzip chunks exceed ${GZIP_GUARDRAIL_KB} KB guardrail: ${risk.playCanvasChunks.totalGzipKb} KB`);
   }
 }
 
