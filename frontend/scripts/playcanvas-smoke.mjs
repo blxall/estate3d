@@ -1,11 +1,14 @@
 import { chromium } from 'playwright';
 import { createServer } from 'vite';
+import { mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 
 const publicSlug = 'playcanvas-smoke';
 const sceneUrl = '/playcanvas-smoke.glb';
 const routePath = `/tour/${publicSlug}`;
 const fallbackRoutePath = `/tour/${publicSlug}?engine=r3f`;
-const expectedLoadedStatus = 'PlayCanvas GLB сцена загружена';
+const expectedLoadedStatus = '3D-модель загружена';
+const outDir = '/Users/blxall/.hermes/media_cache/estate3d-playcanvas-controls';
 
 function publicTourPayload(baseUrl) {
   return {
@@ -32,6 +35,7 @@ function publicTourPayload(baseUrl) {
 }
 
 async function main() {
+  mkdirSync(outDir, { recursive: true });
   const server = await createServer({
     server: {
       host: '127.0.0.1',
@@ -74,6 +78,9 @@ async function main() {
     }
     await page.getByText('GLB scene · PlayCanvas runtime').waitFor();
     await page.getByText('Renderer: PlayCanvas · WebGL/WebGPU-ready · GLB-first').waitFor();
+    await page.getByRole('status', { name: /playcanvas interaction controls/i }).waitFor();
+    await page.getByText('Вращайте модель перетаскиванием · масштабируйте колесом · откройте на весь экран').waitFor();
+    await page.getByText('Интерактивный 3D-просмотр готов для публичного тура').waitFor();
     const fallbackLink = page.getByRole('link', { name: /open fallback renderer/i });
     await fallbackLink.waitFor();
     const fallbackLinkHref = await fallbackLink.getAttribute('href');
@@ -81,17 +88,50 @@ async function main() {
       throw new Error(`expected fallback link ${fallbackRoutePath}, got ${fallbackLinkHref ?? 'missing'}`);
     }
     await page.getByText(sceneUrl).waitFor();
+    const visibleLeakage = await page.evaluate(() => {
+      const leaks = ['Renderer:', 'PlayCanvas rollout guardrails', 'accepted warnings:', 'http://127.0.0.1'];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const visibleText = [];
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        const parent = node.parentElement;
+        if (!parent || parent.closest('.visually-hidden')) continue;
+        const style = window.getComputedStyle(parent);
+        const rect = parent.getBoundingClientRect();
+        if (style.visibility === 'hidden' || style.display === 'none' || rect.width <= 1 || rect.height <= 1) continue;
+        visibleText.push(node.textContent ?? '');
+      }
+      return leaks.filter((leak) => visibleText.some((text) => text.includes(leak)));
+    });
+    if (visibleLeakage.length > 0) {
+      throw new Error(`visible technical leakage: ${visibleLeakage.join(', ')}`);
+    }
     await page.getByText(expectedLoadedStatus).waitFor({ timeout: 10_000 });
+    await page.screenshot({ path: join(outDir, 'mobile-playcanvas-loaded.jpg'), type: 'jpeg', quality: 78, fullPage: true });
 
     const canvasCount = await page.locator('[data-testid="playcanvas-glb-canvas"]').count();
     if (canvasCount !== 1) {
       throw new Error(`expected one PlayCanvas canvas, got ${canvasCount}`);
     }
 
+    const canvasBox = await page.locator('[data-testid="playcanvas-glb-canvas"]').boundingBox();
+    if (!canvasBox) {
+      throw new Error('PlayCanvas canvas bounding box missing');
+    }
+    await page.mouse.move(canvasBox.x + canvasBox.width * 0.45, canvasBox.y + canvasBox.height * 0.45);
+    await page.mouse.down();
+    await page.mouse.move(canvasBox.x + canvasBox.width * 0.7, canvasBox.y + canvasBox.height * 0.55, { steps: 6 });
+    await page.mouse.up();
+    await page.getByText('Вращение модели обновлено').waitFor({ timeout: 2_000 });
+    await page.mouse.wheel(0, -180);
+    await page.getByText('Масштаб модели обновлён').waitFor({ timeout: 2_000 });
+
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.waitForTimeout(250);
+    await page.screenshot({ path: join(outDir, 'desktop-playcanvas-controls.jpg'), type: 'jpeg', quality: 78, fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForTimeout(250);
+    await page.screenshot({ path: join(outDir, 'mobile-playcanvas-controls.jpg'), type: 'jpeg', quality: 78, fullPage: true });
 
     const layout = await page.evaluate(() => {
       const root = document.querySelector('[data-testid="viewer-canvas-root"]');
@@ -138,6 +178,7 @@ async function main() {
           fallbackLinkHref,
           fallbackNavigationUrl,
           sceneUrl: `${baseUrl}${sceneUrl}`,
+          outDir,
           status: expectedLoadedStatus,
           fallbackEngine,
           layout,

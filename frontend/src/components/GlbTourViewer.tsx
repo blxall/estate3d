@@ -43,9 +43,9 @@ export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEn
       </div>
       {showFallbackLink ? (
         <p className="viewer-fallback-switch">
-          Trouble loading?{' '}
+          Модель не открылась?{' '}
           <a href={fallbackUrl} aria-label="Open fallback renderer">
-            Open fallback renderer with R3F
+            Перейти в резервный просмотр
           </a>
         </p>
       ) : null}
@@ -54,9 +54,15 @@ export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEn
           <SceneComponent sceneUrl={sceneUrl} />
         </Suspense>
       </div>
-      <p className="viewer-engine-readout">{engineConfig.readout}</p>
+      <p className="viewer-engine-readout visually-hidden">{engineConfig.readout}</p>
+      {engineConfig.runtimeControls ? (
+        <div className={engineConfig.runtimeControls.controlClass} role="status" aria-label="PlayCanvas interaction controls">
+          <span>{engineConfig.runtimeControls.label}</span>
+          <small>{engineConfig.runtimeControls.pointerReadout}</small>
+        </div>
+      ) : null}
       {engineConfig.rollout ? (
-        <aside className="viewer-engine-diagnostics viewer-engine-rollout" role="note" aria-label="PlayCanvas rollout guardrails">
+        <aside className="viewer-engine-diagnostics viewer-engine-rollout visually-hidden" role="note" aria-label="PlayCanvas rollout guardrails">
           <strong>PlayCanvas rollout guardrails</strong>
           <p>{engineConfig.rollout.fallbackLabel}</p>
           <p>lazy chunk budget: {engineConfig.rollout.lazyChunkBudgetKbGzip} KB gzip</p>
@@ -85,7 +91,7 @@ export function GlbTourViewer({ sceneUrl, title, engine = getDefaultPublicTourEn
           </div>
         </aside>
       ) : null}
-      <p className="scene-url">{sceneUrl}</p>
+      <p className="scene-url visually-hidden">{sceneUrl}</p>
     </section>
   );
 }

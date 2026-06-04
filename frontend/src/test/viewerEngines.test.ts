@@ -57,6 +57,12 @@ describe('viewer engine adapter boundary', () => {
       'mobile-viewport-has-no-horizontal-overflow',
       'console-has-no-runtime-errors',
     ]);
+    expect(getViewerEngineConfig('playcanvas').runtimeControls).toEqual({
+      label: 'Вращайте модель перетаскиванием · масштабируйте колесом · откройте на весь экран',
+      gestures: ['drag-orbit', 'wheel-zoom', 'resize-safe'],
+      pointerReadout: 'Интерактивный 3D-просмотр готов для публичного тура',
+      controlClass: 'viewer-engine-controls playcanvas-orbit-controls customer-safe-controls',
+    });
   });
 
   it('documents PlayCanvas rollout guardrails for default GLB tours', () => {
@@ -76,7 +82,7 @@ describe('viewer engine adapter boundary', () => {
       sceneUrl: '/playcanvas-smoke.glb',
       routePath: '/tour/playcanvas-smoke',
       fallbackRoutePath: '/tour/playcanvas-smoke?engine=r3f',
-      expectedLoadedStatus: 'PlayCanvas GLB сцена загружена',
+      expectedLoadedStatus: '3D-модель загружена',
     });
     const fixture = readFileSync(join(process.cwd(), 'public', playCanvasSmokeFixture.sceneUrl.replace(/^\//, '')));
     expect(fixture.subarray(0, 4).toString('utf8')).toBe('glTF');

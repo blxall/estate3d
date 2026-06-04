@@ -9,6 +9,12 @@ export type ViewerEngineConfig = {
   validationStatus: ViewerEngineValidationStatus;
   riskNotes: string[];
   smokeChecklist: string[];
+  runtimeControls?: {
+    label: string;
+    gestures: string[];
+    pointerReadout: string;
+    controlClass: string;
+  };
   rollout?: {
     status: 'default-with-guardrails';
     fallbackQuery: string;
@@ -24,7 +30,7 @@ export const playCanvasSmokeFixture = {
   sceneUrl: '/playcanvas-smoke.glb',
   routePath: '/tour/playcanvas-smoke',
   fallbackRoutePath: '/tour/playcanvas-smoke?engine=r3f',
-  expectedLoadedStatus: 'PlayCanvas GLB сцена загружена',
+  expectedLoadedStatus: '3D-модель загружена',
 } as const;
 
 export const viewerEngineOptions: ViewerEngineConfig[] = [
@@ -51,6 +57,12 @@ export const viewerEngineOptions: ViewerEngineConfig[] = [
       'mobile-viewport-has-no-horizontal-overflow',
       'console-has-no-runtime-errors',
     ],
+    runtimeControls: {
+      label: 'Вращайте модель перетаскиванием · масштабируйте колесом · откройте на весь экран',
+      gestures: ['drag-orbit', 'wheel-zoom', 'resize-safe'],
+      pointerReadout: 'Интерактивный 3D-просмотр готов для публичного тура',
+      controlClass: 'viewer-engine-controls playcanvas-orbit-controls customer-safe-controls',
+    },
     rollout: {
       status: 'default-with-guardrails',
       fallbackQuery: '?engine=r3f',
