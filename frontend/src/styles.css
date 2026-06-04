@@ -3539,10 +3539,13 @@ button {
 .reference-viewer-overlay.tap-safe-overlay .r3f-floor-hitboxes,
 .reference-viewer-overlay.tap-safe-overlay .r3f-unit-hitboxes,
 .reference-viewer-overlay.tap-safe-overlay .r3f-room-hitboxes,
-.reference-viewer-overlay.tap-safe-overlay .r3f-window-hotspots,
+.reference-viewer-overlay.tap-safe-overlay .r3f-window-hotspots {
+  pointer-events: auto;
+}
+
 .reference-viewer-overlay.tap-safe-overlay .procedural-tower,
 .reference-viewer-overlay.tap-safe-overlay .procedural-tower * {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .reference-viewer-overlay .click-through-model-shell {
@@ -3581,6 +3584,76 @@ button {
 
 .reference-viewer-overlay .mobile-touch-fallback.browser-click-safe {
   z-index: 38;
+  pointer-events: none !important;
+}
+
+.reference-viewer-overlay .mobile-touch-fallback.browser-click-safe * {
+  pointer-events: none !important;
+}
+
+/* v3.38 reduce mobile floor-stack clutter while keeping semantic bridge controls */
+.reference-viewer-overlay .r3f-scene-meta {
+  display: none;
+}
+
+.state-unit_top_down .reference-viewer-overlay .r3f-model-guide,
+.state-walk_mode .reference-viewer-overlay .r3f-model-guide,
+.state-window_view .reference-viewer-overlay .r3f-model-guide {
+  display: none;
+}
+
+.r3f-model-guide.customer-model-guide {
+  position: absolute;
+  left: clamp(14px, 4vw, 30px);
+  top: clamp(54px, 9vw, 82px);
+  z-index: 42;
+  display: grid;
+  gap: 4px;
+  max-width: min(260px, 54%);
+  padding: 10px 12px;
+  border: 1px solid rgba(74, 10, 5, 0.13);
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.72);
+  color: #4a0a05;
+  box-shadow: 0 18px 52px rgba(74, 10, 5, 0.11);
+  backdrop-filter: blur(18px) saturate(1.06);
+  pointer-events: none;
+}
+
+.r3f-model-guide-title {
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.r3f-model-guide-copy {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: rgba(74, 10, 5, 0.68);
+}
+
+.reference-viewer-overlay .mobile-condensed-floor-stack.floor-stack-clutter-reduced {
+  gap: 2px;
+  filter: drop-shadow(0 14px 20px rgba(74, 10, 5, 0.1));
+}
+
+.reference-viewer-overlay .mobile-condensed-floor-stack .r3f-floor-hitbox {
+  box-shadow: none;
+  opacity: 0.36;
+}
+
+.reference-viewer-overlay .mobile-condensed-floor-stack .r3f-floor-hitbox.has-units,
+.reference-viewer-overlay .mobile-condensed-floor-stack .r3f-floor-hitbox.active,
+.reference-viewer-overlay .mobile-condensed-floor-stack .r3f-floor-hitbox.hovered,
+.reference-viewer-overlay .mobile-condensed-floor-stack .r3f-floor-hitbox:hover {
+  opacity: 0.96;
+}
+
+.reference-viewer-overlay .mobile-condensed-floor-stack .primary-sales-floor-target {
+  min-height: 34px;
+  border-color: rgba(184, 138, 71, 0.42) !important;
+  background: linear-gradient(90deg, rgba(184, 138, 71, 0.84), rgba(125, 144, 121, 0.68)) !important;
 }
 
 @media (max-width: 720px) {
@@ -3614,6 +3687,24 @@ button {
 
   .reference-viewer-overlay.mobile-model-first.tap-safe-overlay .viewer-stage-readouts {
     display: none;
+  }
+
+  .reference-viewer-overlay.mobile-model-first .r3f-model-guide.mobile-legible-model-guide {
+    top: 76px;
+    left: auto;
+    right: 16px;
+    max-width: 138px;
+    padding: 8px 9px;
+    border-radius: 14px;
+  }
+
+  .reference-viewer-overlay.mobile-model-first .r3f-model-guide-title {
+    font-size: 0.58rem;
+  }
+
+  .reference-viewer-overlay.mobile-model-first .r3f-model-guide-copy {
+    font-size: 0.62rem;
+    line-height: 1.18;
   }
 
   .reference-viewer-overlay.mobile-model-first.tap-safe-overlay .viewer-scene,

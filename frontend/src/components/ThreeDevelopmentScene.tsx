@@ -268,12 +268,17 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
           <div className="r3f-canvas-fallback">WebGL preview fallback</div>
         )}
       </div>
-      <div className="r3f-floor-hitboxes tap-target-bridge browser-click-safe" aria-label="3D floor selection bridge">
+      <div className="r3f-model-guide customer-model-guide mobile-legible-model-guide" aria-label="Подсказка выбора этажа">
+        <span className="r3f-model-guide-title">Выберите этаж на модели</span>
+        <span className="r3f-model-guide-copy">Доступный 8 этаж подсвечен; вся башня остаётся интерактивной без визуальной сетки.</span>
+      </div>
+      <div className="r3f-floor-hitboxes tap-target-bridge browser-click-safe mobile-condensed-floor-stack floor-stack-clutter-reduced" aria-label="3D floor selection bridge">
         {scene.towerFloors.map((floor) => (
           <button
             key={floor.id}
             type="button"
-            className={`r3f-floor-hitbox tap-target-floor ${selectedFloorId === floor.id ? 'active' : ''} ${hoveredFloorId === floor.id ? 'hovered' : ''} ${floor.hasUnits ? 'has-units' : ''}`}
+            data-visible-label="hidden"
+            className={`r3f-floor-hitbox tap-target-floor ${selectedFloorId === floor.id ? 'active' : ''} ${hoveredFloorId === floor.id ? 'hovered' : ''} ${floor.hasUnits ? 'has-units primary-sales-floor-target' : ''}`}
             onMouseEnter={() => setHoveredFloorId(floor.id)}
             onFocus={() => setHoveredFloorId(floor.id)}
             onMouseLeave={() => setHoveredFloorId(null)}

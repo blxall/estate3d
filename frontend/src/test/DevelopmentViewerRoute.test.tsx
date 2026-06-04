@@ -131,6 +131,24 @@ describe('Premium development viewer route', () => {
     Object.defineProperty(window, 'innerWidth', { value: 1440, configurable: true });
   });
 
+  it('condenses the mobile floor stack and exposes a customer-facing selection guide without raw technical labels', async () => {
+    Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true });
+    window.history.pushState({}, '', '/developments/demo-premium/viewer');
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(<App />);
+
+    expect(await screen.findByText('Estate3D Skyline')).toBeInTheDocument();
+    expect(await screen.findByLabelText('3D floor selection bridge')).toHaveClass('mobile-condensed-floor-stack', 'floor-stack-clutter-reduced');
+    expect(container.querySelector('.r3f-model-guide')).toHaveClass('customer-model-guide', 'mobile-legible-model-guide');
+    expect(screen.getByText('Выберите этаж на модели')).toHaveClass('r3f-model-guide-title');
+    expect(screen.getByText('Доступный 8 этаж подсвечен; вся башня остаётся интерактивной без визуальной сетки.')).toHaveClass('r3f-model-guide-copy');
+    expect(container.querySelector('.r3f-floor-hitbox')).toHaveAttribute('data-visible-label', 'hidden');
+    expect(screen.getByRole('button', { name: '3D floor mesh: 8 этаж' })).toHaveClass('primary-sales-floor-target');
+    Object.defineProperty(window, 'innerWidth', { value: 1440, configurable: true });
+  });
+
   it('renders the selected Refero mix as a warm editorial atelier showroom shell', async () => {
     window.history.pushState({}, '', '/developments/demo-premium/viewer');
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => demoPayload });
