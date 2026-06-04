@@ -401,6 +401,17 @@ export function buildUnitCard({ floor, unit, active = false }: { floor: Developm
   };
 }
 
+function viewerStateDisplayLabel(state: ViewerState | string): string {
+  const labels: Record<ViewerState, string> = {
+    development_overview: 'обзор ЖК',
+    floor_focus: 'выбор этажа',
+    unit_top_down: 'план квартиры',
+    walk_mode: 'прогулка по квартире',
+    window_view: 'вид из окна',
+  };
+  return isViewerState(state) ? labels[state] : state;
+}
+
 export function buildLeadContextSummary({
   development,
   building,
@@ -479,7 +490,7 @@ export function buildShareHandoffSummary({
   if (!selectedFloor || !selectedUnit) {
     return null;
   }
-  const context = `${selectedFloor.label} · квартира ${selectedUnit.number} · ${viewerState}`;
+  const context = `${selectedFloor.label} · квартира ${selectedUnit.number} · ${viewerStateDisplayLabel(viewerState)}`;
   return {
     label: `Ссылка на выбранную квартиру готова: ${context}`,
     copy: `Ссылка для клиента: ${shareLink}`,
@@ -838,15 +849,16 @@ export function buildCrmExportAction(groupedFields: GroupedLeadExportFields | nu
   }
   const labelParts = groupedFields.label.replace(/^CRM fields: /, '').split(' · ');
   const [, unit = 'unit', viewerState = 'viewer'] = labelParts;
+  const viewerStateLabel = viewerStateDisplayLabel(viewerState);
   const fieldCount = groupedFields.groups.reduce((total, group) => total + group.rows.length, 0);
   const plainText = groupedFields.groups
     .map((group) => `${group.title}\n${group.rows.map((row) => `- ${row}`).join('\n')}`)
     .join('\n\n');
 
   return {
-    label: `CRM copy action: ${unit} · ${viewerState} · ${fieldCount} полей`,
+    label: `CRM copy action: ${unit} · ${viewerStateLabel} · ${fieldCount} полей`,
     buttonLabel: 'Скопировать CRM block',
-    ariaLabel: `Copy CRM export block to clipboard: ${unit} · ${viewerState} · manager-ready`,
+    ariaLabel: `Copy CRM export block to clipboard: ${unit} · ${viewerStateLabel} · manager-ready`,
     plainText,
     cardClass: 'crm-export-action-card glass-card copy-action-ready',
     textClass: 'crm-export-action-text copy-ready',

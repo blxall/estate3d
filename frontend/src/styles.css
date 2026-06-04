@@ -1369,6 +1369,20 @@ button {
   backdrop-filter: blur(16px);
 }
 
+.reference-viewer-overlay.mobile-model-first .viewer-hud.mobile-stack.compact-lead .lead-card {
+  position: static;
+  bottom: auto;
+  z-index: auto;
+  isolation: isolate;
+}
+
+.reference-viewer-overlay.mobile-model-first .lead-card,
+.reference-viewer-overlay.mobile-model-first .share-handoff-card.glass-card,
+.reference-viewer-overlay.mobile-model-first .crm-export-action-card.copy-action-ready {
+  background: rgba(255, 253, 248, 0.92);
+  backdrop-filter: none;
+}
+
 .viewer-hud.mobile-stack .unit-list button {
   text-align: left;
   border-radius: 18px;

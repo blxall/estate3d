@@ -361,9 +361,9 @@ describe('viewer scene adapter', () => {
     const unit = floor.units[0];
 
     expect(buildShareHandoffSummary({ selectedFloor: floor, selectedUnit: unit, viewerState: 'window_view', shareLink: '/developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city' })).toEqual({
-      label: 'Ссылка на выбранную квартиру готова: 2 этаж · квартира 21 · window_view',
+      label: 'Ссылка на выбранную квартиру готова: 2 этаж · квартира 21 · вид из окна',
       copy: 'Ссылка для клиента: /developments/demo-premium/viewer?floor=floor_2&unit=unit_2_1&view=window_view&viewpoint=vp_living&window=window_city',
-      ariaLabel: 'Copy share link: 2 этаж · квартира 21 · window_view',
+      ariaLabel: 'Copy share link: 2 этаж · квартира 21 · вид из окна',
       cardClass: 'share-handoff-card glass-card desktop-inline',
       copyClass: 'share-handoff-copy copy-ready',
       buttonClass: 'share-copy-button premium-outline',
@@ -635,9 +635,9 @@ describe('viewer scene adapter', () => {
     };
 
     expect(buildCrmExportAction(groupedFields)).toEqual({
-      label: 'CRM copy action: квартира 81 · window_view · 9 полей',
+      label: 'CRM copy action: квартира 81 · вид из окна · 9 полей',
       buttonLabel: 'Скопировать CRM block',
-      ariaLabel: 'Copy CRM export block to clipboard: квартира 81 · window_view · manager-ready',
+      ariaLabel: 'Copy CRM export block to clipboard: квартира 81 · вид из окна · manager-ready',
       plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A\n- Этаж: 8 этаж\n- Квартира: квартира 81\n- Viewer state: window_view\n\nShare\n- Copy-ready link: /developments/demo-premium/viewer?floor=floor_8\n\nDigest\n- Digest note: квартира 81 · available · window_view · share ready · follow-up ready.\n- Digest готов для менеджера\n\nNext step\n- Следующий шаг: открыть ссылку и выбрать время звонка.',
       cardClass: 'crm-export-action-card glass-card copy-action-ready',
       textClass: 'crm-export-action-text copy-ready',
@@ -648,7 +648,7 @@ describe('viewer scene adapter', () => {
 
   it('builds CRM copy intent analytics summaries for manager audit trail', () => {
     const action = {
-      label: 'CRM copy action: квартира 81 · window_view · 9 полей',
+      label: 'CRM copy action: квартира 81 · вид из окна · 9 полей',
       buttonLabel: 'Скопировать CRM block',
       ariaLabel: 'Copy CRM export block: квартира 81 · window_view',
       plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A',
@@ -659,14 +659,14 @@ describe('viewer scene adapter', () => {
 
     expect(buildCrmCopyIntentSummary({ status: 'copied', action })).toEqual({
       analyticsAction: 'crm_copy_success',
-      label: 'CRM copy audit: copied · квартира 81 · window_view · 9 полей',
-      managerNote: 'CRM copy audit: менеджер скопировал 9 полей for квартира 81 · window_view.',
+      label: 'CRM copy audit: copied · квартира 81 · вид из окна · 9 полей',
+      managerNote: 'CRM copy audit: менеджер скопировал 9 полей for квартира 81 · вид из окна.',
       cardClass: 'crm-copy-audit-card glass-card copied',
     });
     expect(buildCrmCopyIntentSummary({ status: 'error', action })).toEqual({
       analyticsAction: 'crm_copy_error',
-      label: 'CRM copy audit: fallback · квартира 81 · window_view · 9 полей',
-      managerNote: 'CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for квартира 81 · window_view.',
+      label: 'CRM copy audit: fallback · квартира 81 · вид из окна · 9 полей',
+      managerNote: 'CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for квартира 81 · вид из окна.',
       cardClass: 'crm-copy-audit-card glass-card error',
     });
     expect(buildCrmCopyIntentSummary({ status: 'copied', action: null })).toBeNull();
@@ -674,7 +674,7 @@ describe('viewer scene adapter', () => {
 
   it('builds mobile CRM handoff density classes for compact sales demos', () => {
     const action = {
-      label: 'CRM copy action: квартира 81 · window_view · 9 полей',
+      label: 'CRM copy action: квартира 81 · вид из окна · 9 полей',
       buttonLabel: 'Скопировать CRM block',
       ariaLabel: 'Copy CRM export block: квартира 81 · window_view',
       plainText: 'Context\n- ЖК: Estate3D Skyline\n- Корпус: Корпус A\n\nShare\n- Copy-ready link: /developments/demo-premium/viewer?floor=floor_8&unit=unit_8_1&view=window_view&viewpoint=vp_living&window=window_city\n\nDigest\n- Digest note: квартира 81 · available · window_view · share ready · follow-up ready.\n- Digest готов для менеджера\n\nNext step\n- Предложить клиенту открыть ссылку и выбрать удобное время для звонка.',

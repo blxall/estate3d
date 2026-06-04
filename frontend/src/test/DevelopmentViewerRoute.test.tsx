@@ -269,10 +269,10 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText(/Клиент смотрел квартира 81 в режиме window_view/)).toHaveClass('lead-handoff-digest-recap');
     expect(screen.getByText('Digest note: квартира 81 · available · window_view · share ready · follow-up ready.', { selector: '.lead-handoff-digest-note' })).toHaveClass('lead-handoff-digest-note');
     expect(screen.getByText('Responsive HUD: desktop panel · sticky CTA · lead context visible')).toBeInTheDocument();
-    const shareHandoff = screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view').closest('.share-handoff-card');
+    const shareHandoff = screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · вид из окна').closest('.share-handoff-card');
     expect(shareHandoff).toHaveClass('glass-card', 'desktop-inline');
     expect(screen.getByText(/^Ссылка для клиента:/i, { selector: '.share-handoff-copy' })).toHaveClass('share-handoff-copy', 'copy-ready');
-    expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · window_view' })).toHaveClass('share-copy-button', 'premium-outline');
+    expect(screen.getByRole('button', { name: 'Copy share link: 8 этаж · квартира 81 · вид из окна' })).toHaveClass('share-copy-button', 'premium-outline');
 
     fireEvent.click(screen.getByRole('button', { name: /оставить заявку/i }));
     expect(await screen.findByText('Заявка отправлена: #lead_123 · 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
@@ -294,10 +294,10 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Digest')).toHaveClass('lead-export-field-title');
     expect(screen.getByText('Digest готов для менеджера', { selector: '.lead-export-field-row' })).toHaveClass('lead-export-field-row');
     expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
-    const crmCopyAction = screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей').closest('.crm-export-action-card');
+    const crmCopyAction = screen.getByText('CRM copy action: квартира 81 · вид из окна · 9 полей').closest('.crm-export-action-card');
     expect(crmCopyAction).toHaveClass('glass-card', 'copy-action-ready');
     expect(screen.getByText(/Context\s+- ЖК: Estate3D Skyline\s+- Корпус: Корпус A/i)).toHaveClass('crm-export-action-text', 'copy-ready');
-    const crmCopyButton = screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · window_view · manager-ready' });
+    const crmCopyButton = screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · вид из окна · manager-ready' });
     expect(crmCopyButton).toHaveClass('crm-export-action-button', 'premium-outline');
     fireEvent.click(crmCopyButton);
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('Context\n- ЖК: Estate3D Skyline')));
@@ -306,8 +306,8 @@ describe('Premium development viewer route', () => {
     expect(copyStatus).toHaveClass('crm-export-feedback', 'copied');
     const auditTrail = screen.getByRole('note', { name: 'CRM copy audit trail' });
     expect(auditTrail).toHaveClass('crm-copy-audit-card', 'glass-card', 'copied');
-    expect(screen.getByText('CRM copy audit: copied · квартира 81 · window_view · 9 полей')).toHaveClass('crm-copy-audit-label');
-    expect(screen.getByText('CRM copy audit: менеджер скопировал 9 полей for квартира 81 · window_view.')).toHaveClass('crm-copy-audit-note');
+    expect(screen.getByText('CRM copy audit: copied · квартира 81 · вид из окна · 9 полей')).toHaveClass('crm-copy-audit-label');
+    expect(screen.getByText('CRM copy audit: менеджер скопировал 9 полей for квартира 81 · вид из окна.')).toHaveClass('crm-copy-audit-note');
     expect(await screen.findByText('Analytics: crm_copy_success · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith('/api/developments/demo-premium/leads', {
       method: 'POST',
@@ -465,7 +465,7 @@ describe('Premium development viewer route', () => {
     expect(screen.getByText('Отправляем заявку менеджеру…')).toHaveClass('lead-feedback', 'sending');
     expect(screen.getByText('Lead context: Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
     expect(screen.getByText('Interaction trail: select_floor → select_unit → enter_walk_mode → open_window_view')).toBeInTheDocument();
-    expect(screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · вид из окна')).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: sending · sales-room context locked')).toBeInTheDocument();
     expect(screen.getByText('Digest закреплен при отправке', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
 
@@ -475,22 +475,22 @@ describe('Premium development viewer route', () => {
     expect(retryButton).not.toBeDisabled();
     expect(retryButton).toHaveClass('lead-submit-button', 'retry');
     expect(screen.getByText('Не удалось отправить заявку. Попробуйте еще раз.')).toHaveClass('lead-feedback', 'error-card');
-    expect(screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · window_view')).toBeInTheDocument();
+    expect(screen.getByText('Ссылка на выбранную квартиру готова: 8 этаж · квартира 81 · вид из окна')).toBeInTheDocument();
     expect(screen.getByText('Digest persistence: error · retry keeps sales-room context')).toBeInTheDocument();
     expect(screen.getByText('Digest сохранен для повтора', { selector: '.lead-handoff-persistence-badge' })).toHaveClass('lead-handoff-persistence-badge');
     expect(screen.getByText('CRM fields: Estate3D Skyline · квартира 81 · window_view · 4 группы')).toBeInTheDocument();
     expect(screen.getByText('Next step')).toHaveClass('lead-export-field-title');
-    expect(screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей')).toBeInTheDocument();
+    expect(screen.getByText('CRM copy action: квартира 81 · вид из окна · 9 полей')).toBeInTheDocument();
     expect(screen.getByText(/Next step\s+- Предложить клиенту открыть ссылку/i)).toHaveClass('crm-export-action-text', 'copy-ready');
-    fireEvent.click(screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · window_view · manager-ready' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · вид из окна · manager-ready' }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('Next step\n- Предложить клиенту открыть ссылку')));
     const fallbackStatus = screen.getByRole('status', { name: 'CRM copy status' });
     expect(fallbackStatus).toHaveTextContent('Clipboard недоступен — CRM block можно скопировать вручную');
     expect(fallbackStatus).toHaveClass('crm-export-feedback', 'error');
     const fallbackAudit = screen.getByRole('note', { name: 'CRM copy audit trail' });
     expect(fallbackAudit).toHaveClass('crm-copy-audit-card', 'glass-card', 'error');
-    expect(screen.getByText('CRM copy audit: fallback · квартира 81 · window_view · 9 полей')).toHaveClass('crm-copy-audit-label');
-    expect(screen.getByText('CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for квартира 81 · window_view.')).toHaveClass('crm-copy-audit-note');
+    expect(screen.getByText('CRM copy audit: fallback · квартира 81 · вид из окна · 9 полей')).toHaveClass('crm-copy-audit-label');
+    expect(screen.getByText('CRM copy audit: clipboard fallback, CRM block остается copy-ready вручную for квартира 81 · вид из окна.')).toHaveClass('crm-copy-audit-note');
     expect(await screen.findByText('Analytics: crm_copy_error · Estate3D Skyline · Корпус A · 8 этаж · квартира 81 · window_view · Войти в гостиную · Вид из окна на город')).toBeInTheDocument();
   });
 
@@ -514,15 +514,15 @@ describe('Premium development viewer route', () => {
     expect(await screen.findByText('Digest persistence: success · manager handoff ready')).toBeInTheDocument();
 
     expect(await screen.findByText('Responsive HUD: mobile stack · sticky CTA · lead context visible')).toBeInTheDocument();
-    expect(await screen.findByText('CRM copy action: квартира 81 · window_view · 9 полей')).toBeInTheDocument();
+    expect(await screen.findByText('CRM copy action: квартира 81 · вид из окна · 9 полей')).toBeInTheDocument();
     expect(await screen.findByText('Mobile CRM handoff: compact · 9 полей · audit hidden · feedback hidden')).toHaveClass('crm-mobile-density-readout');
     const crmStack = screen.getByLabelText('Mobile CRM handoff stack');
     expect(crmStack).toHaveClass('crm-handoff-stack', 'mobile-density', 'compact-copy', 'audit-hidden', 'feedback-hidden');
-    const crmCard = screen.getByText('CRM copy action: квартира 81 · window_view · 9 полей').closest('.crm-export-action-card');
+    const crmCard = screen.getByText('CRM copy action: квартира 81 · вид из окна · 9 полей').closest('.crm-export-action-card');
     expect(crmCard).toHaveClass('mobile-density', 'compact-copy');
     expect(screen.getByText(/Context\s+- ЖК: Estate3D Skyline\s+- Корпус: Корпус A/i)).toHaveClass('crm-export-action-text', 'copy-ready', 'mobile-scroll-safe');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · window_view · manager-ready' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Copy CRM export block to clipboard: квартира 81 · вид из окна · manager-ready' }));
 
     expect(await screen.findByText('Mobile CRM handoff: compact · 9 полей · audit visible · feedback visible')).toHaveClass('crm-mobile-density-readout');
     expect(screen.getByRole('note', { name: 'CRM copy audit trail' })).toHaveClass('crm-copy-audit-card', 'glass-card', 'mobile-density', 'audit-visible');
