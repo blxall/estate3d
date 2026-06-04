@@ -29,6 +29,9 @@ const demoPayload = {
         preview_url: '/demo/editorial-development-hero.jpg',
         source_type: 'glb_model',
         source_quality: 'artist_approved',
+        asset_profile: 'demo_fixture',
+        runtime_readiness: 'runtime_connected',
+        production_asset_required: true,
         facade_bays: 16,
         foreground_planes: 4,
       },
@@ -217,6 +220,10 @@ describe('Premium development viewer route', () => {
     expect(screen.getByLabelText('Интерактивный runtime исходной 3D модели')).toHaveClass('source-backed-runtime-ready', 'r3f-gltf-runtime', 'customer-facing-runtime-note');
     expect(screen.getByText('Интерактивная модель комплекса подключена к сцене')).toHaveClass('showroom-runtime-title');
     expect(screen.getByText('Готово к просмотру · GLB · source-backed')).toHaveClass('showroom-runtime-status');
+    expect(screen.getByLabelText('Качество исходной 3D модели')).toHaveClass('demo-fixture-runtime', 'production-asset-needed', 'customer-facing-quality-note');
+    expect(screen.getByText('Качество модели: демо-GLB подключен к runtime')).toHaveClass('runtime-quality-label');
+    expect(screen.getByText('Сцена показывает рабочий интерактивный формат; для продаж нужен финальный архитектурный GLB.')).toHaveClass('runtime-quality-copy');
+    expect(screen.getByText('Demo GLB · production asset next')).toHaveClass('runtime-quality-badge');
     expect(container.querySelector('.source-backed-gltf-stage')).toHaveClass('runtime-asset-loaded');
     expect(container.querySelector('.source-backed-gltf-stage')).toHaveAttribute('data-asset-url', '/demo/source/estate3d-skyline-massing.glb');
     expect(screen.queryByText('/demo/source/estate3d-skyline-massing.glb')).not.toBeInTheDocument();

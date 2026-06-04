@@ -27,6 +27,7 @@ import {
   buildRoomFootprints,
   buildScenePresentationState,
   buildShowroomAssetReadiness,
+  buildShowroomRuntimeQualityState,
   buildShowroomRuntimeState,
   buildUnitCard,
   buildUnitFootprints,
@@ -794,6 +795,9 @@ describe('viewer scene adapter', () => {
             preview_url: '/demo/source/estate3d-skyline-massing.jpg',
             source_type: 'glb_model',
             source_quality: 'artist_approved',
+            asset_profile: 'demo_fixture',
+            runtime_readiness: 'runtime_connected',
+            production_asset_required: true,
           },
         },
       ],
@@ -808,6 +812,38 @@ describe('viewer scene adapter', () => {
       customerLabel: 'Интерактивная модель комплекса подключена к сцене',
       statusLabel: 'Готово к просмотру · GLB · source-backed',
       slotClass: 'showroom-runtime-slot source-backed-runtime-ready r3f-gltf-runtime customer-facing-runtime-note',
+      debugVisibleByDefault: false,
+    });
+  });
+
+  it('keeps source-backed runtime honest about demo-fixture versus production asset quality', () => {
+    const scene = buildViewerScene({
+      ...payload,
+      buildings: [
+        {
+          ...payload.buildings[0],
+          model: {
+            kind: 'source_backed_architectural_scene',
+            source_url: '/demo/source/estate3d-skyline-massing.glb',
+            preview_url: '/demo/source/estate3d-skyline-massing.jpg',
+            source_type: 'glb_model',
+            source_quality: 'artist_approved',
+            asset_profile: 'demo_fixture',
+            runtime_readiness: 'runtime_connected',
+            production_asset_required: true,
+          },
+        },
+      ],
+    });
+
+    expect(buildShowroomRuntimeQualityState(scene)).toEqual({
+      profile: 'demo-fixture',
+      readiness: 'runtime-connected',
+      label: 'Качество модели: демо-GLB подключен к runtime',
+      customerCopy: 'Сцена показывает рабочий интерактивный формат; для продаж нужен финальный архитектурный GLB.',
+      badge: 'Demo GLB · production asset next',
+      cardClass: 'runtime-quality-card demo-fixture-runtime production-asset-needed customer-facing-quality-note',
+      productionAssetRequired: true,
       debugVisibleByDefault: false,
     });
   });

@@ -3039,6 +3039,65 @@ button {
   font-weight: 760;
 }
 
+.design-audit-clean .runtime-quality-card {
+  position: absolute;
+  z-index: 8;
+  left: 18px;
+  right: auto;
+  top: 150px;
+  bottom: auto;
+  max-width: min(210px, calc(100% - 36px));
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px;
+  border: 1px solid rgba(184,138,71,0.2);
+  border-radius: 18px;
+  background: rgba(255,248,236,0.8);
+  color: #3a2b1a;
+  box-shadow: rgba(92,64,30,0.09) 0 16px 44px -26px;
+  backdrop-filter: blur(16px);
+  pointer-events: none;
+}
+
+.design-audit-clean .runtime-quality-label {
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.design-audit-clean .runtime-quality-copy {
+  display: none;
+  color: rgba(58,43,26,0.66);
+  font-size: 0.65rem;
+  font-weight: 720;
+  line-height: 1.32;
+}
+
+.design-audit-clean .runtime-quality-badge {
+  justify-self: start;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(184,138,71,0.15);
+  color: rgba(74,10,5,0.74);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.design-audit-clean .runtime-quality-card.production-asset-needed::before {
+  content: '';
+  position: absolute;
+  inset: 8px auto 8px 8px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(184,138,71,0.94), rgba(74,10,5,0.32));
+}
+
+.design-audit-clean .runtime-quality-card.production-asset-needed > * {
+  margin-left: 7px;
+}
+
 .design-audit-clean .source-backed-gltf-stage {
   position: absolute;
   inset: 22% 17% 18% 17%;
@@ -3092,11 +3151,24 @@ button {
   }
 
   .design-audit-clean .showroom-runtime-slot {
-    right: 12px;
+    right: auto;
     bottom: 12px;
     left: 12px;
-    max-width: none;
+    max-width: calc(50% - 18px);
     padding: 8px 10px;
+  }
+
+  .design-audit-clean .runtime-quality-card {
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    left: auto;
+    max-width: calc(50% - 18px);
+    padding: 8px 10px;
+  }
+
+  .design-audit-clean .runtime-quality-copy {
+    display: none;
   }
 
   .design-audit-clean .source-backed-gltf-stage {

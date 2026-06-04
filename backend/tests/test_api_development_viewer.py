@@ -27,6 +27,9 @@ def test_demo_development_viewer_returns_spatial_hierarchy():
         "preview_url": "/demo/editorial-development-hero.jpg",
         "source_type": "glb_model",
         "source_quality": "artist_approved",
+        "asset_profile": "demo_fixture",
+        "runtime_readiness": "runtime_connected",
+        "production_asset_required": True,
         "facade_bays": 16,
         "foreground_planes": 4,
     }

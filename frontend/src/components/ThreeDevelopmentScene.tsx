@@ -12,6 +12,7 @@ import {
   buildRoomFootprints,
   buildScenePresentationState,
   buildShowroomAssetReadiness,
+  buildShowroomRuntimeQualityState,
   buildShowroomRuntimeState,
   buildUnitFootprints,
   buildViewpointAnchors,
@@ -204,6 +205,7 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
   const presentation = buildScenePresentationState({ scene, selectedFloor, selectedUnit });
   const assetReadiness = buildShowroomAssetReadiness(scene);
   const runtimeState = buildShowroomRuntimeState(scene);
+  const runtimeQuality = buildShowroomRuntimeQualityState(scene);
 
   function chooseUnitById(unitId: string) {
     const unit = selectedFloor?.units.find((candidate) => candidate.id === unitId);
@@ -266,6 +268,11 @@ export function ThreeDevelopmentScene({ scene, viewerState, selectedFloor, selec
       <div className={runtimeState.slotClass} aria-label="Интерактивный runtime исходной 3D модели">
         <span className="showroom-runtime-title">{runtimeState.customerLabel}</span>
         <span className="showroom-runtime-status">{runtimeState.statusLabel}</span>
+      </div>
+      <div className={runtimeQuality.cardClass} aria-label="Качество исходной 3D модели">
+        <span className="runtime-quality-label">{runtimeQuality.label}</span>
+        <span className="runtime-quality-copy">{runtimeQuality.customerCopy}</span>
+        <span className="runtime-quality-badge">{runtimeQuality.badge}</span>
       </div>
       <div
         className={`source-backed-gltf-stage ${runtimeState.enabled ? 'runtime-asset-loaded' : 'runtime-procedural-only'}`}

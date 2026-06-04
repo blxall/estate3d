@@ -101,6 +101,17 @@ export type ShowroomRuntimeState = {
   debugVisibleByDefault: boolean;
 };
 
+export type ShowroomRuntimeQualityState = {
+  profile: 'demo-fixture' | 'production-asset' | 'procedural';
+  readiness: 'runtime-connected' | 'production-ready' | 'not-connected';
+  label: string;
+  customerCopy: string;
+  badge: string;
+  cardClass: string;
+  productionAssetRequired: boolean;
+  debugVisibleByDefault: boolean;
+};
+
 export type EditorialShowroomDirection = {
   directionName: string;
   pageClass: string;
@@ -1170,6 +1181,11 @@ function modelNumber(model: Record<string, unknown>, key: string, fallback: numb
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
+function modelBoolean(model: Record<string, unknown>, key: string): boolean {
+  const value = model[key];
+  return value === true;
+}
+
 export function buildShowroomAssetReadiness(scene: ViewerScene): ShowroomAssetReadiness {
   const model = scene.building.model;
   const sourceUrl = modelString(model, 'source_url');
@@ -1232,6 +1248,51 @@ export function buildShowroomRuntimeState(scene: ViewerScene): ShowroomRuntimeSt
     customerLabel: 'Интерактивный макет комплекса готов для демо-показа',
     statusLabel: 'Демо-макет · без внешнего GLB',
     slotClass: 'showroom-runtime-slot procedural-runtime-preview customer-facing-runtime-note',
+    debugVisibleByDefault: false,
+  };
+}
+
+export function buildShowroomRuntimeQualityState(scene: ViewerScene): ShowroomRuntimeQualityState {
+  const model = scene.building.model;
+  const sourceUrl = modelString(model, 'source_url');
+  const assetProfile = modelString(model, 'asset_profile');
+  const runtimeReadiness = modelString(model, 'runtime_readiness');
+  const productionAssetRequired = modelBoolean(model, 'production_asset_required');
+
+  if (sourceUrl && assetProfile === 'demo_fixture') {
+    return {
+      profile: 'demo-fixture',
+      readiness: runtimeReadiness === 'runtime_connected' ? 'runtime-connected' : 'not-connected',
+      label: 'Качество модели: демо-GLB подключен к runtime',
+      customerCopy: 'Сцена показывает рабочий интерактивный формат; для продаж нужен финальный архитектурный GLB.',
+      badge: 'Demo GLB · production asset next',
+      cardClass: 'runtime-quality-card demo-fixture-runtime production-asset-needed customer-facing-quality-note',
+      productionAssetRequired,
+      debugVisibleByDefault: false,
+    };
+  }
+
+  if (sourceUrl) {
+    return {
+      profile: 'production-asset',
+      readiness: 'production-ready',
+      label: 'Качество модели: финальный 3D-asset подключен',
+      customerCopy: 'Сцена готова для публичного продажного показа с подготовленной архитектурной моделью.',
+      badge: 'Production GLB · ready',
+      cardClass: 'runtime-quality-card production-runtime-ready customer-facing-quality-note',
+      productionAssetRequired: false,
+      debugVisibleByDefault: false,
+    };
+  }
+
+  return {
+    profile: 'procedural',
+    readiness: 'not-connected',
+    label: 'Качество модели: интерактивный демо-макет',
+    customerCopy: 'Можно пройти сценарий выбора квартиры; внешний 3D-asset ещё не подключен.',
+    badge: 'Procedural demo',
+    cardClass: 'runtime-quality-card procedural-runtime-quality customer-facing-quality-note',
+    productionAssetRequired: false,
     debugVisibleByDefault: false,
   };
 }
